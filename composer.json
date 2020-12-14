@@ -1,0 +1,44 @@
+{
+    "name": "angellco/market",
+    "description": "A fully-stocked multi-vendor solution for Craft Commerce.",
+    "type": "craft-plugin",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "commerce",
+        "market",
+        "marketplace",
+        "multi-vendor",
+    ],
+    "support": {
+        "docs": "https://github.com/angell-co/market/blob/master/README.md",
+        "issues": "https://github.com/angell-co/market/issues"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Angell & Co",
+            "homepage": "https://angell.io"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.5",
+        "craftcms/commerce": "^3",
+    },
+    "autoload": {
+        "psr-4": {
+          "angellco\\market\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Market",
+        "handle": "market",
+        "developer": "Angell &amp; Co",
+        "developerUrl": "https://angell.io",
+        "documentationUrl": "https://github.com/angell-co/market/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/angell-co/market/master/CHANGELOG.md",
+        "class": "angellco\\market\\Market"
+    }
+}
