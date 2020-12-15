@@ -21,6 +21,7 @@
  * @since     2.0.0
  */
 return [
+    'Market' => 'Market',
     'Vendor' => 'Vendor',
     'Vendors' => 'Vendors',
     'Active' => 'Active',

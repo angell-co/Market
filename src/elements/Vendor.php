@@ -10,8 +10,11 @@
 
 namespace angellco\market\elements;
 
+use angellco\market\elements\db\VendorQuery;
 use Craft;
 use craft\base\Element;
+use craft\elements\db\ElementQueryInterface;
+use craft\helpers\UrlHelper;
 use yii\db\Exception;
 
 /**
@@ -146,14 +149,63 @@ class Vendor extends Element
     /**
      * @inheritdoc
      */
+    public function getIsEditable(): bool
+    {
+//        return Craft::$app->getUser()->checkPermission('commerce-manageOrders');
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCpEditUrl(): ?string
+    {
+        return UrlHelper::cpUrl('market/vendors/'.$this->id);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function statuses(): array
     {
         return [
-            self::STATUS_ACTIVE => Craft::t('market', 'Active'),
-            self::STATUS_PENDING => Craft::t('market', 'Pending'),
-            self::STATUS_SUSPENDED => Craft::t('market', 'Suspended'),
-            self::STATUS_DISABLED => Craft::t('app', 'Disabled')
+            self::STATUS_ACTIVE => [
+                'label' => Craft::t('market', 'Active'),
+            ],
+            self::STATUS_PENDING => [
+                'label' => Craft::t('market', 'Pending')
+            ],
+            self::STATUS_SUSPENDED => [
+                'label' => Craft::t('market', 'Suspended')
+            ],
+            self::STATUS_DISABLED => [
+                'label' => Craft::t('app', 'Disabled')
+            ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStatus(): ?string
+    {
+        $status = parent::getStatus();
+
+        if ($status == static::STATUS_ENABLED) {
+
+            if ($this->suspended) {
+                return self::STATUS_SUSPENDED;
+            }
+
+            if ($this->pending) {
+                return self::STATUS_PENDING;
+            }
+
+            return self::STATUS_ACTIVE;
+
+        }
+
+        return $status;
     }
 
     /**
@@ -179,14 +231,53 @@ class Vendor extends Element
 
         if ($isNew) {
             Craft::$app->db->createCommand()
-                ->insert('{{%products}}', array_merge(['id' => $this->id], $columns))
+                ->insert('{{%market_vendors}}', array_merge(['id' => $this->id], $columns))
                 ->execute();
         } else {
             Craft::$app->db->createCommand()
-                ->update('{{%products}}', $columns, ['id' => $this->id])
+                ->update('{{%market_vendors}}', $columns, ['id' => $this->id])
                 ->execute();
         }
 
         parent::afterSave($isNew);
     }
+
+    /**
+     * @inheritdoc
+     *
+     * @return ElementQueryInterface
+     */
+    public static function find(): ElementQueryInterface
+    {
+        return new VendorQuery(static::class);
+    }
+
+
+    // Protected Methods
+    // -------------------------------------------------------------------------
+
+    protected static function defineSources(string $context = null): array
+    {
+        return [
+            '*' => [
+                'label' => Craft::t('market', 'All vendors'),
+                'hasThumbs' => false
+            ]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineTableAttributes(): array
+    {
+        return [
+            'title' => Craft::t('app', 'Title'),
+            'dateCreated' => Craft::t('app', 'Date Created'),
+            'dateUpdated' => Craft::t('app', 'Date Updated'),
+//            'price' => \Craft::t('plugin-handle', 'Price'),
+//            'currency' => \Craft::t('plugin-handle', 'Currency'),
+        ];
+    }
+
 }

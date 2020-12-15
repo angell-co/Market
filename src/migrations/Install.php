@@ -10,6 +10,7 @@
 
 namespace angellco\market\migrations;
 
+use angellco\market\elements\Vendor;
 use craft\db\Migration;
 
 /**
@@ -25,6 +26,7 @@ class Install extends Migration
     public function safeUp()
     {
         $this->_renameTables();
+        $this->_updateElementReferences();
     }
 
     public function safeDown()
@@ -66,4 +68,15 @@ class Install extends Migration
         }
     }
 
+    private function _updateElementReferences()
+    {
+        // Elements
+        $this->update('{{%elements}}', ['type' => Vendor::class], ['type' => 'Marketplace_Vendor']);
+
+        // Fields
+//        $this->update('{{%fields}}', ['type' => Vendor::class], ['type' => 'Marketplace_Vendor']);
+//        $this->update('{{%fields}}', ['type' => Vendors::class], ['type' => 'Marketplace_Vendors']);
+//        $this->update('{{%fields}}', ['type' => ShippingProfile::class], ['type' => 'Marketplace_ShippingProfile']);
+
+    }
 }

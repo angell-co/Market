@@ -11,9 +11,12 @@
 namespace angellco\market;
 
 use angellco\market\elements\Vendor;
+use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterCpNavItemsEvent;
 use craft\services\Elements;
+use craft\web\twig\variables\Cp;
 use yii\base\Event;
 
 /**
@@ -44,6 +47,12 @@ class Market extends Plugin
      */
     public $schemaVersion = '2.0.0';
 
+    /**
+     * @var bool Whether the plugin has its own section in the control panel
+     */
+    public $hasCpSection = true;
+
+
     // Public Methods
     // =========================================================================
 
@@ -70,6 +79,25 @@ class Market extends Plugin
                 $event->types[] = Vendor::class;
             }
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCpNavItem(): array
+    {
+        $navItem = parent::getCpNavItem();
+
+        $navItem['label'] = Craft::t('market', 'Market');
+
+//        if (Craft::$app->getUser()->checkPermission('market-manageVendors')) {
+        $navItem['subnav']['vendors'] = [
+            'label' => Craft::t('market', 'Vendors'),
+            'url' => 'market/vendors'
+        ];
+//        }
+
+        return $navItem;
     }
 
 }
