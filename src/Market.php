@@ -10,7 +10,11 @@
 
 namespace angellco\market;
 
+use angellco\market\elements\Vendor;
 use craft\base\Plugin;
+use craft\events\RegisterComponentTypesEvent;
+use craft\services\Elements;
+use yii\base\Event;
 
 /**
  * @author    Angell & Co
@@ -58,6 +62,14 @@ class Market extends Plugin
     {
         parent::init();
         self::$plugin = $this;
+
+        // Register the element type
+        Event::on(Elements::class,
+            Elements::EVENT_REGISTER_ELEMENT_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = Vendor::class;
+            }
+        );
     }
 
 }
