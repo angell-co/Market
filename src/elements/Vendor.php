@@ -12,6 +12,7 @@ namespace angellco\market\elements;
 
 use Craft;
 use craft\base\Element;
+use yii\db\Exception;
 
 /**
  * @author    Angell & Co
@@ -26,6 +27,62 @@ class Vendor extends Element
     public const STATUS_ACTIVE    = 'active';
     public const STATUS_SUSPENDED = 'suspended';
     public const STATUS_PENDING   = 'pending';
+
+    /**
+     * @var int User ID
+     */
+    public $userId;
+
+    /**
+     * @var int Profile Picture ID
+     */
+    public $profilePictureId;
+
+    /**
+     * @var bool Suspended
+     */
+    public $suspended = false;
+
+    /**
+     * @var bool Pending
+     */
+    public $pending = false;
+
+    /**
+     * @var string Code
+     */
+    public $code;
+
+    /**
+     * @var string Stripe User ID
+     */
+    public $stripeUserId;
+
+    /**
+     * @var string Stripe Refresh Token
+     */
+    public $stripeRefreshToken;
+
+    /**
+     * @var string Stripe Access Token
+     */
+    public $stripeAccessToken;
+
+    /**
+     * @var int Main folder ID
+     */
+    public $mainFolderId;
+
+    /**
+     * @var int Account folder ID
+     */
+    public $accountFolderId;
+
+    /**
+     * @var int Files folder ID
+     */
+    public $filesFolderId;
+
 
     // Public Methods
     // -------------------------------------------------------------------------
@@ -99,4 +156,37 @@ class Vendor extends Element
         ];
     }
 
+    /**
+     * @inheritdoc
+     *
+     * @throws Exception
+     */
+    public function afterSave(bool $isNew): void
+    {
+        $columns = [
+            'userId' => $this->userId,
+            'profilePictureId' => $this->profilePictureId,
+            'suspended' => $this->suspended,
+            'pending' => $this->pending,
+            'code' => $this->code,
+            'stripeUserId' => $this->stripeUserId,
+            'stripeRefreshToken' => $this->stripeRefreshToken,
+            'stripeAccessToken' => $this->stripeAccessToken,
+            'mainFolderId' => $this->mainFolderId,
+            'filesFolderId' => $this->filesFolderId,
+            'accountFolderId' => $this->accountFolderId
+        ];
+
+        if ($isNew) {
+            Craft::$app->db->createCommand()
+                ->insert('{{%products}}', array_merge(['id' => $this->id], $columns))
+                ->execute();
+        } else {
+            Craft::$app->db->createCommand()
+                ->update('{{%products}}', $columns, ['id' => $this->id])
+                ->execute();
+        }
+
+        parent::afterSave($isNew);
+    }
 }
