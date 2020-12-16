@@ -21,22 +21,59 @@ use craft\helpers\Db;
  */
 class VendorQuery extends ElementQuery
 {
-    public $suspended;
-    public $pending;
-//
-    public function suspended($value)
+
+    // General parameters
+    // -------------------------------------------------------------------------
+
+    /**
+     * @var bool Whether to return only suspended elements.
+     * @used-by suspended()
+     */
+    public $suspended = false;
+
+    /**
+     * @var bool Whether to return only pending elements.
+     * @used-by pending()
+     */
+    public $pending = false;
+
+
+    // Element criteria parameter setters
+    // -------------------------------------------------------------------------
+
+    /**
+     * Sets the [[$suspended]] property.
+     *
+     * @param bool $value The property value (defaults to true)
+     * @uses $suspended
+     * @return static self reference
+     */
+    public function suspended(bool $value = true): VendorQuery
     {
         $this->suspended = $value;
         return $this;
     }
 
-    public function pending($value)
+    /**
+     * Sets the [[$pending]] property.
+     *
+     * @param bool $value The property value (defaults to true)
+     * @uses $pending
+     * @return static self reference
+     */
+    public function pending(bool $value = true): VendorQuery
     {
         $this->pending = $value;
         return $this;
     }
 
-//
+
+    // Protected Methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * @inheritdoc
+     */
     protected function beforePrepare(): bool
     {
         $this->joinElementTable('market_vendors');
@@ -48,18 +85,6 @@ class VendorQuery extends ElementQuery
             'market_vendors.pending',
         ]);
 
-
-//        if ($this->suspended) {
-//            $this->subQuery->andWhere(Db::parseParam('market_vendors.suspended', $this->suspended));
-//        }
-//
-//        if ($this->pending) {
-//            $this->subQuery->andWhere(Db::parseParam('market_vendors.pending', $this->pending));
-//        }
-
-//        $this->emulateExecution = true;
-
-//        \Craft::dd($this->all());
 //
 
 //
@@ -70,6 +95,9 @@ class VendorQuery extends ElementQuery
         return parent::beforePrepare();
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function statusCondition(string $status)
     {
         switch ($status) {

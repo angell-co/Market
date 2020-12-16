@@ -169,18 +169,10 @@ class Vendor extends Element
     public static function statuses(): array
     {
         return [
-            self::STATUS_ACTIVE => [
-                'label' => Craft::t('market', 'Active'),
-            ],
-            self::STATUS_PENDING => [
-                'label' => Craft::t('market', 'Pending')
-            ],
-            self::STATUS_SUSPENDED => [
-                'label' => Craft::t('market', 'Suspended')
-            ],
-            self::STATUS_DISABLED => [
-                'label' => Craft::t('app', 'Disabled')
-            ]
+            self::STATUS_ACTIVE => Craft::t('market', 'Active'),
+            self::STATUS_PENDING => Craft::t('market', 'Pending'),
+            self::STATUS_SUSPENDED => Craft::t('market', 'Suspended'),
+            self::STATUS_DISABLED => Craft::t('app', 'Disabled'),
         ];
     }
 
@@ -245,7 +237,7 @@ class Vendor extends Element
     /**
      * @inheritdoc
      *
-     * @return ElementQueryInterface
+     * @return VendorQuery
      */
     public static function find(): ElementQueryInterface
     {
@@ -256,10 +248,16 @@ class Vendor extends Element
     // Protected Methods
     // -------------------------------------------------------------------------
 
+    /**
+     * @inheritdoc
+     */
     protected static function defineSources(string $context = null): array
     {
+        // This is annoying, don’t really want to have to define sources but the base element index js
+        // requires us to have at least one to work
         return [
-            '*' => [
+            [
+                'key' => '*',
                 'label' => Craft::t('market', 'All vendors'),
                 'hasThumbs' => false
             ]
