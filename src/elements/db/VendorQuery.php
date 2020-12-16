@@ -90,8 +90,12 @@ class VendorQuery extends ElementQuery
             'market_vendors.suspended',
             'market_vendors.pending',
             'market_vendors.code',
-            // stripe cols
-            // folder cols
+            'market_vendors.stripeUserId',
+            'market_vendors.stripeRefreshToken',
+            'market_vendors.stripeAccessToken',
+            'market_vendors.mainFolderId',
+            'market_vendors.accountFolderId',
+            'market_vendors.filesFolderId',
         ]);
 
         if ($this->userId)
@@ -99,11 +103,24 @@ class VendorQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('market_vendors.userId', $this->userId));
         }
 
-//
+//        if ($criteria->code)
+//        {
+//            $query->andWhere(DbHelper::parseParam('vendors.code', $criteria->code, $query->params));
+//        }
 
+//        if ($criteria->username || $criteria->email)
+//        {
+//            $query->join('users users', 'users.id = vendors.userId');
 //
-//        if ($this->currency) {
-//            $this->subQuery->andWhere(Db::parseParam('products.currency', $this->currency));
+//            if ($criteria->username)
+//            {
+//                $query->andWhere(DbHelper::parseParam('users.username', $criteria->username, $query->params));
+//            }
+//
+//            if ($criteria->email)
+//            {
+//                $query->andWhere(DbHelper::parseParam('users.email', $criteria->email, $query->params));
+//            }
 //        }
 
         return parent::beforePrepare();

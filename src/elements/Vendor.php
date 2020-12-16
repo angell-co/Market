@@ -181,6 +181,28 @@ class Vendor extends Element
     /**
      * @inheritdoc
      */
+    public function getThumbUrl(int $size)
+    {
+        $profilePicture = $this->getProfilePicture();
+
+        if ($profilePicture) {
+            return Craft::$app->getAssets()->getThumbUrl($profilePicture, $size, $size, false);
+        }
+
+        return Craft::$app->getAssetManager()->getPublishedUrl('@app/web/assets/cp/dist', true, 'images/user.svg');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHasCheckeredThumb(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function statuses(): array
     {
         return [
@@ -344,7 +366,7 @@ class Vendor extends Element
             [
                 'key' => '*',
                 'label' => Craft::t('market', 'All vendors'),
-                'hasThumbs' => false
+                'hasThumbs' => true
             ]
         ];
     }
