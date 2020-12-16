@@ -13,6 +13,7 @@ namespace angellco\market\elements;
 use angellco\market\elements\db\VendorQuery;
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\Cp;
@@ -94,6 +95,11 @@ class Vendor extends Element
      * @var User|null|false
      */
     private $_user;
+
+    /**
+     * @var Asset|null|false
+     */
+    private $_profilePicture;
 
 
     // Public Methods
@@ -292,6 +298,37 @@ class Vendor extends Element
         $this->_user = $user;
     }
 
+    /**
+     * Returns the vendor's profile picture
+     *
+     * @return Asset|null
+     */
+    public function getProfilePicture(): ?Asset
+    {
+        if ($this->_profilePicture === null) {
+            if ($this->profilePictureId === null) {
+                return null;
+            }
+
+            if (($this->_profilePicture = Craft::$app->getAssets()->getAssetById($this->profilePictureId)) === null) {
+                // The asset is probably soft-deleted.
+                $this->_profilePicture = false;
+            }
+        }
+
+        return $this->_profilePicture ?: null;
+    }
+
+    /**
+     * Sets the vendor's profile picture
+     *
+     * @param Asset|null $profilePicture
+     */
+    public function setProfilePicture(Asset $profilePicture = null): void
+    {
+        $this->_profilePicture = $profilePicture;
+    }
+
 
     // Protected Methods
     // -------------------------------------------------------------------------
@@ -351,7 +388,9 @@ class Vendor extends Element
             'slug' => Craft::t('app', 'Slug'),
             'uri' => Craft::t('app', 'URI'),
             'id' => Craft::t('app', 'ID'),
+            'code' => Craft::t('market', 'Code'),
             'user' => Craft::t('app', 'User'),
+            'profilePicture' => Craft::t('market', 'Profile Picture'),
             'dateCreated' => Craft::t('app', 'Date Created'),
             'dateUpdated' => Craft::t('app', 'Date Updated'),
             'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
@@ -363,8 +402,7 @@ class Vendor extends Element
      */
     protected static function defineDefaultTableAttributes(string $source): array
     {
-        // TODO: include code
-        return ['user','link'];
+        return ['code', 'user', 'link'];
     }
 
     /**
@@ -376,6 +414,10 @@ class Vendor extends Element
             case 'user':
                 $user = $this->getUser();
                 return $user ? Cp::elementHtml($user) : '';
+
+            case 'profilePicture':
+                $profilePicture = $this->getProfilePicture();
+                return $profilePicture ? Cp::elementHtml($profilePicture) : '';
         }
 
         return parent::tableAttributeHtml($attribute);

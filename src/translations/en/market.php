@@ -26,6 +26,7 @@ return [
     'Vendors' => 'Vendors',
     'Active' => 'Active',
     'Pending' => 'Pending',
-    'Suspended' => 'Suspended'
-
+    'Suspended' => 'Suspended',
+    'Profile Picture' => 'Profile Picture',
+    'Code' => 'Code',
 ];

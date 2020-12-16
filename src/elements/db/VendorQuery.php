@@ -86,8 +86,12 @@ class VendorQuery extends ElementQuery
         $this->query->select([
             'market_vendors.id',
             'market_vendors.userId',
+            'market_vendors.profilePictureId',
             'market_vendors.suspended',
             'market_vendors.pending',
+            'market_vendors.code',
+            // stripe cols
+            // folder cols
         ]);
 
         if ($this->userId)
