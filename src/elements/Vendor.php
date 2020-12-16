@@ -14,8 +14,12 @@ use angellco\market\elements\db\VendorQuery;
 use Craft;
 use craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\User;
+use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\db\Expression;
 
 /**
  * @author    Angell & Co
@@ -85,6 +89,11 @@ class Vendor extends Element
      * @var int Files folder ID
      */
     public $filesFolderId;
+
+    /**
+     * @var User|null|false
+     */
+    private $_user;
 
 
     // Public Methods
@@ -244,6 +253,45 @@ class Vendor extends Element
         return new VendorQuery(static::class);
     }
 
+    /**
+     * Returns the vendor's user.
+     *
+     * ---
+     * ```php
+     * $user = $vendor->user;
+     * ```
+     * ```twig
+     * <p>By {{ vendor.user.name }}</p>
+     * ```
+     *
+     * @return User|null
+     */
+    public function getUser()
+    {
+        if ($this->_user === null) {
+            if ($this->userId === null) {
+                return null;
+            }
+
+            if (($this->_user = Craft::$app->getUsers()->getUserById($this->userId)) === null) {
+                // The user is probably soft-deleted. Just no user is set
+                $this->_user = false;
+            }
+        }
+
+        return $this->_user ?: null;
+    }
+
+    /**
+     * Sets the vendor's user.
+     *
+     * @param User|null $user
+     */
+    public function setUser(User $user = null): void
+    {
+        $this->_user = $user;
+    }
+
 
     // Protected Methods
     // -------------------------------------------------------------------------
@@ -267,15 +315,59 @@ class Vendor extends Element
     /**
      * @inheritdoc
      */
+    protected static function defineSortOptions(): array
+    {
+        return [
+            'title' => Craft::t('app', 'Title'),
+            'slug' => Craft::t('app', 'Slug'),
+            'uri' => Craft::t('app', 'URI'),
+            [
+                'label' => Craft::t('app', 'Date Created'),
+                'orderBy' => 'elements.dateCreated',
+                'attribute' => 'dateCreated',
+                'defaultDir' => 'desc',
+            ],
+            [
+                'label' => Craft::t('app', 'Date Updated'),
+                'orderBy' => 'elements.dateUpdated',
+                'attribute' => 'dateUpdated',
+                'defaultDir' => 'desc',
+            ],
+            [
+                'label' => Craft::t('app', 'ID'),
+                'orderBy' => 'elements.id',
+                'attribute' => 'id',
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected static function defineTableAttributes(): array
     {
         return [
             'title' => Craft::t('app', 'Title'),
+            'slug' => Craft::t('app', 'Slug'),
+            'uri' => Craft::t('app', 'URI'),
+            'id' => Craft::t('app', 'ID'),
+            'user' => Craft::t('app', 'User'),
             'dateCreated' => Craft::t('app', 'Date Created'),
             'dateUpdated' => Craft::t('app', 'Date Updated'),
-//            'price' => \Craft::t('plugin-handle', 'Price'),
-//            'currency' => \Craft::t('plugin-handle', 'Currency'),
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function tableAttributeHtml(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'user':
+                $user = $this->getUser();
+                return $user ? Cp::elementHtml($user) : '';
+        }
+
+        return parent::tableAttributeHtml($attribute);
+    }
 }

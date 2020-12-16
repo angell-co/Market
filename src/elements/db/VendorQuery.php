@@ -26,6 +26,11 @@ class VendorQuery extends ElementQuery
     // -------------------------------------------------------------------------
 
     /**
+     * @var int|null The user ID
+     */
+    public $userId;
+
+    /**
      * @var bool Whether to return only suspended elements.
      * @used-by suspended()
      */
@@ -80,10 +85,15 @@ class VendorQuery extends ElementQuery
 
         $this->query->select([
             'market_vendors.id',
-//            'market_vendors.userId',
+            'market_vendors.userId',
             'market_vendors.suspended',
             'market_vendors.pending',
         ]);
+
+        if ($this->userId)
+        {
+            $this->subQuery->andWhere(Db::parseParam('market_vendors.userId', $this->userId));
+        }
 
 //
 
