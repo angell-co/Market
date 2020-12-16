@@ -25,8 +25,11 @@ class Install extends Migration
 
     public function safeUp()
     {
+        // Upgrade methods - safe to run on new installs
         $this->_renameTables();
+        $this->_fixFksAndIndexes();
         $this->_updateElementReferences();
+        $this->_updateVendorSettings();
     }
 
     public function safeDown()
@@ -68,15 +71,74 @@ class Install extends Migration
         }
     }
 
-    private function _updateElementReferences()
+    private function _fixFksAndIndexes(): void
+    {
+        // Remove old keys
+        $keys = $this->db->schema->getTableForeignKeys('{{%market_vendors}}');
+        $keyNames = array_map(static function($obj) {
+            return $obj->name;
+        }, $keys);
+
+        $fks = [
+            'craft_marketplace_vendors_id_fk',
+            'craft_craft_marketplace_vendors_userId_fk',
+            'craft_craft_marketplace_vendors_profilePictureId_fk',
+            'craft_craft_marketplace_vendors_mainFolderId_fk',
+            'craft_craft_marketplace_vendors_accountFolderId_fk',
+            'craft_craft_marketplace_vendors_filesFolderId_fk',
+        ];
+
+        foreach ($keyNames as $keyName) {
+            if (!empty($keyName)) {
+                $this->dropForeignKey($keyName, '{{%market_vendors}}');
+            }
+        }
+
+        // Remove old indexes
+        $indexes = $this->db->schema->getTableIndexes('{{%market_vendors}}');
+        $indexNames = array_map(static function($obj) {
+            return $obj->name;
+        }, $indexes);
+
+        foreach ($indexNames as $indexName) {
+            if (!empty($indexName)) {
+                $this->dropIndex($indexName, '{{%market_vendors}}');
+            }
+        }
+
+        // Add in the foreign keys
+        $this->addForeignKey(null, '{{%market_vendors}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%market_vendors}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%market_vendors}}', 'profilePictureId', '{{%assets}}', 'id', 'SET NULL', null);
+        $this->addForeignKey(null, '{{%market_vendors}}', 'mainFolderId', '{{%volumefolders}}', 'id', 'SET NULL', null);
+        $this->addForeignKey(null, '{{%market_vendors}}', 'accountFolderId', '{{%volumefolders}}', 'id', 'SET NULL', null);
+        $this->addForeignKey(null, '{{%market_vendors}}', 'filesFolderId', '{{%volumefolders}}', 'id', 'SET NULL', null);
+
+        // Add back in the indexes
+        $this->createIndex(null, '{{%market_vendors}}', 'userId', true);
+        $this->createIndex(null, '{{%market_vendors}}', 'code', true);
+    }
+
+    private function _updateElementReferences(): void
     {
         // Elements
         $this->update('{{%elements}}', ['type' => Vendor::class], ['type' => 'Marketplace_Vendor']);
+
+        // Field layouts
+        $this->update('{{%fieldlayouts}}', ['type' => Vendor::class], ['type' => 'Marketplace_Vendor']);
 
         // Fields
 //        $this->update('{{%fields}}', ['type' => Vendor::class], ['type' => 'Marketplace_Vendor']);
 //        $this->update('{{%fields}}', ['type' => Vendors::class], ['type' => 'Marketplace_Vendors']);
 //        $this->update('{{%fields}}', ['type' => ShippingProfile::class], ['type' => 'Marketplace_ShippingProfile']);
 
+    }
+
+    private function _updateVendorSettings(): void
+    {
+
+        // TODO
+//        assetSourceId renamed to volumeId
+        // Added siteId and updated existing row to primary site
     }
 }
