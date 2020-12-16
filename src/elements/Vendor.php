@@ -354,7 +354,17 @@ class Vendor extends Element
             'user' => Craft::t('app', 'User'),
             'dateCreated' => Craft::t('app', 'Date Created'),
             'dateUpdated' => Craft::t('app', 'Date Updated'),
+            'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        // TODO: include code
+        return ['user','link'];
     }
 
     /**
