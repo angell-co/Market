@@ -18,11 +18,14 @@ use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
-use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 use yii\db\Exception;
-use yii\db\Expression;
 
 /**
+ * @property Asset|null $profilePicture
+ * @property-read bool $hasCheckeredThumb
+ * @property User|null|bool|false $user
+ *
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
@@ -180,6 +183,7 @@ class Vendor extends Element
 
     /**
      * @inheritdoc
+     * @throws NotSupportedException
      */
     public function getThumbUrl(int $size)
     {

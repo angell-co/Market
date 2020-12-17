@@ -8,8 +8,8 @@
 
 {% block content %}
 
-{#    <input type="hidden" name="action" value="marketplace/vendorSettings/saveSettings">#}
-{#    <input type="hidden" name="redirect" value="marketplace/settings/vendorsettings">#}
+    {{ actionInput('market/settings/save-vendors') }}
+    {{ redirectInput('market/settings/vendors/general') }}
 
     {% if settings.id %}
         {{ hiddenInput('settingsId', settings.id) }}

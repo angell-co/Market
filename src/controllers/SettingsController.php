@@ -25,18 +25,38 @@ use yii\web\Response;
 class SettingsController extends Controller
 {
 
+    /**
+     * Root settings URL redirects to general settings.
+     *
+     * @return Response
+     */
     public function actionIndex(): Response
     {
         return $this->redirect('market/settings/general');
     }
 
+
+    // General settings
+    // -------------------------------------------------------------------------
+
+    /**
+     * General settings edit view.
+     *
+     * @return Response
+     */
     public function actionGeneral(): Response
     {
         $variables = [];
         return $this->renderTemplate('market/settings/_general.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
+
+    // Vendor settings
+    // -------------------------------------------------------------------------
+
     /**
+     * Vendor settings edit view.
+     *
      * @param array $variables
      * @return Response
      */
@@ -59,10 +79,26 @@ class SettingsController extends Controller
         return $this->renderTemplate('market/settings/vendors/_settings.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
+    /**
+     * Vendor fields edit view.
+     *
+     * @return Response
+     */
     public function actionVendorsFields(): Response
     {
         $variables = [];
         return $this->renderTemplate('market/settings/vendors/_fields.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
+    public function actionSaveVendors()
+    {
+        Craft::dd('here I am');
+        // Next up, project config like this: https://craftcms.com/docs/3.x/extend/project-config.html#implementing-project-config-support
+    }
+
+
+    // Stripe settings
+    // -------------------------------------------------------------------------
+
+    // TODO
 }
