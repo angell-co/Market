@@ -36,10 +36,12 @@ class SettingsController extends Controller
         return $this->renderTemplate('market/settings/_general.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
-    public function actionVendors(): Response
+    /**
+     * @param array $variables
+     * @return Response
+     */
+    public function actionVendors(array $variables = []): Response
     {
-        $variables = [];
-
         if (empty($variables['settings']))
         {
             $variables['settings'] = Market::$plugin->getVendorSettings()->getSettings();

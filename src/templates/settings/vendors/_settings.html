@@ -6,12 +6,14 @@
 
 {% set selectedNavItem = 'vendorsettings' %}
 
-{% block main %}
+{% block content %}
 
-    <input type="hidden" name="action" value="marketplace/vendorSettings/saveSettings">
-    <input type="hidden" name="redirect" value="marketplace/settings/vendorsettings">
+{#    <input type="hidden" name="action" value="marketplace/vendorSettings/saveSettings">#}
+{#    <input type="hidden" name="redirect" value="marketplace/settings/vendorsettings">#}
 
-    {% if vendorSettings.id %}<input type="hidden" name="vendorSettingsId" value="{{ vendorSettings.id }}">{% endif %}
+    {% if settings.id %}
+        {{ hiddenInput('settingsId', settings.id) }}
+    {% endif %}
 
     {{ forms.textField({
         label: "URL Format"|t,
@@ -19,8 +21,8 @@
         id: 'urlFormat',
         class: 'code ltr',
         name: 'urlFormat',
-        value: vendorSettings.urlFormat ? vendorSettings.urlFormat : 'shop/{slug}',
-        errors: vendorSettings.getErrors('urlFormat'),
+        value: settings.urlFormat ? settings.urlFormat : 'shop/{slug}',
+        errors: settings.getErrors('urlFormat'),
         required: true
     }) }}
 
@@ -30,18 +32,18 @@
         id: 'template',
         class: 'ltr',
         name: 'template',
-        value: vendorSettings.template ? vendorSettings.template : 'marketplace/vendors/_entry',
-        errors: vendorSettings.getErrors('template')
+        value: settings.template ? settings.template : 'marketplace/vendors/_entry',
+        errors: settings.getErrors('template')
     }) }}
 
     {{ forms.selectField({
-        id: 'assetSourceId',
-        name: 'assetSourceId',
-        label: 'Asset Source'|t,
-        instructions: 'The asset source that should used to store this vendor’s files.'|t,
-        options: assetSourceOptions,
-        value: vendorSettings.assetSourceId,
-        errors: vendorSettings.getErrors('assetSourceId'),
+        id: 'volumeId',
+        name: 'volumeId',
+        label: 'Asset Volume'|t,
+        instructions: 'The asset volume that should used to store this vendor’s files.'|t,
+        options: volumeOptions,
+        value: settings.volumeId,
+        errors: settings.getErrors('volumeId'),
         required: true,
     }) }}
 
@@ -51,10 +53,9 @@
         label: 'Default Shipping Origin'|t,
         instructions: 'Where Vendors will ship from by default, they won’t be able to change this in their shipping profiles but admins can in the cp.'|t,
         options: countryOptions,
-        value: vendorSettings.shippingOriginId,
-        errors: vendorSettings.getErrors('shippingOriginId'),
+        value: settings.shippingOriginId,
+        errors: settings.getErrors('shippingOriginId'),
         required: true,
     }) }}
-
 
 {% endblock %}
