@@ -11,11 +11,13 @@
 namespace angellco\market;
 
 use angellco\market\elements\Vendor;
+use angellco\market\fields\Vendors;
 use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterCpNavItemsEvent;
 use craft\services\Elements;
+use craft\services\Fields;
 use craft\web\twig\variables\Cp;
 use yii\base\Event;
 
@@ -77,6 +79,15 @@ class Market extends Plugin
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = Vendor::class;
+            }
+        );
+
+        // Register the field types
+        Event::on(
+            Fields::class,
+            Fields::EVENT_REGISTER_FIELD_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = Vendors::class;
             }
         );
     }

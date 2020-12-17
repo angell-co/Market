@@ -29,4 +29,5 @@ return [
     'Suspended' => 'Suspended',
     'Profile Picture' => 'Profile Picture',
     'Code' => 'Code',
+    'Add a vendor' => 'Add a vendor'
 ];
