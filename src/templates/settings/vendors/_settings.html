@@ -1,0 +1,60 @@
+{% extends 'market/settings/_layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set fullPageForm = true %}
+
+{% set selectedNavItem = 'vendorsettings' %}
+
+{% block main %}
+
+    <input type="hidden" name="action" value="marketplace/vendorSettings/saveSettings">
+    <input type="hidden" name="redirect" value="marketplace/settings/vendorsettings">
+
+    {% if vendorSettings.id %}<input type="hidden" name="vendorSettingsId" value="{{ vendorSettings.id }}">{% endif %}
+
+    {{ forms.textField({
+        label: "URL Format"|t,
+        instructions: "What the vendor URLs should look like. You can include tags that output vendor properties, such as {ex1} or {ex2}."|t({ ex1: '<code>{slug}</code>', ex2: '<code>{user.username}</code>' }),
+        id: 'urlFormat',
+        class: 'code ltr',
+        name: 'urlFormat',
+        value: vendorSettings.urlFormat ? vendorSettings.urlFormat : 'shop/{slug}',
+        errors: vendorSettings.getErrors('urlFormat'),
+        required: true
+    }) }}
+
+    {{ forms.textField({
+        label: "Template"|t,
+        instructions: "The template to use when a vendor’s URL is requested."|t,
+        id: 'template',
+        class: 'ltr',
+        name: 'template',
+        value: vendorSettings.template ? vendorSettings.template : 'marketplace/vendors/_entry',
+        errors: vendorSettings.getErrors('template')
+    }) }}
+
+    {{ forms.selectField({
+        id: 'assetSourceId',
+        name: 'assetSourceId',
+        label: 'Asset Source'|t,
+        instructions: 'The asset source that should used to store this vendor’s files.'|t,
+        options: assetSourceOptions,
+        value: vendorSettings.assetSourceId,
+        errors: vendorSettings.getErrors('assetSourceId'),
+        required: true,
+    }) }}
+
+    {{ forms.selectField({
+        id: 'shippingOriginId',
+        name: 'shippingOriginId',
+        label: 'Default Shipping Origin'|t,
+        instructions: 'Where Vendors will ship from by default, they won’t be able to change this in their shipping profiles but admins can in the cp.'|t,
+        options: countryOptions,
+        value: vendorSettings.shippingOriginId,
+        errors: vendorSettings.getErrors('shippingOriginId'),
+        required: true,
+    }) }}
+
+
+{% endblock %}

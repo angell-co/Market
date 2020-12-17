@@ -10,21 +10,26 @@
 
 namespace angellco\market;
 
+use angellco\market\base\PluginTrait;
 use angellco\market\elements\Vendor;
 use angellco\market\fields\Vendors;
 use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterCpNavItemsEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\web\twig\variables\Cp;
+use craft\web\UrlManager;
 use yii\base\Event;
 
 /**
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
+ *
+ * @property-read array $cpNavItem
  */
 class Market extends Plugin
 {
@@ -54,6 +59,7 @@ class Market extends Plugin
      */
     public $hasCpSection = true;
 
+    use PluginTrait;
 
     // Public Methods
     // =========================================================================
@@ -74,6 +80,8 @@ class Market extends Plugin
         parent::init();
         self::$plugin = $this;
 
+        $this->_setPluginComponents();
+
         // Register the element type
         Event::on(Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
@@ -90,6 +98,18 @@ class Market extends Plugin
                 $event->types[] = Vendors::class;
             }
         );
+
+        $request = Craft::$app->getRequest();
+
+        if ($request->getIsConsoleRequest()) {
+            //
+        } else if ($request->getIsCpRequest()) {
+            $this->_registerCpRoutes();
+
+        } else {
+            $this->_registerSiteRoutes();
+        }
+
     }
 
     /**
@@ -101,12 +121,18 @@ class Market extends Plugin
 
         $navItem['label'] = Craft::t('market', 'Market');
 
-//        if (Craft::$app->getUser()->checkPermission('market-manageVendors')) {
+        // TODO: Permissions
+        // if (Craft::$app->getUser()->checkPermission('market-manageVendors')) {}
+
         $navItem['subnav']['vendors'] = [
             'label' => Craft::t('market', 'Vendors'),
             'url' => 'market/vendors'
         ];
-//        }
+
+        $navItem['subnav']['settings'] = [
+            'label' => Craft::t('app', 'Settings'),
+            'url' => 'market/settings'
+        ];
 
         return $navItem;
     }

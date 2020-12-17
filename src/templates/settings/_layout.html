@@ -1,0 +1,21 @@
+{% requireAdmin %}
+
+{% extends "_layouts/cp" %}
+
+{% set title = "Market Settings"|t('market') %}
+
+{% set crumbs = [
+    { label: "Market"|t('market'), url: url('market') }
+] %}
+
+{% set navItems = {
+    general: { label: "General"|t('market'), url: url('market/settings/general') },
+    vendorsettings: { label: "Vendor Settings"|t('market'), url: url('market/settings/vendors/general') },
+    vendorfields: { label: "Vendor Fields"|t('market'), url: url('market/settings/vendors/fields') },
+} %}
+
+{% set docTitle = navItems[selectedNavItem].label~' - '~title %}
+
+{% block sidebar %}
+    {% include "_includes/nav" with { items: navItems, selectedItem: selectedNavItem } only %}
+{% endblock %}

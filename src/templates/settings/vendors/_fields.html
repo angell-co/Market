@@ -1,0 +1,15 @@
+{% extends 'market/settings/_layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set fullPageForm = true %}
+
+{% set selectedNavItem = 'vendorfields' %}
+
+{% block content %}
+        {{ forms.fieldLayoutDesignerField({
+            fieldLayout: craft.app.fields.getLayoutByType(
+                'angellco\\market\\elements\\Vendor'
+            ),
+        }) }}
+{% endblock %}

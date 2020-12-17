@@ -29,5 +29,10 @@ return [
     'Suspended' => 'Suspended',
     'Profile Picture' => 'Profile Picture',
     'Code' => 'Code',
-    'Add a vendor' => 'Add a vendor'
+    'Add a vendor' => 'Add a vendor',
+    'Vendor Fields' => 'Vendor Fields',
+    'General' => 'General',
+    'Vendor Settings' => 'Vendor Settings',
+    'Market Settings' => 'Market Settings',
+    'Vendor Settings ({siteName})' => 'Vendor Settings ({siteName})',
 ];
