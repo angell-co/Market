@@ -8,6 +8,8 @@
     { label: "Market"|t('market'), url: url('market') }
 ] %}
 
+{% set selectedSubnavItem = 'settings' %}
+
 {% set navItems = {
     general: { label: "General"|t('market'), url: url('market/settings/general') },
     vendors: { label: "Vendors"|t('market'), url: url('market/settings/vendors') },
