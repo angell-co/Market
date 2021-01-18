@@ -81,26 +81,9 @@ class Market extends Plugin
         self::$plugin = $this;
 
         $this->_setPluginComponents();
-
-        // Register the element type
-        Event::on(Elements::class,
-            Elements::EVENT_REGISTER_ELEMENT_TYPES,
-            function(RegisterComponentTypesEvent $event) {
-                $event->types[] = Vendor::class;
-            }
-        );
-
-        // Register the field types
-        Event::on(
-            Fields::class,
-            Fields::EVENT_REGISTER_FIELD_TYPES,
-            function(RegisterComponentTypesEvent $event) {
-                $event->types[] = Vendors::class;
-            }
-        );
+        $this->_installGlobalEventListeners();
 
         $request = Craft::$app->getRequest();
-
         if ($request->getIsConsoleRequest()) {
             //
         } else if ($request->getIsCpRequest()) {

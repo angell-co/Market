@@ -10,11 +10,15 @@
 
 namespace angellco\market\controllers;
 
+use angellco\market\elements\Vendor;
 use angellco\market\Market;
+use angellco\market\models\VendorSettings;
 use Craft;
 use craft\commerce\Plugin as CommercePlugin;
 use craft\web\Controller;
 use craft\web\View;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 /**
@@ -76,24 +80,58 @@ class SettingsController extends Controller
 
         $variables['countryOptions'] = CommercePlugin::getInstance()->getCountries()->getAllCountriesAsList();
 
-        return $this->renderTemplate('market/settings/vendors/_settings.html', $variables, View::TEMPLATE_MODE_CP);
+        return $this->renderTemplate('market/settings/_vendors.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
     /**
-     * Vendor fields edit view.
+     * Saves the Vendor settings.
      *
-     * @return Response
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
      */
-    public function actionVendorsFields(): Response
+    public function actionSaveVendors(): ?Response
     {
-        $variables = [];
-        return $this->renderTemplate('market/settings/vendors/_fields.html', $variables, View::TEMPLATE_MODE_CP);
-    }
+        $this->requirePostRequest();
+        $this->requireAdmin();
 
-    public function actionSaveVendors()
-    {
-        Craft::dd('here I am');
-        // Next up, project config like this: https://craftcms.com/docs/3.x/extend/project-config.html#implementing-project-config-support
+        $settingsService = Market::$plugin->getVendorSettings();
+        $settingsId = $this->request->getBodyParam('settingsId');
+
+        if ($settingsId) {
+            $settings = $settingsService->getSettingsById($settingsId);
+            if (!$settings) {
+                throw new BadRequestHttpException("Invalid Vendor settings ID: $settingsId");
+            }
+        } else {
+            $settings = new VendorSettings();
+        }
+
+        // Set the simple stuff
+        $settings->urlFormat = $this->request->getBodyParam('urlFormat');
+        $settings->template = $this->request->getBodyParam('template');
+        $settings->volumeId = $this->request->getBodyParam('volumeId');
+        $settings->shippingOriginId = $this->request->getBodyParam('shippingOriginId');
+
+        // Set the field layout
+        $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost();
+        $fieldLayout->type = Vendor::class;
+        $settings->setFieldLayout($fieldLayout);
+
+        // Save it
+        if (!$settingsService->saveSettings($settings)) {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t save Vendor settings.'));
+
+            // Send the tag group back to the template
+            Craft::$app->getUrlManager()->setRouteParams([
+                'settings' => $settings
+            ]);
+
+            return null;
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Vendor settings saved.'));
+        return $this->redirectToPostedUrl($settings);
     }
 
 

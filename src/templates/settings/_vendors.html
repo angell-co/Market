@@ -4,18 +4,21 @@
 
 {% set fullPageForm = true %}
 
-{% set selectedNavItem = 'vendorsettings' %}
+{% set selectedNavItem = 'vendors' %}
+
+{# TODO: multi-site #}
 
 {% block content %}
 
     {{ actionInput('market/settings/save-vendors') }}
-    {{ redirectInput('market/settings/vendors/general') }}
+    {{ redirectInput('market/settings/vendors') }}
 
     {% if settings.id %}
         {{ hiddenInput('settingsId', settings.id) }}
     {% endif %}
 
     {{ forms.textField({
+        first: true,
         label: "URL Format"|t,
         instructions: "What the vendor URLs should look like. You can include tags that output vendor properties, such as {ex1} or {ex2}."|t({ ex1: '<code>{slug}</code>', ex2: '<code>{user.username}</code>' }),
         id: 'urlFormat',
@@ -56,6 +59,14 @@
         value: settings.shippingOriginId,
         errors: settings.getErrors('shippingOriginId'),
         required: true,
+    }) }}
+
+    <hr>
+
+    {{ forms.fieldLayoutDesignerField({
+        fieldLayout: craft.app.fields.getLayoutByType(
+            'angellco\\market\\elements\\Vendor'
+        ),
     }) }}
 
 {% endblock %}

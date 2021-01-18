@@ -35,4 +35,6 @@ return [
     'Vendor Settings' => 'Vendor Settings',
     'Market Settings' => 'Market Settings',
     'Vendor Settings ({siteName})' => 'Vendor Settings ({siteName})',
+    'Couldn’t save Vendor settings.' => 'Couldn’t save Vendor settings.',
+    'Vendor settings saved.' => 'Vendor settings saved.'
 ];

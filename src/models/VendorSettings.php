@@ -17,6 +17,9 @@ use craft\base\Volume;
 use craft\behaviors\FieldLayoutBehavior;
 use craft\commerce\models\Country;
 use craft\commerce\Plugin as CommercePlugin;
+use craft\db\Table;
+use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
 use craft\models\Site;
 use yii\base\InvalidConfigException;
@@ -27,6 +30,7 @@ use yii\base\InvalidConfigException;
  * @property Volume $volume
  * @property-read Site $site
  * @property Country $shippingOrigin
+ * @property-read array $config
  * @property-read FieldLayout $fieldLayout
  * @mixin FieldLayoutBehavior
  *
@@ -229,6 +233,36 @@ class VendorSettings extends Model
                 'idAttribute' => 'fieldLayoutId'
             ]
         ];
+    }
+
+    /**
+     * Returns the project config array for this settings model.
+     *
+     * @return array
+     * @throws InvalidConfigException
+     */
+    public function getConfig(): array
+    {
+        $config = [
+            'shippingOrigin' => $this->getShippingOrigin()->iso,
+            'site' => $this->getSite()->uid,
+            'template' => $this->template,
+            'urlFormat' => $this->urlFormat,
+            'volume' => $this->getVolume()->uid,
+        ];
+
+        $fieldLayout = $this->getFieldLayout();
+
+        if ($fieldLayoutConfig = $fieldLayout->getConfig()) {
+            if (!$fieldLayout->uid) {
+                $fieldLayout->uid = $fieldLayout->id ? Db::uidById(Table::FIELDLAYOUTS, $fieldLayout->id) : StringHelper::UUID();
+            }
+            $config['fieldLayouts'] = [
+                $fieldLayout->uid => $fieldLayoutConfig,
+            ];
+        }
+
+        return $config;
     }
 
 }

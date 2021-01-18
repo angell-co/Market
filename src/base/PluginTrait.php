@@ -10,8 +10,14 @@
 
 namespace angellco\market\base;
 
+use angellco\market\elements\Vendor;
+use angellco\market\fields\Vendors;
 use angellco\market\services\VendorSettings;
+use Craft;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\services\Elements;
+use craft\services\Fields;
 use craft\web\UrlManager;
 use yii\base\Event;
 
@@ -47,6 +53,33 @@ trait PluginTrait
         ]);
     }
 
+    private function _installGlobalEventListeners()
+    {
+        // Register the element type
+        Event::on(Elements::class,
+            Elements::EVENT_REGISTER_ELEMENT_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = Vendor::class;
+            }
+        );
+
+        // Register the field types
+        Event::on(
+            Fields::class,
+            Fields::EVENT_REGISTER_FIELD_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = Vendors::class;
+            }
+        );
+
+        // Project config
+        $vendorSettingsPath = VendorSettings::CONFIG_VENDOR_SETTINGS_KEY.".{uid}";
+        Craft::$app->projectConfig
+            ->onAdd($vendorSettingsPath, [$this->vendorSettings, 'handleChangedVendorSettings'])
+            ->onUpdate($vendorSettingsPath, [$this->vendorSettings, 'handleChangedVendorSettings'])
+            ->onRemove($vendorSettingsPath, [$this->vendorSettings, 'handleDeletedVendorSettings']);
+    }
+
     private function _registerSiteRoutes()
     {
         //
@@ -60,8 +93,7 @@ trait PluginTrait
             function(RegisterUrlRulesEvent $event) {
                 $event->rules['market/settings'] = 'market/settings/index';
                 $event->rules['market/settings/general'] = 'market/settings/general';
-                $event->rules['market/settings/vendors/general'] = 'market/settings/vendors';
-                $event->rules['market/settings/vendors/fields'] = 'market/settings/vendors-fields';
+                $event->rules['market/settings/vendors'] = 'market/settings/vendors';
             }
         );
     }
