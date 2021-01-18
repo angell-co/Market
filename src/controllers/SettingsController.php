@@ -12,16 +12,25 @@ namespace angellco\market\controllers;
 
 use angellco\market\elements\Vendor;
 use angellco\market\Market;
+use angellco\market\models\StripeSettings;
 use angellco\market\models\VendorSettings;
 use Craft;
 use craft\commerce\Plugin as CommercePlugin;
+use craft\errors\SiteNotFoundException;
 use craft\web\Controller;
 use craft\web\View;
+use yii\base\ErrorException;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
+ * TODO: multi-site
+ *
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
@@ -50,7 +59,10 @@ class SettingsController extends Controller
      */
     public function actionGeneral(): Response
     {
-        $variables = [];
+        $variables = [
+            'settings' => Market::$plugin->getSettings()
+        ];
+
         return $this->renderTemplate('market/settings/_general.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
@@ -63,6 +75,7 @@ class SettingsController extends Controller
      *
      * @param array $variables
      * @return Response
+     * @throws SiteNotFoundException
      */
     public function actionVendors(array $variables = []): Response
     {
@@ -89,6 +102,11 @@ class SettingsController extends Controller
      * @return Response|null
      * @throws BadRequestHttpException
      * @throws ForbiddenHttpException
+     * @throws ErrorException
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws ServerErrorHttpException
      */
     public function actionSaveVendors(): ?Response
     {
@@ -138,5 +156,72 @@ class SettingsController extends Controller
     // Stripe settings
     // -------------------------------------------------------------------------
 
-    // TODO
+    /**
+     * Stripe settings edit view.
+     *
+     * @param array $variables
+     * @return Response
+     * @throws SiteNotFoundException
+     */
+    public function actionStripe(array $variables = []): Response
+    {
+        if (empty($variables['settings']))
+        {
+            $variables['settings'] = Market::$plugin->getStripeSettings()->getSettings();
+        }
+
+        return $this->renderTemplate('market/settings/_stripe.html', $variables, View::TEMPLATE_MODE_CP);
+    }
+
+    /**
+     * Saves the Stripe settings.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws ErrorException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws ServerErrorHttpException
+     */
+    public function actionSaveStripe(): ?Response
+    {
+        $this->requirePostRequest();
+        $this->requireAdmin();
+
+        $settingsService = Market::$plugin->getStripeSettings();
+        $settingsId = $this->request->getBodyParam('settingsId');
+
+        if ($settingsId) {
+            $settings = $settingsService->getSettingsById($settingsId);
+            if (!$settings) {
+                throw new BadRequestHttpException("Invalid Stripe settings ID: $settingsId");
+            }
+        } else {
+            $settings = new StripeSettings();
+        }
+
+        // Set the simple stuff
+        $settings->clientId = $this->request->getBodyParam('clientId');
+        $settings->secretKey = $this->request->getBodyParam('secretKey');
+        $settings->publishableKey = $this->request->getBodyParam('publishableKey');
+        $settings->redirectSuccess = $this->request->getBodyParam('redirectSuccess');
+        $settings->redirectError = $this->request->getBodyParam('redirectError');
+
+        // Save it
+        if (!$settingsService->saveSettings($settings)) {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t save Stripe settings.'));
+
+            // Send the tag group back to the template
+            Craft::$app->getUrlManager()->setRouteParams([
+                'settings' => $settings
+            ]);
+
+            return null;
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Stripe settings saved.'));
+        return $this->redirectToPostedUrl($settings);
+    }
 }

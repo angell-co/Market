@@ -12,6 +12,7 @@ namespace angellco\market\base;
 
 use angellco\market\elements\Vendor;
 use angellco\market\fields\Vendors;
+use angellco\market\services\StripeSettings;
 use angellco\market\services\VendorSettings;
 use Craft;
 use craft\events\RegisterComponentTypesEvent;
@@ -23,6 +24,7 @@ use yii\base\Event;
 
 /**
  * @property VendorSettings $vendorSettings the vendor settings service
+ * @property StripeSettings $stripeSettings the stripe settings service
  *
  * @author    Angell & Co
  * @package   Market
@@ -42,18 +44,34 @@ trait PluginTrait
     }
 
     /**
+     * Returns the stripe settings service
+     *
+     * @return StripeSettings The stripe settings service
+     */
+    public function getStripeSettings(): StripeSettings
+    {
+        return $this->get('stripeSettings');
+    }
+
+    /**
      * Sets the components of the commerce plugin
      */
-    private function _setPluginComponents()
+    private function _setPluginComponents(): void
     {
         $this->setComponents([
             'vendorSettings' => [
                 'class' => VendorSettings::class,
             ],
+            'stripeSettings' => [
+                'class' => StripeSettings::class,
+            ],
         ]);
     }
 
-    private function _installGlobalEventListeners()
+    /**
+     * Installs the global event listeners
+     */
+    private function _installGlobalEventListeners(): void
     {
         // Register the element type
         Event::on(Elements::class,
@@ -74,18 +92,22 @@ trait PluginTrait
 
         // Project config
         $vendorSettingsPath = VendorSettings::CONFIG_VENDOR_SETTINGS_KEY.".{uid}";
+        $stripeSettingsPath = StripeSettings::CONFIG_STRIPE_SETTINGS_KEY.".{uid}";
         Craft::$app->projectConfig
-            ->onAdd($vendorSettingsPath, [$this->vendorSettings, 'handleChangedVendorSettings'])
-            ->onUpdate($vendorSettingsPath, [$this->vendorSettings, 'handleChangedVendorSettings'])
-            ->onRemove($vendorSettingsPath, [$this->vendorSettings, 'handleDeletedVendorSettings']);
+            ->onAdd($vendorSettingsPath, [$this->vendorSettings, 'handleChangedSettings'])
+            ->onUpdate($vendorSettingsPath, [$this->vendorSettings, 'handleChangedSettings'])
+            ->onRemove($vendorSettingsPath, [$this->vendorSettings, 'handleDeletedSettings'])
+            ->onAdd($stripeSettingsPath, [$this->stripeSettings, 'handleChangedSettings'])
+            ->onUpdate($stripeSettingsPath, [$this->stripeSettings, 'handleChangedSettings'])
+            ->onRemove($stripeSettingsPath, [$this->stripeSettings, 'handleDeletedSettings']);
     }
 
-    private function _registerSiteRoutes()
+    private function _registerSiteRoutes(): void
     {
         //
     }
 
-    private function _registerCpRoutes()
+    private function _registerCpRoutes(): void
     {
         Event::on(
             UrlManager::class,
@@ -94,6 +116,7 @@ trait PluginTrait
                 $event->rules['market/settings'] = 'market/settings/index';
                 $event->rules['market/settings/general'] = 'market/settings/general';
                 $event->rules['market/settings/vendors'] = 'market/settings/vendors';
+                $event->rules['market/settings/stripe'] = 'market/settings/stripe';
             }
         );
     }

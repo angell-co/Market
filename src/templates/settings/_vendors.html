@@ -19,10 +19,10 @@
 
     {{ forms.textField({
         first: true,
-        label: "URL Format"|t,
-        instructions: "What the vendor URLs should look like. You can include tags that output vendor properties, such as {ex1} or {ex2}."|t({ ex1: '<code>{slug}</code>', ex2: '<code>{user.username}</code>' }),
+        label: 'URL Format'|t('app'),
+        instructions: 'What the vendor URLs should look like. You can include tags that output vendor properties, such as {ex1} or {ex2}.'|t('market', params = { ex1: '<code>{slug}</code>', ex2: '<code>{user.username}</code>' }),
         id: 'urlFormat',
-        class: 'code ltr',
+        class: 'code',
         name: 'urlFormat',
         value: settings.urlFormat ? settings.urlFormat : 'shop/{slug}',
         errors: settings.getErrors('urlFormat'),
@@ -30,10 +30,9 @@
     }) }}
 
     {{ forms.textField({
-        label: "Template"|t,
-        instructions: "The template to use when a vendor’s URL is requested."|t,
+        label: 'Template'|t('app'),
+        instructions: 'The template to use when a vendor’s URL is requested.'|t('market'),
         id: 'template',
-        class: 'ltr',
         name: 'template',
         value: settings.template ? settings.template : 'marketplace/vendors/_entry',
         errors: settings.getErrors('template')
@@ -42,8 +41,8 @@
     {{ forms.selectField({
         id: 'volumeId',
         name: 'volumeId',
-        label: 'Asset Volume'|t,
-        instructions: 'The asset volume that should used to store this vendor’s files.'|t,
+        label: 'Asset Volume'|t('app'),
+        instructions: 'The asset volume that should used to store this vendor’s files.'|t('market'),
         options: volumeOptions,
         value: settings.volumeId,
         errors: settings.getErrors('volumeId'),
@@ -53,8 +52,8 @@
     {{ forms.selectField({
         id: 'shippingOriginId',
         name: 'shippingOriginId',
-        label: 'Default Shipping Origin'|t,
-        instructions: 'Where Vendors will ship from by default, they won’t be able to change this in their shipping profiles but admins can in the cp.'|t,
+        label: 'Default Shipping Origin'|t('market'),
+        instructions: 'Where Vendors will ship from by default, they won’t be able to change this in their shipping profiles but admins can in the cp.'|t('market'),
         options: countryOptions,
         value: settings.shippingOriginId,
         errors: settings.getErrors('shippingOriginId'),

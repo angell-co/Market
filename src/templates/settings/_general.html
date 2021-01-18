@@ -3,3 +3,11 @@
 {% import '_includes/forms' as forms %}
 
 {% set selectedNavItem = 'general' %}
+
+{% block content %}
+
+    {{ actionInput('market/settings/save-general') }}
+    {{ redirectInput('market/settings/general') }}
+
+
+{% endblock %}

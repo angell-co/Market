@@ -11,52 +11,49 @@
 namespace angellco\market\services;
 
 use angellco\market\db\Table;
-use angellco\market\elements\Vendor;
-use angellco\market\models\VendorSettings as VendorSettingsModel;
-use angellco\market\records\VendorSettings as VendorSettingsRecord;
+use angellco\market\records\StripeSettings as StripeSettingsRecord;
 use Craft;
 use craft\base\Component;
-use craft\commerce\Plugin as Commerce;
+use angellco\market\models\StripeSettings as StripeSettingsModel;
 use craft\errors\SiteNotFoundException;
 use craft\events\ConfigEvent;
 use craft\helpers\Db;
 use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\StringHelper;
-use craft\models\FieldLayout;
 use yii\base\ErrorException;
-use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
+use yii\db\Exception;
 use yii\web\ServerErrorHttpException;
 
 /**
- * Vendor settings service
+ * Stripe settings service
  *
  * TODO: multi-site
  *
- * @property-read VendorSettingsModel $settings
+ * @property-read StripeSettingsModel $settings
  *
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
  */
-class VendorSettings extends Component
+class StripeSettings extends Component
 {
 
-    public const CONFIG_VENDOR_SETTINGS_KEY = 'market.settings.vendors';
+    public const CONFIG_STRIPE_SETTINGS_KEY = 'market.settings.stripe';
 
     /**
      * Returns the settings for this Site.
      *
-     * @return VendorSettingsModel
+     * @return StripeSettingsModel
      * @throws SiteNotFoundException
      */
-    public function getSettings(): VendorSettingsModel
+    public function getSettings(): StripeSettingsModel
     {
         $siteId = Craft::$app->getSites()->getPrimarySite()->id;
 
         // Get the last added settings record
-        $record = VendorSettingsRecord::find()
+        $record = StripeSettingsRecord::find()
             ->where(['siteId' => $siteId])
             ->orderBy(['id' => SORT_DESC])
             ->one();
@@ -64,42 +61,42 @@ class VendorSettings extends Component
         // If there was one, populate a model and return
         if ($record)
         {
-            return new VendorSettingsModel($record->toArray([
+            return new StripeSettingsModel($record->toArray([
                 'id',
                 'siteId',
-                'volumeId',
-                'fieldLayoutId',
-                'shippingOriginId',
-                'template',
-                'urlFormat',
+                'clientId',
+                'secretKey',
+                'publishableKey',
+                'redirectSuccess',
+                'redirectError',
                 'uid',
             ]));
         }
 
         // If not, return a fresh model
-        return new VendorSettingsModel();
+        return new StripeSettingsModel();
     }
 
     /**
      * @param int $settingsId
-     * @return VendorSettingsModel|null
+     * @return StripeSettingsModel|null
      */
-    public function getSettingsById(int $settingsId): ?VendorSettingsModel
+    public function getSettingsById(int $settingsId): ?StripeSettingsModel
     {
-        $record = VendorSettingsRecord::find()
+        $record = StripeSettingsRecord::find()
             ->where(['id' => $settingsId])
             ->one();
 
         if ($record)
         {
-            return new VendorSettingsModel($record->toArray([
+            return new StripeSettingsModel($record->toArray([
                 'id',
                 'siteId',
-                'volumeId',
-                'fieldLayoutId',
-                'shippingOriginId',
-                'template',
-                'urlFormat',
+                'clientId',
+                'secretKey',
+                'publishableKey',
+                'redirectSuccess',
+                'redirectError',
                 'uid',
             ]));
         }
@@ -108,15 +105,15 @@ class VendorSettings extends Component
     }
 
     /**
-     * @param VendorSettingsModel $settings
+     * @param StripeSettingsModel $settings
      * @return bool
      * @throws ErrorException
-     * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
      * @throws ServerErrorHttpException
+     * @throws \yii\base\Exception
      */
-    public function saveSettings(VendorSettingsModel $settings): bool
+    public function saveSettings(StripeSettingsModel $settings): bool
     {
         $isNew = !$settings->id;
 
@@ -124,7 +121,7 @@ class VendorSettings extends Component
         if ($isNew) {
             $settings->uid = StringHelper::UUID();
         } else if (!$settings->uid) {
-            $settings->uid = Db::uidById(Table::VENDORSETTINGS, $settings->id);
+            $settings->uid = Db::uidById(Table::STRIPESETTINGS, $settings->id);
         }
 
         // Make sure it validates
@@ -135,12 +132,12 @@ class VendorSettings extends Component
         $projectConfig = Craft::$app->getProjectConfig();
 
         // Save it to the project config
-        $path = self::CONFIG_VENDOR_SETTINGS_KEY.".".$settings->uid;
-        $projectConfig->set($path, $settings->getConfig(), "Save vendor settings “{$settings->getSite()->name}”");
+        $path = self::CONFIG_STRIPE_SETTINGS_KEY.".".$settings->uid;
+        $projectConfig->set($path, $settings->getConfig(), "Save stripe settings “{$settings->getSite()->name}”");
 
         // Now set the ID on the settings in case the caller needs to know it
         if ($isNew) {
-            $settings->id = Db::idByUid(Table::VENDORSETTINGS, $settings->uid);
+            $settings->id = Db::idByUid(Table::STRIPESETTINGS, $settings->uid);
         }
 
         return true;
@@ -160,38 +157,22 @@ class VendorSettings extends Component
         ProjectConfigHelper::ensureAllSitesProcessed();
         ProjectConfigHelper::ensureAllFieldsProcessed();
 
-        $shippingOrigin = Commerce::getInstance()->getCountries()->getCountryByIso($data['shippingOrigin']);
         $site = Craft::$app->getSites()->getSiteByUid($data['site']);
-        $volume = Craft::$app->getVolumes()->getVolumeByUid($data['volume']);
         $settingsRecord = $this->_getSettingsRecord($uid);
 
-        if (!$shippingOrigin || !$site || !$volume || !$settingsRecord) {
+        if (!$site || !$settingsRecord) {
             return;
         }
 
         $transaction = Craft::$app->getDb()->beginTransaction();
         try {
-            $settingsRecord->shippingOriginId = $shippingOrigin->id;
             $settingsRecord->siteId = $site->id;
-            $settingsRecord->template = $data['template'];
-            $settingsRecord->urlFormat = $data['urlFormat'];
-            $settingsRecord->volumeId = $volume->id;
+            $settingsRecord->clientId = $data['clientId'];
+            $settingsRecord->secretKey = $data['secretKey'];
+            $settingsRecord->publishableKey = $data['publishableKey'];
+            $settingsRecord->redirectSuccess = $data['redirectSuccess'];
+            $settingsRecord->redirectError = $data['redirectError'];
             $settingsRecord->uid = $uid;
-
-            if (!empty($data['fieldLayouts'])) {
-                // Save the field layout
-                $layout = FieldLayout::createFromConfig(reset($data['fieldLayouts']));
-
-                $layout->id = $settingsRecord->fieldLayoutId;
-                $layout->type = Vendor::class;
-                $layout->uid = key($data['fieldLayouts']);
-                Craft::$app->getFields()->saveLayout($layout);
-                $settingsRecord->fieldLayoutId = $layout->id;
-            } else if ($settingsRecord->fieldLayoutId) {
-                // Delete the field layout
-                Craft::$app->getFields()->deleteLayoutById($settingsRecord->fieldLayoutId);
-                $settingsRecord->fieldLayoutId = null;
-            }
 
             // Save
             $settingsRecord->save(false);
@@ -201,14 +182,11 @@ class VendorSettings extends Component
             $transaction->rollBack();
             throw $e;
         }
-
-        // Invalidate entry caches
-        Craft::$app->getElements()->invalidateCachesForElementType(Vendor::class);
     }
 
     /**
      * @param ConfigEvent $event
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     public function handleDeletedSettings(ConfigEvent $event): void
     {
@@ -225,7 +203,7 @@ class VendorSettings extends Component
 
         // Delete its row
         Craft::$app->db->createCommand()
-            ->delete(Table::VENDORSETTINGS, ['id' => $record->id])
+            ->delete(Table::STRIPESETTINGS, ['id' => $record->id])
             ->execute();
     }
 
@@ -233,11 +211,11 @@ class VendorSettings extends Component
      * Gets a settings record by uid.
      *
      * @param string $uid
-     * @return VendorSettingsRecord
+     * @return StripeSettingsRecord
      */
-    private function _getSettingsRecord(string $uid): VendorSettingsRecord
+    private function _getSettingsRecord(string $uid): StripeSettingsRecord
     {
-        $query = VendorSettingsRecord::find()->where(['uid' => $uid]);
-        return $query->one() ?? new VendorSettingsRecord();
+        $query = StripeSettingsRecord::find()->where(['uid' => $uid]);
+        return $query->one() ?? new StripeSettingsRecord();
     }
 }

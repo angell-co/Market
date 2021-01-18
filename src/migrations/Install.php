@@ -31,12 +31,15 @@ class Install extends Migration
 
     public function safeUp()
     {
+        // TODO: migration for clean install
+
         // Upgrade methods - safe to run on new installs
-        // TODO: in 2.1 or greater add a check to see if we really need to run this
+        // TODO: in 2.1 or greater add a check to see if we really need to run these
         $this->_renameTables();
         $this->_fixFksAndIndexes();
         $this->_updateElementReferences();
         $this->_updateVendorSettings();
+        $this->_updateStripeSettings();
     }
 
     public function safeDown()
@@ -116,6 +119,7 @@ class Install extends Migration
         // Fields
         $this->update(CraftTable::FIELDS, ['type' => Vendors::class], ['type' => 'Marketplace_Vendor']);
         $this->update(CraftTable::FIELDS, ['type' => Vendors::class], ['type' => 'Marketplace_Vendors']);
+        // TODO shipping profiles
 //        $this->update('{{%fields}}', ['type' => ShippingProfile::class], ['type' => 'Marketplace_ShippingProfile']);
 
     }
@@ -155,6 +159,33 @@ class Install extends Migration
         $this->addForeignKey(null, Table::VENDORSETTINGS, 'volumeId', CraftTable::VOLUMES, 'id', 'SET NULL', null);
         $this->addForeignKey(null, Table::VENDORSETTINGS, 'fieldLayoutId', CraftTable::FIELDLAYOUTS, 'id', 'SET NULL', null);
         $this->addForeignKey(null, Table::VENDORSETTINGS, 'shippingOriginId', CommerceTable::COUNTRIES, 'id', 'CASCADE', 'CASCADE');
+    }
+
+    private function _updateStripeSettings(): void
+    {
+        $tableSchema = $this->db->getTableSchema(Table::STRIPESETTINGS);
+
+        // Drop foreign keys and indexes
+        $this->_dropForeignKeys(Table::STRIPESETTINGS);
+        $this->_dropIndexes(Table::STRIPESETTINGS);
+
+        // Add siteId col
+        if (!in_array('siteId', $tableSchema->columnNames, true)) {
+            $this->addColumn(Table::STRIPESETTINGS, 'siteId', $this->integer()->notNull());
+        }
+
+        // Update existing row with the primary site ID
+        try {
+            $site = Craft::$app->getSites()->getPrimarySite();
+            if ($site) {
+                $this->update(Table::STRIPESETTINGS, ['siteId' => $site->id], ['id' => 1]);
+            }
+        } catch (SiteNotFoundException $e) {
+        }
+
+        // Add in the index and fk for the siteId col
+        $this->createIndex(null, Table::STRIPESETTINGS, ['id', 'siteId'], true);
+        $this->addForeignKey(null, Table::STRIPESETTINGS, 'siteId', CraftTable::SITES, 'id', 'CASCADE', 'CASCADE');
     }
 
     /**

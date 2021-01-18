@@ -11,6 +11,7 @@
 {% set navItems = {
     general: { label: "General"|t('market'), url: url('market/settings/general') },
     vendors: { label: "Vendors"|t('market'), url: url('market/settings/vendors') },
+    stripe: { label: "Stripe"|t('market'), url: url('market/settings/stripe') },
 } %}
 
 {% set docTitle = navItems[selectedNavItem].label~' - '~title %}
