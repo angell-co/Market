@@ -66,7 +66,6 @@ class SettingsController extends Controller
         return $this->renderTemplate('market/settings/_general.html', $variables, View::TEMPLATE_MODE_CP);
     }
 
-
     // Vendor settings
     // -------------------------------------------------------------------------
 

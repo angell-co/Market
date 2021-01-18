@@ -55,4 +55,12 @@ return [
     'Stripe Settings ({siteName})' => 'Stripe Settings ({siteName})',
     'Couldn’t save Stripe settings.' => 'Couldn’t save Stripe settings.',
     'Stripe settings saved.' => 'Stripe settings saved.',
+    'Vendor Dashboard Title' => 'Vendor Dashboard Title',
+    'The title used in the vendor dashboard, defaults to ‘Marketplace’.' => 'The title used in the vendor dashboard, defaults to ‘Marketplace’.',
+    'Apply To Sell URL' => 'Apply To Sell URL',
+    'If you have a URL where people can apply to sell on your platform, add it here.' => 'If you have a URL where people can apply to sell on your platform, add it here.',
+    'Order confirmation email' => 'Order confirmation email',
+    'Specify the path of the template you want to use for order confirmation emails.' => 'Specify the path of the template you want to use for order confirmation emails.',
+    'Google Analytics UA' => 'Google Analytics UA',
+    'If you set this then Google Analytics will be implemented across the marketplace templates.' => 'If you set this then Google Analytics will be implemented across the marketplace templates.',
 ];

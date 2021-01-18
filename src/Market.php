@@ -13,11 +13,13 @@ namespace angellco\market;
 use angellco\market\base\PluginTrait;
 use angellco\market\elements\Vendor;
 use angellco\market\fields\Vendors;
+use angellco\market\models\Settings;
 use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\web\twig\variables\Cp;
@@ -58,6 +60,11 @@ class Market extends Plugin
      * @var bool Whether the plugin has its own section in the control panel
      */
     public $hasCpSection = true;
+
+    /**
+     * @var bool Whether the plugin has a settings page in the control panel
+     */
+    public $hasCpSettings = true;
 
     use PluginTrait;
 
@@ -118,6 +125,17 @@ class Market extends Plugin
         ];
 
         return $navItem;
+    }
+
+    protected function createSettingsModel()
+    {
+        return new Settings();
+    }
+
+    public function getSettingsResponse()
+    {
+        $url = UrlHelper::cpUrl('market/settings/general');
+        return Craft::$app->controller->redirect($url);
     }
 
 }

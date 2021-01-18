@@ -2,12 +2,66 @@
 
 {% import '_includes/forms' as forms %}
 
+{% set fullPageForm = true %}
+
 {% set selectedNavItem = 'general' %}
 
 {% block content %}
-
-    {{ actionInput('market/settings/save-general') }}
+    {{ actionInput('plugins/save-plugin-settings') }}
     {{ redirectInput('market/settings/general') }}
+    {{ hiddenInput('pluginHandle', 'market') }}
 
+    {{ forms.textField({
+        first: true,
+        label: 'Vendor Dashboard Title'|t('market'),
+        instructions: 'The title used in the vendor dashboard, defaults to ‘Marketplace’.'|t('market'),
+        id: 'vendorDashboardTitle',
+        name: 'settings[vendorDashboardTitle]',
+        placeholder: 'Market'|t('market'),
+        value: settings.vendorDashboardTitle,
+        errors: settings.getErrors('vendorDashboardTitle'),
+    }) }}
 
+{#    {{ forms.elementSelectField({#}
+{#        jsClass: 'Craft.AssetSelectInput',#}
+{#        label: "Vendor Dashboard Logo"|t,#}
+{#        id: 'vendorDashboardLogoId',#}
+{#        name: 'settings[vendorDashboardLogoId]',#}
+{#        elementType: assetElementType,#}
+{#        selectionLabel: "Choose"|t,#}
+{#        criteria: {#}
+{#            'kind' : ['image'],#}
+{#            'localeEnabled' : null,#}
+{#            'locale' : craft.locale,#}
+{#        },#}
+{#        limit: 1,#}
+{#        elements: (settings.vendorDashboardLogoId is defined and settings.vendorDashboardLogoId ? craft.assets.find({id:settings.vendorDashboardLogoId}))#}
+{#    }) }}#}
+
+    {{ forms.textField({
+        label: 'Apply To Sell URL'|t('market'),
+        instructions: 'If you have a URL where people can apply to sell on your platform, add it here.'|t('market'),
+        id: 'applyToSell',
+        name: 'settings[applyToSell]',
+        value: settings.applyToSell,
+        errors: settings.getErrors('applyToSell'),
+    }) }}
+
+    {{ forms.textField({
+        label: 'Order confirmation email'|t('market'),
+        instructions: 'Specify the path of the template you want to use for order confirmation emails.'|t('market'),
+        id: 'orderConfirmation',
+        name: 'settings[orderConfirmation]',
+        value: settings.orderConfirmation,
+        errors: settings.getErrors('orderConfirmation'),
+    }) }}
+
+    {{ forms.textField({
+        label: 'Google Analytics UA'|t('market'),
+        instructions: 'If you set this then Google Analytics will be implemented across the marketplace templates.'|t('market'),
+        id: 'googleAnalyticsUA',
+        name: 'settings[googleAnalyticsUA]',
+        value: settings.googleAnalyticsUA,
+        errors: settings.getErrors('googleAnalyticsUA'),
+    }) }}
 {% endblock %}

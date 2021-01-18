@@ -17,6 +17,7 @@ use yii\base\InvalidConfigException;
 /**
  * Stripe Settings model
  *
+ * @property-read array $config
  * @property-read Site $site
  *
  * @author    Angell & Co
