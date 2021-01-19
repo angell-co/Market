@@ -48,12 +48,16 @@ class VendorSettings extends Component
     /**
      * Returns the settings for this Site.
      *
-     * @return VendorSettingsModel
+     * @param int|null $siteId
+     * @return VendorSettingsModel|null
      * @throws SiteNotFoundException
      */
-    public function getSettings(): VendorSettingsModel
+    public function getSettings(int $siteId = null): ?VendorSettingsModel
     {
-        $siteId = Craft::$app->getSites()->getPrimarySite()->id;
+        // Default to the primary site
+        if (!$siteId) {
+            $siteId = Craft::$app->getSites()->getPrimarySite()->id;
+        }
 
         // Get the last added settings record
         $record = VendorSettingsRecord::find()
@@ -76,8 +80,7 @@ class VendorSettings extends Component
             ]));
         }
 
-        // If not, return a fresh model
-        return new VendorSettingsModel();
+        return null;
     }
 
     /**

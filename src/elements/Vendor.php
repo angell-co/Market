@@ -11,6 +11,7 @@
 namespace angellco\market\elements;
 
 use angellco\market\elements\db\VendorQuery;
+use angellco\market\Market;
 use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
@@ -169,6 +170,7 @@ class Vendor extends Element
      */
     public function getIsEditable(): bool
     {
+        // TODO: permissions
 //        return Craft::$app->getUser()->checkPermission('commerce-manageOrders');
         return true;
     }
@@ -447,5 +449,31 @@ class Vendor extends Element
         }
 
         return parent::tableAttributeHtml($attribute);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEditorHtml(): string
+    {
+        $html = '';
+
+        $html .= parent::getEditorHtml();
+
+        return $html;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFieldLayout()
+    {
+        $vendorSettings = Market::$plugin->getVendorSettings()->getSettings($this->siteId);
+
+        if ($vendorSettings && $vendorSettings->fieldLayoutId) {
+            return Craft::$app->fields->getLayoutById($vendorSettings->fieldLayoutId);
+        }
+
+        return null;
     }
 }

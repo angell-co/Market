@@ -63,4 +63,9 @@ return [
     'Specify the path of the template you want to use for order confirmation emails.' => 'Specify the path of the template you want to use for order confirmation emails.',
     'Google Analytics UA' => 'Google Analytics UA',
     'If you set this then Google Analytics will be implemented across the marketplace templates.' => 'If you set this then Google Analytics will be implemented across the marketplace templates.',
+    'Save as a new Vendor' => 'Save as a new Vendor',
+    'Delete Vendor' => 'Delete Vendor',
+    'Are you sure you want to delete this Vendor?' => 'Are you sure you want to delete this Vendor?',
+    'Create a new vendor' => 'Create a new vendor',
+    'Edit Vendor' => 'Edit Vendor',
 ];

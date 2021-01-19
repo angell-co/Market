@@ -11,8 +11,8 @@
 namespace angellco\market\base;
 
 use angellco\market\elements\Vendor;
-use angellco\market\fields\Vendors;
 use angellco\market\services\StripeSettings;
+use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
 use Craft;
 use craft\events\RegisterComponentTypesEvent;
@@ -23,6 +23,7 @@ use craft\web\UrlManager;
 use yii\base\Event;
 
 /**
+ * @property Vendors $vendors the vendors service
  * @property VendorSettings $vendorSettings the vendor settings service
  * @property StripeSettings $stripeSettings the stripe settings service
  *
@@ -32,6 +33,16 @@ use yii\base\Event;
  */
 trait PluginTrait
 {
+
+    /**
+     * Returns the vendors service
+     *
+     * @return Vendors The vendors service
+     */
+    public function getVendors(): Vendors
+    {
+        return $this->get('vendors');
+    }
 
     /**
      * Returns the vendor settings service
@@ -59,6 +70,9 @@ trait PluginTrait
     private function _setPluginComponents(): void
     {
         $this->setComponents([
+            'vendors' => [
+                'class' => Vendors::class,
+            ],
             'vendorSettings' => [
                 'class' => VendorSettings::class,
             ],
@@ -113,10 +127,17 @@ trait PluginTrait
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
+                // Settings
                 $event->rules['market/settings'] = 'market/settings/index';
                 $event->rules['market/settings/general'] = 'market/settings/general';
                 $event->rules['market/settings/vendors'] = 'market/settings/vendors';
                 $event->rules['market/settings/stripe'] = 'market/settings/stripe';
+
+                // Vendor elements
+                $event->rules['market/vendors/new'] = 'market/vendors/edit-vendor';
+                $event->rules['market/vendors/new/<siteHandle:{handle}>'] = 'market/vendors/edit-vendor';
+                $event->rules['market/vendors/<vendorId:\d+><slug:(?:-{slug})?>'] = 'market/vendors/edit-vendor';
+                $event->rules['market/vendors/<vendorId:\d+><slug:(?:-{slug})?>/<siteHandle:{handle}>'] = 'market/vendors/edit-vendor';
             }
         );
     }
