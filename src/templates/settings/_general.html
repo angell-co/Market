@@ -22,22 +22,6 @@
         errors: settings.getErrors('vendorDashboardTitle'),
     }) }}
 
-{#    {{ forms.elementSelectField({#}
-{#        jsClass: 'Craft.AssetSelectInput',#}
-{#        label: "Vendor Dashboard Logo"|t,#}
-{#        id: 'vendorDashboardLogoId',#}
-{#        name: 'settings[vendorDashboardLogoId]',#}
-{#        elementType: assetElementType,#}
-{#        selectionLabel: "Choose"|t,#}
-{#        criteria: {#}
-{#            'kind' : ['image'],#}
-{#            'localeEnabled' : null,#}
-{#            'locale' : craft.locale,#}
-{#        },#}
-{#        limit: 1,#}
-{#        elements: (settings.vendorDashboardLogoId is defined and settings.vendorDashboardLogoId ? craft.assets.find({id:settings.vendorDashboardLogoId}))#}
-{#    }) }}#}
-
     {{ forms.textField({
         label: 'Apply To Sell URL'|t('market'),
         instructions: 'If you have a URL where people can apply to sell on your platform, add it here.'|t('market'),
