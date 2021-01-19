@@ -15,8 +15,11 @@ use angellco\market\services\StripeSettings;
 use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
 use Craft;
+use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\fieldlayoutelements\TitleField;
+use craft\models\FieldLayout;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\web\UrlManager;
@@ -94,6 +97,16 @@ trait PluginTrait
                 $event->types[] = Vendor::class;
             }
         );
+
+        // Add title fields to Vendors
+        Event::on(FieldLayout::class, FieldLayout::EVENT_DEFINE_STANDARD_FIELDS, function(DefineFieldLayoutFieldsEvent $event) {
+            /** @var FieldLayout $fieldLayout */
+            $fieldLayout = $event->sender;
+
+            if ($fieldLayout->type == Vendor::class) {
+                $event->fields[] = TitleField::class;
+            }
+        });
 
         // Register the field types
         Event::on(

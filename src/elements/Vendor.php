@@ -19,6 +19,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use yii\base\NotSupportedException;
 use yii\db\Exception;
 
@@ -466,7 +467,7 @@ class Vendor extends Element
     /**
      * @inheritdoc
      */
-    public function getFieldLayout()
+    public function getFieldLayout(): ?FieldLayout
     {
         $vendorSettings = Market::$plugin->getVendorSettings()->getSettings($this->siteId);
 
