@@ -11,27 +11,18 @@
 namespace angellco\market;
 
 use angellco\market\base\PluginTrait;
-use angellco\market\elements\Vendor;
-use angellco\market\fields\Vendors;
 use angellco\market\models\Settings;
 use Craft;
 use craft\base\Plugin;
-use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterCpNavItemsEvent;
-use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
-use craft\services\Elements;
-use craft\services\Fields;
-use craft\web\twig\variables\Cp;
-use craft\web\UrlManager;
-use yii\base\Event;
 
 /**
+ * @property-read mixed $settingsResponse
+ * @property-read array $cpNavItem
+ *
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
- *
- * @property-read array $cpNavItem
  */
 class Market extends Plugin
 {

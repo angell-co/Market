@@ -1,5 +1,6 @@
 {% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
+{% import "market/vendors/_fields" as vendorFields %}
 
 {% set fullPageForm = true %}
 {% set saveShortcutRedirect = continueEditingUrl %}
@@ -84,17 +85,34 @@
 {% block details %}
     <div id="settings" class="meta">
 
-        {{ forms.textField({
-            label: "Slug"|t('app'),
-            siteId: vendor.siteId,
-            id: 'slug',
-            name: 'slug',
-            autocorrect: false,
-            autocapitalize: false,
-            value: vendor.slug,
-            placeholder: "Enter slug"|t('app'),
-            errors: (vendor.getErrors('slug')|merge(vendor.getErrors('uri')))
+        {{ vendorFields.generalMetaFields(vendor) }}
+
+        {{ forms.elementSelectField({
+            label: "User"|t,
+            id: 'user',
+            name: 'user',
+            elementType: userElementType,
+            selectionLabel: "Choose"|t,
+            limit: 1,
+            elements: (user is defined and user ? [user])
         }) }}
+
+        {{ vendorFields.stripeMeta(vendor) }}
+
+        {% if vendor.id %}
+            {{ forms.elementSelectField({
+                jsClass: 'Craft.AssetSelectInput',
+                label: "Profile Picture"|t,
+                id: 'profilePicture',
+                name: 'profilePicture',
+                elementType: assetElementType,
+                selectionLabel: "Choose"|t,
+                sources: profilePictureOptionSources,
+                criteria: profilePictureOptionCriteria,
+                limit: 1,
+                elements: (profilePicture is defined and profilePicture ? [profilePicture])
+            }) }}
+        {% endif %}
 
         {{ forms.lightswitchField({
             label: "Enabled"|t('app'),

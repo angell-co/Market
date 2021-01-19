@@ -48,6 +48,8 @@ class VendorSettings extends Component
     /**
      * Returns the settings for this Site.
      *
+     * TODO: memoize this when multi-site is in like category group site settings
+     *
      * @param int|null $siteId
      * @return VendorSettingsModel|null
      * @throws SiteNotFoundException

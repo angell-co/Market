@@ -11,6 +11,7 @@
 namespace angellco\market\base;
 
 use angellco\market\elements\Vendor;
+use angellco\market\fields\Vendors as VendorsField;
 use angellco\market\services\StripeSettings;
 use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
@@ -113,7 +114,7 @@ trait PluginTrait
             Fields::class,
             Fields::EVENT_REGISTER_FIELD_TYPES,
             function(RegisterComponentTypesEvent $event) {
-                $event->types[] = Vendors::class;
+                $event->types[] = VendorsField::class;
             }
         );
 

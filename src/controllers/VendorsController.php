@@ -14,6 +14,8 @@ use angellco\market\elements\Vendor;
 use angellco\market\Market;
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
+use craft\elements\User;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
@@ -84,6 +86,42 @@ class VendorsController extends Controller
         $vendor = $variables['vendor'];
 
         $this->_enforceEditVendorPermissions($vendor);
+
+
+        // User selector variables
+        // ---------------------------------------------------------------------
+        $variables['userElementType'] = User::class;
+        $variables['user'] = $variables['vendor']->getUser();
+
+
+        // Vendor profile picture selector variables
+        // ---------------------------------------------------------------------
+
+        if ($variables['vendor']->id) {
+            $variables['assetElementType'] = Asset::class;
+
+            // Lifted from craft\fields\Assets::_getSourcePathByFolderId
+            $folder = Craft::$app->getAssets()->getFolderById($variables['vendor']->accountFolderId);
+            if ($folder) {
+                $folderPath = 'folder:' . $folder->uid;
+
+                while ($folder->parentId && $folder->volumeId !== null) {
+                    $parent = $folder->getParent();
+                    $folderPath = 'folder:' . $parent->uid . '/' . $folderPath;
+                    $folder = $parent;
+                }
+
+                $variables['profilePictureOptionSources'] = [$folderPath];
+
+                $variables['profilePictureOptionCriteria'] = [
+                    'kind' => ['image'],
+                    'siteId' => $site->id,
+                ];
+
+                $variables['profilePicture'] = $variables['vendor']->getProfilePicture();
+            }
+        }
+
 
         // Variables
         // ---------------------------------------------------------------------

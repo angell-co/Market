@@ -68,4 +68,5 @@ return [
     'Are you sure you want to delete this Vendor?' => 'Are you sure you want to delete this Vendor?',
     'Create a new vendor' => 'Create a new vendor',
     'Edit Vendor' => 'Edit Vendor',
+    'Code' => 'Code',
 ];
