@@ -16,16 +16,20 @@ use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
 use craft\errors\SiteNotFoundException;
+use craft\events\ElementEvent;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
 use craft\web\Controller;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * TODO: multi-site
@@ -197,35 +201,39 @@ class VendorsController extends Controller
     }
 
     /**
-     * Previews a category.
+     * Previews a vendor.
      *
      * @return Response
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws SiteNotFoundException
      */
-    public function actionPreviewCategory(): Response
+    public function actionPreviewVendor(): Response
     {
         $this->requirePostRequest();
 
-        $vendor = $this->_getCategoryModel();
+        $vendor = $this->_getVendorModel();
         $this->_enforceEditVendorPermissions($vendor);
-        $this->_populateCategoryModel($vendor);
+        $this->_populateVendorModel($vendor);
 
         // Fire a 'previewCategory' event
-        if ($this->hasEventHandlers(self::EVENT_PREVIEW_CATEGORY)) {
-            $this->trigger(self::EVENT_PREVIEW_CATEGORY, new ElementEvent([
+        if ($this->hasEventHandlers(self::EVENT_PREVIEW_VENDOR)) {
+            $this->trigger(self::EVENT_PREVIEW_VENDOR, new ElementEvent([
                 'element' => $vendor,
             ]));
         }
 
-        return $this->_showCategory($vendor);
+        return $this->_showVendor($vendor);
     }
 
     /**
-     * Saves an category.
-     *
-     * @return Response|null
-     * @throws ServerErrorHttpException
+     * Saves a vendor.
+     * TODO
      */
-    public function actionSaveCategory()
+    public function actionSaveVendor()
     {
         $this->requirePostRequest();
 
@@ -310,6 +318,8 @@ class VendorsController extends Controller
     /**
      * Deletes a category.
      *
+     * TODO
+     *
      * @return Response|null
      * @throws NotFoundHttpException if the requested vendor cannot be found
      */
@@ -359,27 +369,27 @@ class VendorsController extends Controller
      * @return Response
      * @throws Exception
      * @throws NotFoundHttpException if the requested vendor cannot be found
-     * @throws ServerErrorHttpException if the vendor group is not configured properly
+     * @throws ServerErrorHttpException if the vendor settings are not configured properly
      */
-    public function actionShareCategory(int $vendorId, int $siteId = null): Response
+    public function actionShareVendor(int $vendorId, int $siteId = null): Response
     {
-        $vendor = Craft::$app->getCategories()->getCategoryById($vendorId, $siteId);
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId, $siteId);
 
         if (!$vendor) {
-            throw new NotFoundHttpException('vendor not found');
+            throw new NotFoundHttpException('Vendor not found');
         }
 
-        // Make sure they have permission to be viewing this category
+        // Make sure they have permission to be viewing this vendor
         $this->_enforceEditVendorPermissions($vendor);
 
         // Make sure the vendor actually can be viewed
-        if (!Craft::$app->getCategories()->isGroupTemplateValid($vendor->getGroup(), $vendor->siteId)) {
-            throw new ServerErrorHttpException('vendor group not configured properly');
+        if (!Market::$plugin->getVendors()->isVendorTemplateValid($vendor->siteId)) {
+            throw new ServerErrorHttpException('Vendor settings not configured properly');
         }
 
         // Create the token and redirect to the vendor URL with the token in place
         $token = Craft::$app->getTokens()->createToken([
-            'categories/view-shared-category',
+            'market/vendors/view-shared-vendor',
             [
                 'vendorId' => $vendorId,
                 'siteId' => $vendor->siteId
@@ -396,24 +406,28 @@ class VendorsController extends Controller
     }
 
     /**
-     * Shows an category/draft/version based on a token.
+     * Shows a vendor/draft/version based on a token.
      *
      * @param int $vendorId
      * @param int|null $siteId
      * @return Response
+     * @throws BadRequestHttpException
+     * @throws InvalidConfigException
      * @throws NotFoundHttpException if the requested vendor cannot be found
+     * @throws ServerErrorHttpException
+     * @throws SiteNotFoundException
      */
-    public function actionViewSharedCategory(int $vendorId, int $siteId = null): Response
+    public function actionViewSharedVendor(int $vendorId, int $siteId = null): Response
     {
         $this->requireToken();
 
-        $vendor = Craft::$app->getCategories()->getCategoryById($vendorId, $siteId);
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId, $siteId);
 
         if (!$vendor) {
-            throw new NotFoundHttpException('vendor not found');
+            throw new NotFoundHttpException('Vendor not found');
         }
 
-        return $this->_showCategory($vendor);
+        return $this->_showVendor($vendor);
     }
 
     /**
@@ -492,32 +506,24 @@ class VendorsController extends Controller
     }
 
     /**
-     * Fetches or creates a Category.
+     * Fetches or creates a Vendor.
      *
-     * @return Category
-     * @throws BadRequestHttpException if the requested vendor group doesn't exist
+     * @return Vendor
      * @throws NotFoundHttpException if the requested vendor cannot be found
      */
-    private function _getCategoryModel(): Category
+    private function _getVendorModel(): Vendor
     {
         $vendorId = $this->request->getBodyParam('vendorId');
         $siteId = $this->request->getBodyParam('siteId');
 
         if ($vendorId) {
-            $vendor = Craft::$app->getCategories()->getCategoryById($vendorId, $siteId);
+            $vendor = Market::$plugin->getVendors()->getVendorById($vendorId, $siteId);
 
             if (!$vendor) {
-                throw new NotFoundHttpException('vendor not found');
+                throw new NotFoundHttpException('Vendor not found');
             }
         } else {
-            $groupId = $this->request->getRequiredBodyParam('groupId');
-            if (($group = Craft::$app->getCategories()->getGroupById($groupId)) === null) {
-                throw new BadRequestHttpException('Invalid vendor group ID: ' . $groupId);
-            }
-
-            $vendor = new Category();
-            $vendor->groupId = $group->id;
-            $vendor->fieldLayoutId = $group->fieldLayoutId;
+            $vendor = new Vendor();
 
             if ($siteId) {
                 $vendor->siteId = $siteId;
@@ -530,7 +536,7 @@ class VendorsController extends Controller
     /**
      * Enforces all Edit vendor permissions.
      *
-     * @param vendor $vendor
+     * @param Vendor $vendor
      * @throws ForbiddenHttpException|InvalidConfigException
      */
     private function _enforceEditVendorPermissions(vendor $vendor): void
@@ -545,14 +551,15 @@ class VendorsController extends Controller
     }
 
     /**
-     * Populates an vendor with post data.
+     * Populates a vendor with post data.
      *
-     * @param vendor $vendor
+     * @param Vendor $vendor
      */
-    private function _populateCategoryModel(vendor $vendor)
+    private function _populateVendorModel(Vendor $vendor): void
     {
         // Set the vendor attributes, defaulting to the existing values for whatever is missing from the post data
         $vendor->slug = $this->request->getBodyParam('slug', $vendor->slug);
+        $vendor->code = $this->request->getBodyParam('code', $vendor->code);
         $vendor->enabled = (bool)$this->request->getBodyParam('enabled', $vendor->enabled);
 
         $vendor->title = $this->request->getBodyParam('title', $vendor->title);
@@ -560,31 +567,36 @@ class VendorsController extends Controller
         $fieldsLocation = $this->request->getParam('fieldsLocation', 'fields');
         $vendor->setFieldValuesFromRequest($fieldsLocation);
 
-        // Parent
-        if (($parentId = $this->request->getBodyParam('parentId')) !== null) {
-            if (is_array($parentId)) {
-                $parentId = reset($parentId) ?: '';
+        // User
+        if (($userId = $this->request->getBodyParam('user', $vendor->userId)) !== null) {
+            if (is_array($userId)) {
+                $userId = reset($userId) ?: null;
             }
 
-            $vendor->newParentId = $parentId ?: '';
+            $vendor->userId = $userId;
+        }
+
+        // Profile picture - only if not new as we need to wait for the vendor folders to be created
+        if ($vendor->id && ($profilePictureId = $this->request->getBodyParam('profilePicture', $vendor->profilePictureId)) !== null) {
+            if (is_array($profilePictureId)) {
+                $profilePictureId = reset($profilePictureId) ?: null;
+            }
+
+            $vendor->profilePictureId = $profilePictureId;
         }
     }
 
     /**
-     * Displays a category.
+     * Displays a vendor.
      *
-     * @param vendor $vendor
+     * @param Vendor $vendor
      * @return Response
-     * @throws ServerErrorHttpException if the vendor doesn't have a URL for the site it's configured with, or if the category's site ID is invalid
+     * @throws InvalidConfigException
+     * @throws ServerErrorHttpException if the vendor doesn't have a URL for the site it's configured with, or if the vendor's site ID is invalid
+     * @throws SiteNotFoundException
      */
-    private function _showCategory(vendor $vendor): Response
+    private function _showVendor(vendor $vendor): Response
     {
-        $vendorGroupSiteSettings = $vendor->getGroup()->getSiteSettings();
-
-        if (!isset($vendorGroupSiteSettings[$vendor->siteId]) || !$vendorGroupSiteSettings[$vendor->siteId]->hasUrls) {
-            throw new ServerErrorHttpException('The vendor ' . $vendor->id . ' doesn’t have a URL for the site ' . $vendor->siteId . '.');
-        }
-
         $site = Craft::$app->getSites()->getSiteById($vendor->siteId, true);
 
         if (!$site) {
@@ -594,6 +606,9 @@ class VendorsController extends Controller
         Craft::$app->language = $site->language;
         Craft::$app->set('locale', Craft::$app->getI18n()->getLocaleById($site->language));
 
+        // Get the vendor settings
+        $vendorSettings = $vendor->getSettings();
+
         // Have this vendor override any freshly queried categories with the same ID/site
         if ($vendor->id) {
             Craft::$app->getElements()->setPlaceholderElement($vendor);
@@ -601,7 +616,7 @@ class VendorsController extends Controller
 
         $this->getView()->getTwig()->disableStrictVariables();
 
-        return $this->renderTemplate($vendorGroupSiteSettings[$vendor->siteId]->template, [
+        return $this->renderTemplate($vendorSettings->template, [
             'vendor' => $vendor
         ]);
     }

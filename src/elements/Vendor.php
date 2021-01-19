@@ -12,16 +12,20 @@ namespace angellco\market\elements;
 
 use angellco\market\elements\db\VendorQuery;
 use angellco\market\Market;
+use angellco\market\models\VendorSettings;
 use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
+use craft\errors\SiteNotFoundException;
 use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\db\Exception;
+use yii\web\ServerErrorHttpException;
 
 /**
  * @property Asset|null $profilePicture
@@ -105,6 +109,11 @@ class Vendor extends Element
      * @var Asset|null|false
      */
     private $_profilePicture;
+
+    /**
+     * @var VendorSettings[]
+     */
+    private $_vendorSettings;
 
 
     // Public Methods
@@ -454,6 +463,7 @@ class Vendor extends Element
 
     /**
      * @inheritdoc
+     * @noinspection PhpUnhandledExceptionInspection
      */
     public function getEditorHtml(): string
     {
@@ -468,15 +478,38 @@ class Vendor extends Element
 
     /**
      * @inheritdoc
+     *
+     * @return FieldLayout|null
+     * @throws ServerErrorHttpException
+     * @throws SiteNotFoundException
      */
     public function getFieldLayout(): ?FieldLayout
     {
-        $vendorSettings = Market::$plugin->getVendorSettings()->getSettings($this->siteId);
+        $vendorSettings = $this->getSettings();
 
         if ($vendorSettings && $vendorSettings->fieldLayoutId) {
             return Craft::$app->fields->getLayoutById($vendorSettings->fieldLayoutId);
         }
 
         return null;
+    }
+
+    /**
+     * Returns the Vendor Settings for the site this Vendor is in
+     *
+     * @return VendorSettings
+     * @throws SiteNotFoundException|ServerErrorHttpException
+     */
+    public function getSettings(): VendorSettings
+    {
+        if ($this->_vendorSettings[$this->siteId]) {
+            return $this->_vendorSettings[$this->siteId];
+        }
+
+        if (!$this->_vendorSettings[$this->siteId] = Market::$plugin->getVendorSettings()->getSettings($this->siteId)) {
+            throw new ServerErrorHttpException('Vendor does not have valid settings.');
+        }
+
+        return $this->_vendorSettings[$this->siteId];
     }
 }
