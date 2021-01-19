@@ -457,9 +457,11 @@ class Vendor extends Element
      */
     public function getEditorHtml(): string
     {
-        $html = '';
+        $view = Craft::$app->getView();
 
-        $html .= parent::getEditorHtml();
+        $html = parent::getEditorHtml();
+        $html .= $view->renderTemplateMacro('market/vendors/_fields', 'generalMetaFields', [$this]);
+        $html .= $view->renderTemplateMacro('market/vendors/_fields', 'stripeMeta', [$this]);
 
         return $html;
     }
