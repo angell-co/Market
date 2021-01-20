@@ -24,6 +24,7 @@
         autocapitalize: false,
         value: vendor.slug,
         placeholder: "Enter slug"|t('app'),
+        required: true,
         errors: (vendor.getErrors('slug')|merge(vendor.getErrors('uri')))
     }) }}
 
