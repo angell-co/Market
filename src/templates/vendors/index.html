@@ -5,3 +5,7 @@
 {% set elementType = 'angellco\\market\\elements\\Vendor' %}
 
 {% set selectedSubnavItem = 'vendors' %}
+
+{% block actionButton %}
+    <a href="{{ url('market/vendors/new') }}" class="btn submit add icon">{{ "New vendor"|t('market') }}</a>
+{% endblock %}

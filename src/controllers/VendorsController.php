@@ -17,6 +17,7 @@ use craft\base\Element;
 use craft\elements\Asset;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
+use craft\errors\InvalidElementException;
 use craft\errors\SiteNotFoundException;
 use craft\events\ElementEvent;
 use craft\helpers\Json;
@@ -231,19 +232,27 @@ class VendorsController extends Controller
 
     /**
      * Saves a vendor.
-     * TODO
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws ElementNotFoundException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \Throwable
      */
-    public function actionSaveVendor()
+    public function actionSaveVendor(): ?Response
     {
         $this->requirePostRequest();
 
-        $vendor = $this->_getCategoryModel();
-        $vendorVariable = $this->request->getValidatedBodyParam('categoryVariable') ?? 'vendor';
+        $vendor = $this->_getVendorModel();
 
         // Permission enforcement
         $this->_enforceEditVendorPermissions($vendor);
 
-        // Are we duplicating the category?
+        // Are we duplicating the vendor?
         if ($this->request->getBodyParam('duplicate')) {
             // Swap $vendor with the duplicate
             try {
@@ -259,7 +268,7 @@ class VendorsController extends Controller
                     ]);
                 }
 
-                $this->setFailFlash(Craft::t('app', 'Couldn’t duplicate category.'));
+                $this->setFailFlash(Craft::t('market', 'Couldn’t duplicate vendor.'));
 
                 // Send the original vendor back to the template, with any validation errors on the clone
                 $vendor->addErrors($clone->getErrors());
@@ -269,12 +278,12 @@ class VendorsController extends Controller
 
                 return null;
             } catch (\Throwable $e) {
-                throw new ServerErrorHttpException(Craft::t('app', 'An error occurred when duplicating the category.'), 0, $e);
+                throw new ServerErrorHttpException(Craft::t('market', 'An error occurred when duplicating the vendor.'), 0, $e);
             }
         }
 
         // Populate the vendor with post data
-        $this->_populateCategoryModel($vendor);
+        $this->_populateVendorModel($vendor);
 
         // Save the category
         if ($vendor->enabled && $vendor->getEnabledForSite()) {
@@ -289,11 +298,11 @@ class VendorsController extends Controller
                 ]);
             }
 
-            $this->setFailFlash(Craft::t('app', 'Couldn’t save category.'));
+            $this->setFailFlash(Craft::t('market', 'Couldn’t save vendor.'));
 
             // Send the vendor back to the template
             Craft::$app->getUrlManager()->setRouteParams([
-                $vendorVariable => $vendor
+                'vendor' => $vendor
             ]);
 
             return null;
@@ -311,7 +320,7 @@ class VendorsController extends Controller
             ]);
         }
 
-        $this->setSuccessFlash(Craft::t('app', 'vendor saved.'));
+        $this->setSuccessFlash(Craft::t('market', 'Vendor saved.'));
         return $this->redirectToPostedUrl($vendor);
     }
 
@@ -384,7 +393,7 @@ class VendorsController extends Controller
 
         // Make sure the vendor actually can be viewed
         if (!Market::$plugin->getVendors()->isVendorTemplateValid($vendor->siteId)) {
-            throw new ServerErrorHttpException('Vendor settings not configured properly');
+            throw new ServerErrorHttpException(Craft::t('market', 'Vendor settings not configured properly.'));
         }
 
         // Create the token and redirect to the vendor URL with the token in place

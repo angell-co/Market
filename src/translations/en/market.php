@@ -68,4 +68,10 @@ return [
     'Are you sure you want to delete this Vendor?' => 'Are you sure you want to delete this Vendor?',
     'Create a new vendor' => 'Create a new vendor',
     'Edit Vendor' => 'Edit Vendor',
+    'Couldn’t duplicate vendor.' => 'Couldn’t duplicate vendor.',
+    'An error occurred when duplicating the vendor.' => 'An error occurred when duplicating the vendor.',
+    'Vendor settings not configured properly.' => 'Vendor settings not configured properly.',
+    'Couldn’t save vendor.' => 'Couldn’t save vendor.',
+    'Vendor saved.' => 'Vendor saved.',
+    'New vendor' => 'New vendor',
 ];
