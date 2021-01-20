@@ -13,6 +13,7 @@ namespace angellco\market\elements;
 use angellco\market\elements\db\VendorQuery;
 use angellco\market\Market;
 use angellco\market\models\VendorSettings;
+use angellco\market\records\Vendor as VendorRecord;
 use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
@@ -22,7 +23,8 @@ use craft\errors\SiteNotFoundException;
 use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
-use yii\base\InvalidConfigException;
+use craft\records\User as UserRecord;
+use craft\validators\UniqueValidator;
 use yii\base\NotSupportedException;
 use yii\db\Exception;
 use yii\web\ServerErrorHttpException;
@@ -30,6 +32,7 @@ use yii\web\ServerErrorHttpException;
 /**
  * @property Asset|null $profilePicture
  * @property-read bool $hasCheckeredThumb
+ * @property-read VendorSettings $settings
  * @property User|null|bool|false $user
  *
  * @author    Angell & Co
@@ -313,7 +316,7 @@ class Vendor extends Element
     public function getUser()
     {
         if ($this->_user === null) {
-            if ($this->userId === null) {
+            if (!$this->userId) {
                 return null;
             }
 
@@ -459,6 +462,33 @@ class Vendor extends Element
         }
 
         return parent::tableAttributeHtml($attribute);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+
+        $rules[] = ['code', 'required'];
+
+        // Validate that the code is exactly 3 letters
+        $rules[] = ['code', function ($attribute, $params, $validator) {
+            if (!preg_match('/^[a-zA-Z]{3}$/m', $this->$attribute)) {
+                $this->addError($attribute, Craft::t('market', 'Code must be exactly 3 letters.'));
+            }
+        }];
+
+        // Validate that the code and userId are unique
+        $rules[] = [
+            ['code', 'userId'],
+            UniqueValidator::class,
+            'targetClass' => VendorRecord::class,
+            'caseInsensitive' => true,
+        ];
+
+        return $rules;
     }
 
     /**

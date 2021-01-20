@@ -89,12 +89,13 @@
 
         {{ forms.elementSelectField({
             label: "User"|t,
-            id: 'user',
-            name: 'user',
+            id: 'userId',
+            name: 'userId',
             elementType: userElementType,
             selectionLabel: "Choose"|t,
             limit: 1,
-            elements: (user is defined and user ? [user])
+            elements: (user is defined and user ? [user]),
+            errors: vendor.getErrors('userId')
         }) }}
 
         {{ vendorFields.stripeMeta(vendor) }}
@@ -103,14 +104,15 @@
             {{ forms.elementSelectField({
                 jsClass: 'Craft.AssetSelectInput',
                 label: "Profile Picture"|t,
-                id: 'profilePicture',
-                name: 'profilePicture',
+                id: 'profilePictureId',
+                name: 'profilePictureId',
                 elementType: assetElementType,
                 selectionLabel: "Choose"|t,
                 sources: profilePictureOptionSources,
                 criteria: profilePictureOptionCriteria,
                 limit: 1,
-                elements: (profilePicture is defined and profilePicture ? [profilePicture])
+                elements: (profilePicture is defined and profilePicture ? [profilePicture]),
+                errors: vendor.getErrors('profilePictureId')
             }) }}
         {% endif %}
 

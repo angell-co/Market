@@ -45,7 +45,7 @@ class VendorsController extends Controller
     /**
      * @event ElementEvent The event that is triggered when a vendor’s template is rendered for Live Preview.
      */
-    const EVENT_PREVIEW_VENDOR = 'previewVendor';
+    public const EVENT_PREVIEW_VENDOR = 'previewVendor';
 
     /**
      * @inheritdoc
@@ -285,7 +285,7 @@ class VendorsController extends Controller
         // Populate the vendor with post data
         $this->_populateVendorModel($vendor);
 
-        // Save the category
+        // Save the vendor
         if ($vendor->enabled && $vendor->getEnabledForSite()) {
             $vendor->setScenario(Element::SCENARIO_LIVE);
         }
@@ -307,6 +307,11 @@ class VendorsController extends Controller
 
             return null;
         }
+
+        // TODO: at this point, if its a new vendor that was just saved we need to create
+        //       the relevent Asset folders and save them back on to the vendor - this only needs
+        //       to happen once so can be triggered here but the code should be in a service method
+        //       See the old `marketplace_vendors.onSaveVendor` event listener
 
         if ($this->request->getAcceptsJson()) {
             return $this->asJson([
@@ -445,7 +450,7 @@ class VendorsController extends Controller
      * @param array &$variables
      * @throws ForbiddenHttpException if the user is not permitted to edit content in the requested site
      * @throws NotFoundHttpException if the requested vendor cannot be found
-     * @throws SiteNotFoundException|InvalidConfigException
+     * @throws SiteNotFoundException|InvalidConfigException|ServerErrorHttpException
      */
     private function _prepEditVendorVariables(array &$variables): void
     {
@@ -577,7 +582,7 @@ class VendorsController extends Controller
         $vendor->setFieldValuesFromRequest($fieldsLocation);
 
         // User
-        if (($userId = $this->request->getBodyParam('user', $vendor->userId)) !== null) {
+        if (($userId = $this->request->getBodyParam('userId', $vendor->userId)) !== null) {
             if (is_array($userId)) {
                 $userId = reset($userId) ?: null;
             }
@@ -586,7 +591,7 @@ class VendorsController extends Controller
         }
 
         // Profile picture - only if not new as we need to wait for the vendor folders to be created
-        if ($vendor->id && ($profilePictureId = $this->request->getBodyParam('profilePicture', $vendor->profilePictureId)) !== null) {
+        if ($vendor->id && ($profilePictureId = $this->request->getBodyParam('profilePictureId', $vendor->profilePictureId)) !== null) {
             if (is_array($profilePictureId)) {
                 $profilePictureId = reset($profilePictureId) ?: null;
             }

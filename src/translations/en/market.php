@@ -74,4 +74,5 @@ return [
     'Couldn’t save vendor.' => 'Couldn’t save vendor.',
     'Vendor saved.' => 'Vendor saved.',
     'New vendor' => 'New vendor',
+    'Code must be exactly 3 letters.' => 'Code must be exactly 3 letters.',
 ];
