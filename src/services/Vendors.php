@@ -14,6 +14,7 @@ use angellco\market\elements\Vendor;
 use angellco\market\Market;
 use Craft;
 use craft\base\Component;
+use craft\base\ElementInterface;
 use craft\errors\SiteNotFoundException;
 use craft\web\View;
 use yii\base\Exception;
@@ -61,6 +62,41 @@ class Vendors extends Component
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return Craft::$app->getElements()->getElementById($vendorId, Vendor::class, $siteId);
+    }
+
+    /**
+     * Returns a vendor by its user ID
+     *
+     * @param int $userId
+     * @return array|ElementInterface|null
+     */
+    public function getVendorByUserId(int $userId)
+    {
+        $query = Vendor::find();
+        $query->userId = $userId;
+        return $query->one();
+    }
+
+    /**
+     * Fetches the Vendor that is currently logged in. Returns false if there is
+     * anything wrong (not logged in or user isn’t attached to a vendor)
+     *
+     * @return array|bool|ElementInterface|null
+     */
+    public function getCurrentVendor()
+    {
+        $currentUser = Craft::$app->getUser()->getIdentity();
+        if (!$currentUser)
+        {
+            return false;
+        }
+
+        if ($vendor = $this->getVendorByUserId($currentUser->id))
+        {
+            return $vendor;
+        }
+
+        return false;
     }
 
 }
