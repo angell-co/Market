@@ -23,18 +23,11 @@
         shift: true,
     },
     not isNewVendor ? {
-        label: 'Save as a new Vendor'|t('market'),
-        params: {
-            duplicate: '1',
-        },
-        redirect: (continueEditingUrl~'#')|hash,
-    },
-    not isNewVendor ? {
         destructive: true,
-        label: 'Delete Vendor'|t('market'),
+        label: 'Delete vendor'|t('market'),
         action: 'vendors/delete-vendor',
         redirect: 'market/vendors#'|hash,
-        confirm: 'Are you sure you want to delete this Vendor?'|t('market'),
+        confirm: 'Are you sure you want to delete this vendor?'|t('market'),
     }
 ]|filter %}
 

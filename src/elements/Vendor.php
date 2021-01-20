@@ -16,7 +16,16 @@ use angellco\market\models\VendorSettings;
 use angellco\market\records\Vendor as VendorRecord;
 use Craft;
 use craft\base\Element;
+use craft\controllers\ElementIndexesController;
+use craft\elements\actions\Delete;
+use craft\elements\actions\Duplicate;
+use craft\elements\actions\Edit;
+use craft\elements\actions\NewChild;
+use craft\elements\actions\Restore;
+use craft\elements\actions\SetStatus;
+use craft\elements\actions\View;
 use craft\elements\Asset;
+use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\errors\SiteNotFoundException;
@@ -388,6 +397,51 @@ class Vendor extends Element
                 'hasThumbs' => true
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     * @throws SiteNotFoundException
+     */
+    protected static function defineActions(string $source = null): array
+    {
+        // Get the selected site
+        $controller = Craft::$app->controller;
+        if ($controller instanceof ElementIndexesController) {
+            /** @var ElementQuery $elementQuery */
+            $elementQuery = $controller->getElementQuery();
+        } else {
+            $elementQuery = null;
+        }
+        $site = $elementQuery && $elementQuery->siteId
+            ? Craft::$app->getSites()->getSiteById($elementQuery->siteId)
+            : Craft::$app->getSites()->getCurrentSite();
+
+        // Now figure out what we can do with it
+        $actions = [];
+        $elementsService = Craft::$app->getElements();
+
+        // Set Status
+        $actions[] = SetStatus::class;
+
+        // Edit
+        $actions[] = $elementsService->createAction([
+            'type' => Edit::class,
+            'label' => Craft::t('market', 'Edit vendor'),
+        ]);
+
+        // Delete
+        $actions[] = Delete::class;
+
+        // Restore
+        $actions[] = $elementsService->createAction([
+            'type' => Restore::class,
+            'successMessage' => Craft::t('market', 'Vendors restored.'),
+            'partialSuccessMessage' => Craft::t('market', 'Some vendors restored.'),
+            'failMessage' => Craft::t('market', 'Vendors not restored.'),
+        ]);
+
+        return $actions;
     }
 
     /**
