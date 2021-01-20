@@ -106,8 +106,7 @@ class VendorsController extends Controller
             $variables['assetElementType'] = Asset::class;
 
             // Lifted from craft\fields\Assets::_getSourcePathByFolderId
-            $folder = Craft::$app->getAssets()->getFolderById($variables['vendor']->accountFolderId);
-            if ($folder) {
+            if ($variables['vendor']->accountFolderId && $folder = Craft::$app->getAssets()->getFolderById($variables['vendor']->accountFolderId)) {
                 $folderPath = 'folder:' . $folder->uid;
 
                 while ($folder->parentId && $folder->volumeId !== null) {
@@ -330,26 +329,26 @@ class VendorsController extends Controller
     }
 
     /**
-     * Deletes a category.
-     *
-     * TODO
+     * Deletes a vendor.
      *
      * @return Response|null
+     * @throws BadRequestHttpException
      * @throws NotFoundHttpException if the requested vendor cannot be found
+     * @throws \Throwable
      */
-    public function actionDeleteCategory()
+    public function actionDeleteVendor(): ?Response
     {
         $this->requirePostRequest();
 
         $vendorId = $this->request->getRequiredBodyParam('vendorId');
-        $vendor = Craft::$app->getCategories()->getCategoryById($vendorId);
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId);
 
         if (!$vendor) {
-            throw new NotFoundHttpException('vendor not found');
+            throw new NotFoundHttpException('Vendor not found');
         }
 
-        // Make sure they have permission to do this
-        $this->requirePermission('editCategories:' . $vendor->getGroup()->uid);
+        // TODO Make sure they have permission to do this
+//        $this->requirePermission('editCategories:' . $vendor->getGroup()->uid);
 
         // Delete it
         if (!Craft::$app->getElements()->deleteElement($vendor)) {
@@ -357,7 +356,7 @@ class VendorsController extends Controller
                 return $this->asJson(['success' => false]);
             }
 
-            $this->setFailFlash(Craft::t('app', 'Couldn’t delete category.'));
+            $this->setFailFlash(Craft::t('market', 'Couldn’t delete vendor.'));
 
             // Send the vendor back to the template
             Craft::$app->getUrlManager()->setRouteParams([
@@ -371,7 +370,7 @@ class VendorsController extends Controller
             return $this->asJson(['success' => true]);
         }
 
-        $this->setSuccessFlash(Craft::t('app', 'vendor deleted.'));
+        $this->setSuccessFlash(Craft::t('market', 'Vendor deleted.'));
         return $this->redirectToPostedUrl($vendor);
     }
 

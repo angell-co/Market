@@ -79,4 +79,6 @@ return [
     'Vendors restored.' => 'Vendors restored.',
     'Some vendors restored.' => 'Some vendors restored.',
     'Vendors not restored.' => 'Vendors not restored.',
+    'Couldn’t delete vendor.' => 'Couldn’t delete vendor.',
+    'Vendor deleted.' => 'Vendor deleted.',
 ];
