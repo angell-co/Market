@@ -38,6 +38,7 @@ use yii\db\ActiveQueryInterface;
  * @property string $processingTime
  * @property Vendor $vendor
  * @property Country $originCountry
+ * @property ShippingDestination[] $destinations
  *
  * @author    Angell & Co
  * @package   Market
