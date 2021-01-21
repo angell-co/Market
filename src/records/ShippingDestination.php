@@ -60,7 +60,7 @@ class ShippingDestination extends ActiveRecord
     }
 
     /**
-     * Returns the shipping profile this destination relates to.
+     * Returns the shipping profile this destination belongs to.
      *
      * @return ActiveQueryInterface
      */
@@ -70,7 +70,7 @@ class ShippingDestination extends ActiveRecord
     }
 
     /**
-     * Returns the Commerce shipping zone this destination relates to.
+     * Returns the Commerce shipping zone this destination belongs to.
      *
      * @return ActiveQueryInterface
      */

@@ -87,7 +87,6 @@ class Install extends Migration
         /**
          * ordergroups
          * ordergroups_commerce_orders
-         * shippingprofiles
          */
 
         // Drop fks and indexes
@@ -95,6 +94,8 @@ class Install extends Migration
         $this->_dropIndexes(Table::VENDORS);
         $this->_dropForeignKeys(Table::SHIPPINGDESTINATIONS);
         $this->_dropIndexes(Table::SHIPPINGDESTINATIONS);
+        $this->_dropForeignKeys(Table::SHIPPINGPROFILES);
+        $this->_dropIndexes(Table::SHIPPINGPROFILES);
 
         // Add in the foreign keys
         $this->addForeignKey(null, Table::VENDORS, 'id', CraftTable::ELEMENTS, 'id', 'CASCADE', null);
@@ -105,12 +106,17 @@ class Install extends Migration
         $this->addForeignKey(null, Table::VENDORS, 'filesFolderId', CraftTable::VOLUMEFOLDERS, 'id', 'SET NULL', null);
         $this->addForeignKey(null, Table::SHIPPINGDESTINATIONS, 'shippingProfileId', Table::SHIPPINGPROFILES, 'id', 'CASCADE', null);
         $this->addForeignKey(null, Table::SHIPPINGDESTINATIONS, 'shippingZoneId', CommerceTable::SHIPPINGZONES, 'id', 'CASCADE', null);
+        $this->addForeignKey(null, Table::SHIPPINGPROFILES, 'vendorId', Table::VENDORS, 'id', 'CASCADE', null);
+        $this->addForeignKey(null, Table::SHIPPINGPROFILES, 'originCountryId', CommerceTable::COUNTRIES, 'id', 'CASCADE', null);
 
         // Add back in the indexes
         $this->createIndex(null, Table::VENDORS, 'userId', true);
         $this->createIndex(null, Table::VENDORS, 'code', true);
         $this->createIndex(null, Table::SHIPPINGDESTINATIONS, 'shippingProfileId');
         $this->createIndex(null, Table::SHIPPINGDESTINATIONS, 'shippingZoneId');
+        $this->createIndex(null, Table::SHIPPINGPROFILES, 'vendorId');
+        $this->createIndex(null, Table::SHIPPINGPROFILES, 'originCountryId');
+        $this->createIndex(null, Table::SHIPPINGPROFILES, ['name', 'vendorId'], true);
     }
 
     private function _updateElementReferences(): void
