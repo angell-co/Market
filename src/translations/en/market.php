@@ -82,4 +82,6 @@ return [
     'Couldn’t delete vendor.' => 'Couldn’t delete vendor.',
     'Vendor deleted.' => 'Vendor deleted.',
     'Couldn’t save vendor volume folders.' => 'Couldn’t save vendor volume folders.',
+    'Shipping Profiles' => 'Shipping Profiles',
+    'Orders' => 'Orders',
 ];

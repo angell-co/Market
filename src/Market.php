@@ -105,15 +105,27 @@ class Market extends Plugin
         // TODO: Permissions
         // if (Craft::$app->getUser()->checkPermission('market-manageVendors')) {}
 
+        $navItem['subnav']['orders'] = [
+            'label' => Craft::t('market', 'Orders'),
+            'url' => 'market/orders'
+        ];
+
         $navItem['subnav']['vendors'] = [
             'label' => Craft::t('market', 'Vendors'),
             'url' => 'market/vendors'
         ];
 
-        $navItem['subnav']['settings'] = [
-            'label' => Craft::t('app', 'Settings'),
-            'url' => 'market/settings'
+        $navItem['subnav']['shippingProfiles'] = [
+            'label' => Craft::t('market', 'Shipping Profiles'),
+            'url' => 'market/shipping-profiles'
         ];
+
+        if (Craft::$app->getUser()->getIsAdmin()) {
+            $navItem['subnav']['settings'] = [
+                'label' => Craft::t('app', 'Settings'),
+                'url' => 'market/settings'
+            ];
+        }
 
         return $navItem;
     }
