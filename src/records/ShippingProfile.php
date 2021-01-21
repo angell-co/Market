@@ -73,7 +73,7 @@ class ShippingProfile extends ActiveRecord
     {
         return [
             [['vendorId', 'originCountryId', 'name'], 'required'],
-            ['name', 'unique', 'targetAttribute' => ['name', 'vendorId']]
+            ['name', 'unique', 'targetAttribute' => ['name', 'vendorId']],
         ];
     }
 
