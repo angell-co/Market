@@ -73,12 +73,7 @@ class ShippingProfile extends ActiveRecord
     {
         return [
             [['vendorId', 'originCountryId', 'name'], 'required'],
-
-            // TODO name and vendorId combo must be unique
-//            ['columns' => ['name','vendorId'], 'unique' => true],
-
-        // TODO processingTime must be one of PROCESSING_TIMES
-
+            ['name', 'unique', 'targetAttribute' => ['name', 'vendorId']]
         ];
     }
 

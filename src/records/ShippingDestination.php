@@ -55,7 +55,7 @@ class ShippingDestination extends ActiveRecord
     {
         return [
             [['primaryRate', 'deliveryTime'], 'required'],
-            [['shippingProfileId', 'shippingZoneId'], 'unique', 'targetAttribute' => ['shippingProfileId', 'shippingZoneId']],
+            ['shippingZoneId', 'unique', 'targetAttribute' => ['shippingProfileId', 'shippingZoneId']],
         ];
     }
 
