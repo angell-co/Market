@@ -81,4 +81,5 @@ return [
     'Vendors not restored.' => 'Vendors not restored.',
     'Couldn’t delete vendor.' => 'Couldn’t delete vendor.',
     'Vendor deleted.' => 'Vendor deleted.',
+    'Couldn’t save vendor volume folders.' => 'Couldn’t save vendor volume folders.',
 ];

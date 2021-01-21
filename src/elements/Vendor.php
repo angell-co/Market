@@ -18,12 +18,9 @@ use Craft;
 use craft\base\Element;
 use craft\controllers\ElementIndexesController;
 use craft\elements\actions\Delete;
-use craft\elements\actions\Duplicate;
 use craft\elements\actions\Edit;
-use craft\elements\actions\NewChild;
 use craft\elements\actions\Restore;
 use craft\elements\actions\SetStatus;
-use craft\elements\actions\View;
 use craft\elements\Asset;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
@@ -32,7 +29,6 @@ use craft\errors\SiteNotFoundException;
 use craft\helpers\Cp;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
-use craft\records\User as UserRecord;
 use craft\validators\UniqueValidator;
 use yii\base\NotSupportedException;
 use yii\db\Exception;
@@ -355,8 +351,8 @@ class Vendor extends Element
      */
     public function getProfilePicture(): ?Asset
     {
-        if ($this->_profilePicture === null) {
-            if ($this->profilePictureId === null) {
+        if (!$this->_profilePicture) {
+            if (!$this->profilePictureId) {
                 return null;
             }
 

@@ -248,6 +248,8 @@ class VendorsController extends Controller
 
         $vendor = $this->_getVendorModel();
 
+        $isNew = !$vendor->id;
+
         // Permission enforcement
         $this->_enforceEditVendorPermissions($vendor);
 
@@ -307,20 +309,31 @@ class VendorsController extends Controller
             return null;
         }
 
-        // TODO: at this point, if its a new vendor that was just saved we need to create
-        //       the relevent Asset folders and save them back on to the vendor - this only needs
-        //       to happen once so can be triggered here but the code should be in a service method
-        //       See the old `marketplace_vendors.onSaveVendor` event listener
+        // Create the volume folders - we only want to do this if the vendor actually saved OK.
+        // The method will only re-save the vendor if the folders actually need creating or are
+        // different for some reason.
+        if (!Market::$plugin->getVendors()->createVolumeFolders($vendor)) {
+            if ($this->request->getAcceptsJson()) {
+                return $this->asJson([
+                    'success' => false,
+                    'errors' => $vendor->getErrors(),
+                ]);
+            }
+
+            $this->setFailFlash(Craft::t('market', 'Couldn’t save vendor volume folders.'));
+
+            // Send the vendor back to the template
+            Craft::$app->getUrlManager()->setRouteParams([
+                'vendor' => $vendor
+            ]);
+
+            return null;
+        }
 
         if ($this->request->getAcceptsJson()) {
             return $this->asJson([
                 'success' => true,
-                'id' => $vendor->id,
-                'title' => $vendor->title,
-                'slug' => $vendor->slug,
-                'status' => $vendor->getStatus(),
-                'url' => $vendor->getUrl(),
-                'cpEditUrl' => $vendor->getCpEditUrl()
+                'vendor' => $vendor->toArray()
             ]);
         }
 
