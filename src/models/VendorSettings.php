@@ -28,10 +28,10 @@ use yii\base\InvalidConfigException;
  * Vendor Settings model
  *
  * @property Volume $volume
- * @property-read Site $site
+ * @property Site $site
  * @property Country $shippingOrigin
- * @property-read array $config
- * @property-read FieldLayout $fieldLayout
+ * @property array $config
+ * @property FieldLayout $fieldLayout
  * @mixin FieldLayoutBehavior
  *
  * @author    Angell & Co
@@ -41,12 +41,12 @@ use yii\base\InvalidConfigException;
 class VendorSettings extends Model
 {
     /**
-     * @var int ID
+     * @var int|null ID
      */
     public $id;
 
     /**
-     * @var int Site ID
+     * @var int|null Site ID
      */
     public $siteId;
 

@@ -17,8 +17,8 @@ use yii\base\InvalidConfigException;
 /**
  * Stripe Settings model
  *
- * @property-read array $config
- * @property-read Site $site
+ * @property Site $site
+ * @property array $config
  *
  * @author    Angell & Co
  * @package   Market
@@ -27,12 +27,12 @@ use yii\base\InvalidConfigException;
 class StripeSettings extends Model
 {
     /**
-     * @var int ID
+     * @var int|null ID
      */
     public $id;
 
     /**
-     * @var int Site ID
+     * @var int|null Site ID
      */
     public $siteId;
 

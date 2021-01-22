@@ -94,4 +94,6 @@ return [
     '4-6 Weeks' => '4-6 Weeks',
     '6-8 Weeks' => '6-8 Weeks',
     'Unknown' => 'Unknown',
+    'Processing Time' => 'Processing Time',
+    'Origin Country' => 'Origin Country',
 ];
