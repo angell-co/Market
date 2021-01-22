@@ -1,0 +1,57 @@
+{% extends 'market/_layouts/cp' %}
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+{% do view.registerTranslations('market', [
+    'No shipping profiles available.',
+    'Vendor',
+    'Origin Country',
+    'Processing Time',
+    'No. of Destinations',
+    'Search shipping profiles by name, vendor or origin country…',
+]) %}
+
+{% set title = 'Shipping Profiles'|t('market') %}
+{% set selectedSubnavItem = 'shipping' %}
+
+{% block content %}
+    <div id="shipping-vue-admin-table"></div>
+{% endblock %}
+
+{% js %}
+var columns = [
+    { name: '__slot:title', title: Craft.t('app', 'Name'), sortField: 'name' },
+    { name: 'vendor', title: Craft.t('market', 'Vendor'), sortField: 'vendorTitle', callback: function(value) {
+        if (!value) {
+            return '';
+        }
+
+        var title = Craft.escapeHtml(value.title);
+        var $html = '';
+        if (value.status) {
+            $html = $html + '<span class="status '+value.status+'"></span>';
+        }
+
+        if (value.url) {
+            $html = $html + '<a class="cell-bold" href="'+value.url+'">'+title+'</a>';
+        } else {
+            $html = $html + '<span class="cell-bold">'+title+'</span>';
+        }
+
+        return $html;
+    } },
+    { name: 'originCountry', title: Craft.t('market', 'Origin Country'), sortField: 'countryIso', callback: function(value) { return value } },
+    { name: 'processingTime', title: Craft.t('market', 'Processing Time'), sortField: 'processingTime' },
+    { name: 'destinations', title: Craft.t('market', 'No. of Destinations') },
+
+];
+
+new Craft.VueAdminTable({
+    columns: columns,
+    container: '#shipping-vue-admin-table',
+    emptyMessage: Craft.t('market', 'No shipping profiles available.'),
+    padded: true,
+    search: true,
+    searchPlaceholder: Craft.t('market', 'Search shipping profiles by name, vendor or origin country…'),
+    tableDataEndpoint: Craft.getActionUrl('market/shipping/shipping-profiles-table')
+});
+{% endjs %}
+

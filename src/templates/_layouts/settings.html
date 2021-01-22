@@ -1,12 +1,8 @@
 {% requireAdmin %}
 
-{% extends "_layouts/cp" %}
+{% extends "market/_layouts/cp" %}
 
 {% set title = "Market Settings"|t('market') %}
-
-{% set crumbs = [
-    { label: "Market"|t('market'), url: url('market') }
-] %}
 
 {% set selectedSubnavItem = 'settings' %}
 

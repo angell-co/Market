@@ -115,9 +115,9 @@ class Market extends Plugin
             'url' => 'market/vendors'
         ];
 
-        $navItem['subnav']['shippingProfiles'] = [
-            'label' => Craft::t('market', 'Shipping Profiles'),
-            'url' => 'market/shipping-profiles'
+        $navItem['subnav']['shipping'] = [
+            'label' => Craft::t('market', 'Shipping'),
+            'url' => 'market/shipping'
         ];
 
         if (Craft::$app->getUser()->getIsAdmin()) {

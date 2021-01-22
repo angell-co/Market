@@ -96,4 +96,8 @@ return [
     'Unknown' => 'Unknown',
     'Processing Time' => 'Processing Time',
     'Origin Country' => 'Origin Country',
+    'Shipping' => 'Shipping',
+    'No shipping profiles available.' => 'No shipping profiles available.',
+    'Search shipping profiles by name, vendor or origin country…' => 'Search shipping profiles by name, vendor or origin country…',
+    'No. of Destinations' => 'No. of Destinations',
 ];

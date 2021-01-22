@@ -152,6 +152,9 @@ trait PluginTrait
                 $event->rules['market/vendors/new/<siteHandle:{handle}>'] = 'market/vendors/edit-vendor';
                 $event->rules['market/vendors/<vendorId:\d+><slug:(?:-{slug})?>'] = 'market/vendors/edit-vendor';
                 $event->rules['market/vendors/<vendorId:\d+><slug:(?:-{slug})?>/<siteHandle:{handle}>'] = 'market/vendors/edit-vendor';
+
+                // Shipping
+                $event->rules['market/shipping'] = 'market/shipping/index';
             }
         );
     }
