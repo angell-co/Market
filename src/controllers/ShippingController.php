@@ -11,11 +11,15 @@
 namespace angellco\market\controllers;
 
 use angellco\market\db\Table;
+use angellco\market\elements\Vendor;
+use angellco\market\helpers\ShippingProfileHelper;
+use angellco\market\Market;
+use angellco\market\models\ShippingDestination;
 use angellco\market\models\ShippingProfile;
 use angellco\market\records\ShippingDestination as ShippingDestinationRecord;
-use angellco\market\records\ShippingProfile as ShippingProfileRecord;
 use Craft;
 use craft\commerce\db\Table as CommerceTable;
+use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
 use craft\db\Table as CraftTable;
 use craft\helpers\AdminTable;
@@ -24,6 +28,7 @@ use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use craft\web\View;
 use yii\web\BadRequestHttpException;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -42,6 +47,153 @@ class ShippingController extends Controller
     {
         return $this->renderTemplate('market/shipping/_index.html', [], View::TEMPLATE_MODE_CP);
     }
+
+    /**
+     * Shipping profile edit page
+     *
+     * @param int|null $profileId
+     * @param ShippingProfile|null $shippingProfile
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionEditShippingProfile(int $profileId = null, ShippingProfile $shippingProfile = null): Response
+    {
+        // TODO permissions
+
+        $variables = [];
+
+        // Sort out the main model
+        if ($profileId !== null) {
+            if ($shippingProfile === null) {
+                $shippingProfile = Market::$plugin->getShippingProfiles()->getShippingProfileById($profileId);
+
+                if (!$shippingProfile) {
+                    throw new NotFoundHttpException('Shipping profile not found');
+                }
+            }
+
+            $variables['title'] = trim($shippingProfile->name) ?: Craft::t('market', 'Edit shipping profile');
+        } else {
+            if ($shippingProfile === null) {
+                $shippingProfile = new ShippingProfile();
+            }
+
+            $variables['title'] = Craft::t('market', 'Create a new shipping profile');
+        }
+
+        $variables['shippingProfile'] = $shippingProfile;
+
+        // Vendor
+        $variables['vendorElementType'] = Vendor::class;
+        $variables['vendor'] = $variables['shippingProfile']->getVendor();
+
+        // Countries
+        $variables['originCountryOptions'] = Commerce::getInstance()->getCountries()->getAllEnabledCountriesAsList();
+
+        // Processing Time options
+        $variables['processingTimeOptions'] = ShippingProfileHelper::processingTimeOptions();
+
+        // Shipping Destinations
+        $variables['zoneOptions'] = [];
+        foreach (Commerce::getInstance()->getShippingZones()->getAllShippingZones() as $zone) {
+            $variables['zoneOptions'][] = [
+                'label' => $zone->name,
+                'value' => $zone->id
+            ];
+        }
+
+        // Get existing destinations or make a default blank row
+        if ($variables['shippingProfile']->getShippingDestinations()) {
+            $variables['destinationsTableRows'] = [];
+            foreach ($variables['shippingProfile']->getShippingDestinations() as $shippingDestination) {
+                $variables['destinationsTableRows'][$shippingDestination->id] = [
+                    'zone' => $shippingDestination->shippingZoneId,
+                    'primaryRate' => Craft::$app->getFormatter()->asDecimal($shippingDestination->primaryRate),
+                    'secondaryRate' => $shippingDestination->secondaryRate > 0 ? Craft::$app->getFormatter()->asDecimal($shippingDestination->secondaryRate) : '',
+                    'deliveryTime' => $shippingDestination->deliveryTime
+                ];
+            }
+        } else {
+            $variables['destinationsTableRows'] = [
+                'new0' => [
+                    'zone' => $variables['zoneOptions'][0]['value'],
+                    'primaryRate' => '',
+                    'secondaryRate' => '',
+                    'deliveryTime' => ''
+                ]
+            ];
+        }
+
+        // Breadcrumbs
+        $variables['crumbs'] = [
+            [
+                'label' => Craft::t('app', 'Market'),
+                'url' => UrlHelper::url('market')
+            ],
+            [
+                'label' => Craft::t('app', 'Shipping'),
+                'url' => UrlHelper::url('market/shipping')
+            ]
+        ];
+
+        // Continue Editing URL
+        $variables['continueEditingUrl'] = 'market/shipping/{id}';
+
+        return $this->renderTemplate('market/shipping/_edit', $variables);
+    }
+
+    /**
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     */
+    public function actionSaveShippingProfile(): void
+    {
+        $this->requirePostRequest();
+        $shippingProfile = new ShippingProfile();
+
+        // Shared attributes
+        $shippingProfile->id = Craft::$app->getRequest()->getBodyParam('profileId');
+        $shippingProfile->name = Craft::$app->getRequest()->getBodyParam('name');
+        $shippingProfile->originCountryId = Craft::$app->getRequest()->getBodyParam('originCountryId');
+        $shippingProfile->processingTime = Craft::$app->getRequest()->getBodyParam('processingTime');
+
+        // Sort out the vendor ID
+        $vendorId = Craft::$app->getRequest()->getBodyParam('vendorId');
+        if (is_array($vendorId)) {
+            $vendorId = array_shift($vendorId);
+        }
+        $shippingProfile->vendorId = $vendorId;
+
+        // Set the shipping destinations as an array of models
+        $destinationsPost = Craft::$app->getRequest()->getBodyParam('destinations');
+        $destinations = [];
+        foreach ($destinationsPost as $id => $destination) {
+            $destinationModel = new ShippingDestination();
+            $destinationModel->id = $id;
+            $destinationModel->primaryRate = $destination['primaryRate'];
+            $destinationModel->secondaryRate = $destination['secondaryRate'];
+            $destinationModel->deliveryTime = $destination['deliveryTime'];
+
+            $destinations[] = $destinationModel;
+        }
+
+        $shippingProfile->setShippingDestinations($destinations);
+
+        // Save it
+        if (Market::$plugin->getShippingProfiles()->saveShippingProfile($shippingProfile)) {
+            $this->setSuccessFlash(Craft::t('market', 'Shipping profile saved.'));
+            $this->redirectToPostedUrl($shippingProfile);
+        } else {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t save shipping profile.'));
+        }
+
+        // Send the model back to the template
+        Craft::$app->getUrlManager()->setRouteParams(['shippingProfile' => $shippingProfile]);
+    }
+
+    // TODO: delete
+
 
     /**
      * @return Response

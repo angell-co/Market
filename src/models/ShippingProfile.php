@@ -21,6 +21,12 @@ use craft\helpers\UrlHelper;
 /**
  * Shipping profile model
  *
+ * @property string $cpEditUrl
+ * @property Vendor|null $vendor
+ * @property null|Country $originCountry
+ * @property ShippingDestination[]|array $shippingDestinations
+ * @property string $processingTimeLabel
+ *
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
@@ -56,7 +62,7 @@ class ShippingProfile extends Model
     /**
      * @var ShippingDestination[] Shipping destinations
      */
-    public $shippingDestinations;
+    private $_shippingDestinations;
 
     /**
      * @var Vendor|null The vendor element
@@ -130,7 +136,7 @@ class ShippingProfile extends Model
     /**
      * Returns the origin country for this profile.
      */
-    public function getOriginCountry()
+    public function getOriginCountry(): ?Country
     {
         if (!$this->_originCountry) {
             $this->_originCountry = Commerce::getInstance()->getCountries()->getCountryById($this->originCountryId);
@@ -149,43 +155,42 @@ class ShippingProfile extends Model
         return ShippingProfileHelper::processingTimeOptions()[$this->processingTime]['label'];
     }
 
-//    /**
-//     * Returns the profile's destination models.
-//     *
-//     * @return array|mixed
-//     */
-//    public function getDestinations($indexBy = null)
-//    {
-//
-//        if (!isset($this->_destinations))
-//        {
-//            if ($this->id)
-//            {
-//                $this->_destinations = craft()->marketplace_shippingProfiles->getShippingProfileDestinations($this->id, $indexBy);
-//            }
-//            else
-//            {
-//                $this->_destinations = [];
-//            }
-//        }
-//
-//        return $this->_destinations;
-//    }
-//
-//    /**
-//     * Sets the profiles's destination models.
-//     *
-//     * @param array $destinations
-//     *
-//     * @return null
-//     */
-//    public function setDestinations($destinations)
-//    {
-//        $this->_destinations = $destinations;
-//    }
-//
+    /**
+     * Returns the profile's destination models.
+     *
+     * @return ShippingDestination[]|array
+     */
+    public function getShippingDestinations(): array
+    {
+        if ($this->_shippingDestinations !== null) {
+            return $this->_shippingDestinations;
+        }
+
+        if (!$this->id) {
+            return [];
+        }
+
+        $this->setShippingDestinations(Market::$plugin->getShippingProfiles()->getShippingProfileDestinations($this->id));
+
+        return $this->_shippingDestinations;
+    }
+
+    /**
+     * Sets the profile's shipping destinations.
+     *
+     * @param ShippingDestination[] $shippingDestinations
+     */
+    public function setShippingDestinations(array $shippingDestinations): void
+    {
+        $this->_shippingDestinations = $shippingDestinations;
+    }
+
+
+//    TODO: adjuster stuff
 //    /**
 //     * Sets the destinations to those that match the given country ID.
+//     *
+//     * This is for the adjuster
 //     *
 //     * @param $countryId
 //     */

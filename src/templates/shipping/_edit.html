@@ -1,0 +1,125 @@
+{% extends 'market/_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% set fullPageForm = true %}
+{% set saveShortcutRedirect = continueEditingUrl %}
+{% set retainScrollOnSaveShortcut = true %}
+
+{% set selectedSubnavItem = 'shipping' %}
+
+{% set isNewProfile = shippingProfile.id ? false : true %}
+
+{% set vendorSettings = vendor.getSettings() %}
+
+{% set formActions = [
+    {
+        label: 'Save and continue editing'|t('app'),
+        redirect: continueEditingUrl|hash,
+        shortcut: true,
+        retainScroll: true,
+    },
+    not isNewProfile ? {
+        destructive: true,
+        label: 'Delete shipping profile'|t('market'),
+        action: 'market/shipping/delete-shipping-profile',
+        redirect: 'market/shipping#'|hash,
+        confirm: 'Are you sure you want to delete this shipping profile?'|t('market'),
+    }
+]|filter %}
+
+{% block content %}
+    {{ actionInput('market/shipping/save-shipping-profile') }}
+    {{ redirectInput('market/shipping') }}
+
+    {% if shippingProfile.id %}{{ hiddenInput('profileId', shippingProfile.id) }}{% endif %}
+
+    {{ forms.textField({
+        first: true,
+        label: 'Name'|t('app'),
+        instructions: 'What this shipping profile will be called, this will be seen by customers during checkout.'|t('market'),
+        id: 'name',
+        name: 'name',
+        value: shippingProfile.name,
+        errors: shippingProfile.getErrors('name'),
+        autofocus: true,
+        required: true,
+    }) }}
+
+    {{ forms.elementSelectField({
+        label: 'Vendor'|t('market'),
+        instructions: 'The Vendor this profile is for.'|t('market'),
+        id: 'vendorId',
+        name: 'vendorId',
+        elementType: vendorElementType,
+        selectionLabel: 'Choose'|t('app'),
+        limit: 1,
+        elements: (vendor is defined and vendor ? [vendor]),
+        required: true,
+        errors: shippingProfile.getErrors('vendorId'),
+    }) }}
+
+    {{ forms.selectField({
+        label: 'Origin Country'|t('market'),
+        instructions: 'Where this profile is shipping from in the world (usually wherever the vendor is).'|t('market'),
+        id: 'originCountryId',
+        name: 'originCountryId',
+        options: originCountryOptions,
+        value: shippingProfile.originCountry ? shippingProfile.originCountry.id : vendorSettings.shippingOriginId,
+        errors: shippingProfile.getErrors('originCountryId'),
+        required: true,
+    }) }}
+
+    {{ forms.selectField({
+        label: 'Processing Time'|t('market'),
+        instructions: 'How long it takes you to ship this item.'|t('market'),
+        id: 'processingTime',
+        name: 'processingTime',
+        options: processingTimeOptions,
+        value: shippingProfile.processingTime,
+        errors: shippingProfile.getErrors('processingTime'),
+        required: true,
+    }) }}
+
+    <hr>
+
+    {{ forms.editableTableField({
+        label: 'Shipping Costs'|t('market'),
+        instructions: 'Add a shipping cost for each destination you ship to.'|t('market'),
+        id: 'destinations',
+        name: 'destinations',
+        addRowLabel: 'Add a destination'|t('market'),
+        maxRows: zoneOptions|length,
+        cols: {
+            zone: {
+                heading: 'Destination *'|t('market'),
+                type: 'select',
+                class: 'thin',
+                options: zoneOptions,
+                required: true
+            },
+            primaryRate: {
+                heading: 'One item *'|t('market'),
+                type: 'number'
+            },
+            secondaryRate: {
+                heading: 'Each additional item'|t('market'),
+                type: 'number'
+            },
+            deliveryTime: {
+                heading: 'Estimated delivery time *'|t('market'),
+                type: 'singleline'
+            }
+        },
+        rows: destinationsTableRows,
+    }) }}
+
+{#    errors: siteErrors|unique#}
+
+{#    {% if shippingProfile.getErrors('destinations') %}#}
+{#        <ul class="errors">#}
+{#            {% for error in shippingProfile.getErrors('destinations') %}#}
+{#                <li>{{ error|replace('Destinations', 'Shipping Costs') }}</li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    {% endif %}#}
+{% endblock %}

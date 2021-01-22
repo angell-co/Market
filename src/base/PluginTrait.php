@@ -12,6 +12,7 @@ namespace angellco\market\base;
 
 use angellco\market\elements\Vendor;
 use angellco\market\fields\Vendors as VendorsField;
+use angellco\market\services\ShippingProfiles;
 use angellco\market\services\StripeSettings;
 use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
@@ -30,6 +31,7 @@ use yii\base\Event;
  * @property Vendors $vendors the vendors service
  * @property VendorSettings $vendorSettings the vendor settings service
  * @property StripeSettings $stripeSettings the stripe settings service
+ * @property ShippingProfiles $shippingProfiles the shipping profiles service
  *
  * @author    Angell & Co
  * @package   Market
@@ -69,6 +71,16 @@ trait PluginTrait
     }
 
     /**
+     * Returns the shipping profiles service
+     *
+     * @return ShippingProfiles The shipping profiles service
+     */
+    public function getShippingProfiles(): ShippingProfiles
+    {
+        return $this->get('shippingProfiles');
+    }
+
+    /**
      * Sets the components of the commerce plugin
      */
     private function _setPluginComponents(): void
@@ -83,6 +95,9 @@ trait PluginTrait
             'stripeSettings' => [
                 'class' => StripeSettings::class,
             ],
+            'shippingProfiles' => [
+                'class' => ShippingProfiles::class,
+            ]
         ]);
     }
 
@@ -155,6 +170,7 @@ trait PluginTrait
 
                 // Shipping
                 $event->rules['market/shipping'] = 'market/shipping/index';
+                $event->rules['market/shipping/<profileId:\d+>'] = 'market/shipping/edit-shipping-profile';
             }
         );
     }
