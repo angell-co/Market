@@ -139,6 +139,8 @@ class ShippingProfiles extends Component
             // Now go over each of the destination models
 //            foreach ($shippingProfile->destinations as $rowId => $row) {
 //
+//             TODO: This bit is probably needed in the controller
+//
 //                // Check if this is a new one or not
 //                if (strncmp($rowId, 'new', 3) === 0 || !isset($existingDestinationsById[$rowId])) {
 //                    $shippingDestination = new Marketplace_ShippingDestinationModel();
