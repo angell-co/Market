@@ -82,6 +82,28 @@
 
     <hr>
 
+    {% set cols = {
+        zone: {
+            heading: 'Destination *'|t('market'),
+            type: 'select',
+            class: 'thin',
+            options: zoneOptions,
+            required: true
+        },
+        primaryRate: {
+            heading: 'One item *'|t('market'),
+            type: 'number'
+        },
+        secondaryRate: {
+            heading: 'Each additional item'|t('market'),
+            type: 'number'
+        },
+        deliveryTime: {
+            heading: 'Estimated delivery time *'|t('market'),
+            type: 'singleline'
+        }
+    } %}
+
     {{ forms.editableTableField({
         label: 'Shipping Costs'|t('market'),
         instructions: 'Add a shipping cost for each destination you ship to.'|t('market'),
@@ -89,37 +111,29 @@
         name: 'destinations',
         addRowLabel: 'Add a destination'|t('market'),
         maxRows: zoneOptions|length,
-        cols: {
-            zone: {
-                heading: 'Destination *'|t('market'),
-                type: 'select',
-                class: 'thin',
-                options: zoneOptions,
-                required: true
-            },
-            primaryRate: {
-                heading: 'One item *'|t('market'),
-                type: 'number'
-            },
-            secondaryRate: {
-                heading: 'Each additional item'|t('market'),
-                type: 'number'
-            },
-            deliveryTime: {
-                heading: 'Estimated delivery time *'|t('market'),
-                type: 'singleline'
-            }
-        },
+        initJs: false,
+        cols: cols,
         rows: destinationsTableRows,
     }) }}
 
-{#    errors: siteErrors|unique#}
+    {#    errors: siteErrors|unique#}
 
-{#    {% if shippingProfile.getErrors('destinations') %}#}
-{#        <ul class="errors">#}
-{#            {% for error in shippingProfile.getErrors('destinations') %}#}
-{#                <li>{{ error|replace('Destinations', 'Shipping Costs') }}</li>#}
-{#            {% endfor %}#}
-{#        </ul>#}
-{#    {% endif %}#}
+    {#    {% if shippingProfile.getErrors('destinations') %}#}
+    {#        <ul class="errors">#}
+    {#            {% for error in shippingProfile.getErrors('destinations') %}#}
+    {#                <li>{{ error|replace('Destinations', 'Shipping Costs') }}</li>#}
+    {#            {% endfor %}#}
+    {#        </ul>#}
+    {#    {% endif %}#}
+
+    {% set jsId = 'destinations'|namespaceInputId|e('js') %}
+    {% set jsName = 'destinations'|namespaceInputName|e('js') %}
+    {% set jsCols = cols|json_encode %}
+    {% js %}
+        new Craft.EditableTable("{{ jsId }}", "{{ jsName }}", {{ jsCols|raw }}, {
+            rowIdPrefix: 'new:',
+            maxRows: {{ zoneOptions|length }}
+        });
+    {% endjs %}
+
 {% endblock %}

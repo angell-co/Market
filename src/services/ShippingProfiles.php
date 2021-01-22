@@ -16,7 +16,6 @@ use angellco\market\records\ShippingDestination as ShippingDestinationRecord;
 use angellco\market\records\ShippingProfile as ShippingProfileRecord;
 use Craft;
 use craft\base\Component;
-use Exception;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -129,6 +128,7 @@ class ShippingProfiles extends Component
             $model->id = $record->id;
 
             // If it saved OK we can save the shipping destinations
+            // TODO: here I am
 
 //            // Might as well update our cache of the shipping profile while we have it.
 //            $this->_shippingProfilesById[$shippingProfile->id] = $shippingProfile;
@@ -136,7 +136,7 @@ class ShippingProfiles extends Component
 //            // Get existing destinations
 //            $existingDestinationsById = $shippingProfile->getDestinations('id');
 //
-//            // Now go over each of the posted destination rows
+            // Now go over each of the destination models
 //            foreach ($shippingProfile->destinations as $rowId => $row) {
 //
 //                // Check if this is a new one or not
@@ -150,11 +150,7 @@ class ShippingProfiles extends Component
 //                    unset($existingDestinationsById[$rowId]);
 //                }
 //
-//                // Set the attributes
-//                $shippingDestination->shippingZoneId = $row['zone'];
-//                $shippingDestination->primaryRate = $row['primaryRate'];
-//                $shippingDestination->secondaryRate = $row['secondaryRate'];
-//                $shippingDestination->deliveryTime = $row['deliveryTime'];
+
 //
 //                // Save it
 //                craft()->marketplace_shippingDestinations->saveShippingDestination($shippingDestination);

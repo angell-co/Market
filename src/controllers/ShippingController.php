@@ -171,6 +171,8 @@ class ShippingController extends Controller
         foreach ($destinationsPost as $id => $destination) {
             $destinationModel = new ShippingDestination();
             $destinationModel->id = $id;
+            $destinationModel->shippingProfileId = $shippingProfile->id;
+            $destinationModel->shippingZoneId = $destination['zone'];
             $destinationModel->primaryRate = $destination['primaryRate'];
             $destinationModel->secondaryRate = $destination['secondaryRate'];
             $destinationModel->deliveryTime = $destination['deliveryTime'];
@@ -178,7 +180,11 @@ class ShippingController extends Controller
             $destinations[] = $destinationModel;
         }
 
+        Craft::dd($destinations);
+
         $shippingProfile->setShippingDestinations($destinations);
+
+        // TODO: return json as well so we can use this on the front
 
         // Save it
         if (Market::$plugin->getShippingProfiles()->saveShippingProfile($shippingProfile)) {
