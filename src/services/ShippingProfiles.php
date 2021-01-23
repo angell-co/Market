@@ -118,7 +118,7 @@ class ShippingProfiles extends Component
 
         $record->validate();
         $model->addErrors($record->getErrors());
-//
+
 //        // Validate the model too so we catch any requirements from that
 //        $model->validate();
 
@@ -134,11 +134,6 @@ class ShippingProfiles extends Component
             // Now that we have a record ID, save it on the model
             $model->id = $record->id;
 
-            // If it saved OK we can save the shipping destinations
-
-//            // Might as well update our cache of the shipping profile while we have it.
-//            $this->_shippingProfilesById[$shippingProfile->id] = $shippingProfile;
-//
             // Get existing destination IDs direct from the db
             $query = (new Query());
             $query->select([

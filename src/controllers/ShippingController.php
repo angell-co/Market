@@ -204,8 +204,9 @@ class ShippingController extends Controller
 
     // TODO: delete
 
-
     /**
+     * Endpoint for the shipping profiles CP index table
+     *
      * @return Response
      * @throws BadRequestHttpException
      */
@@ -234,7 +235,6 @@ class ShippingController extends Controller
         $query->from(Table::SHIPPINGPROFILES . ' shippingprofiles');
         $query->leftJoin(CraftTable::CONTENT . ' vendorcontent', '[[vendorcontent.elementId]] = [[shippingprofiles.vendorId]]');
         $query->leftJoin(CommerceTable::COUNTRIES . ' countries', '[[countries.id]] = [[shippingprofiles.originCountryId]]');
-
 
         if ($search) {
             $likeOperator = Craft::$app->getDb()->getIsPgsql() ? 'ILIKE' : 'LIKE';
