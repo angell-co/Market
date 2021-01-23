@@ -79,7 +79,11 @@ class ShippingProfiles extends Component
         return $destinations;
     }
 
+    // TODO: class caching?
+
     /**
+     * Saves a shipping profile and its destinations.
+     *
      * @param ShippingProfile $model
      * @param bool $runValidation
      * @return bool
@@ -171,10 +175,6 @@ class ShippingProfiles extends Component
             $transaction->rollBack();
             throw $e;
         }
-
-
-
-//        $this->_allShippingMethods = null; //clear the cache
 
         return true;
     }
