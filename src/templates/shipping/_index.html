@@ -55,7 +55,8 @@ new Craft.VueAdminTable({
     padded: true,
     search: true,
     searchPlaceholder: Craft.t('market', 'Search shipping profiles by name, vendor or origin country…'),
-    tableDataEndpoint: Craft.getActionUrl('market/shipping/shipping-profiles-table')
+    tableDataEndpoint: Craft.getActionUrl('market/shipping/shipping-profiles-table'),
+    deleteAction: 'market/shipping/delete-shipping-profile',
 });
 {% endjs %}
 

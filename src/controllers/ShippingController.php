@@ -219,7 +219,13 @@ class ShippingController extends Controller
     {
         $this->requirePostRequest();
 
-        $profileId = $this->request->getRequiredBodyParam('profileId');
+        // From the edit view
+        $profileId = $this->request->getBodyParam('profileId');
+
+        // From the index view
+        if (!$profileId) {
+            $profileId = $this->request->getBodyParam('id');
+        }
 
         if (!Market::$plugin->getShippingProfiles()->deleteShippingProfileById($profileId)) {
             if ($this->request->getAcceptsJson()) {
