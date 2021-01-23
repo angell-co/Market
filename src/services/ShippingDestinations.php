@@ -73,14 +73,14 @@ class ShippingDestinations extends Component
             // Save it!
             $record->save(false);
 
-            // Now that we have a record ID, save it on the model
-            $model->id = $record->id;
-
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();
             throw $e;
         }
+
+        // Now that we have a record ID, save it on the model
+        $model->id = $record->id;
 
         return true;
     }

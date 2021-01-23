@@ -126,7 +126,7 @@ class ShippingProfile extends Model
      */
     public function getVendor(): ?Vendor
     {
-        if (!$this->_vendor) {
+        if (!$this->_vendor && $this->vendorId) {
             $this->_vendor = Market::$plugin->getVendors()->getVendorById($this->vendorId);
         }
 
@@ -138,7 +138,7 @@ class ShippingProfile extends Model
      */
     public function getOriginCountry(): ?Country
     {
-        if (!$this->_originCountry) {
+        if (!$this->_originCountry && $this->originCountryId) {
             $this->_originCountry = Commerce::getInstance()->getCountries()->getCountryById($this->originCountryId);
         }
 

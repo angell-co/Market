@@ -185,6 +185,7 @@ trait PluginTrait
 
                 // Shipping
                 $event->rules['market/shipping'] = 'market/shipping/index';
+                $event->rules['market/shipping/new'] = 'market/shipping/edit-shipping-profile';
                 $event->rules['market/shipping/<profileId:\d+>'] = 'market/shipping/edit-shipping-profile';
             }
         );

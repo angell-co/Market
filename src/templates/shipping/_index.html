@@ -12,6 +12,10 @@
 {% set title = 'Shipping Profiles'|t('market') %}
 {% set selectedSubnavItem = 'shipping' %}
 
+{% block actionButton %}
+    <a href="{{ url('market/shipping/new') }}" class="btn submit add icon">{{ "New shipping profile"|t('market') }}</a>
+{% endblock %}
+
 {% block content %}
     <div id="shipping-vue-admin-table"></div>
 {% endblock %}

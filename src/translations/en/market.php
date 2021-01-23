@@ -119,4 +119,7 @@ return [
     'Shipping profile saved.' => 'Shipping profile saved.',
     'Couldn’t save shipping profile.' => 'Couldn’t save shipping profile.',
     'No shipping destination exists with the ID “{id}”' => 'No shipping destination exists with the ID “{id}”',
+    'Couldn’t delete shipping profile.' => 'Couldn’t delete shipping profile.',
+    'Shipping profile deleted.' => 'Shipping profile deleted.',
+    'New shipping profile' => 'New shipping profile',
 ];

@@ -22,11 +22,13 @@ use craft\commerce\db\Table as CommerceTable;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
 use craft\db\Table as CraftTable;
+use craft\errors\SiteNotFoundException;
 use craft\helpers\AdminTable;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use craft\web\View;
+use yii\db\Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -55,6 +57,7 @@ class ShippingController extends Controller
      * @param ShippingProfile|null $shippingProfile
      * @return Response
      * @throws NotFoundHttpException
+     * @throws SiteNotFoundException
      */
     public function actionEditShippingProfile(int $profileId = null, ShippingProfile $shippingProfile = null): Response
     {
@@ -86,6 +89,9 @@ class ShippingController extends Controller
         // Vendor
         $variables['vendorElementType'] = Vendor::class;
         $variables['vendor'] = $variables['shippingProfile']->getVendor();
+
+        // Vendor settings
+        $variables['vendorSettings'] = Market::$plugin->getVendorSettings()->getSettings();
 
         // Countries
         $variables['originCountryOptions'] = Commerce::getInstance()->getCountries()->getAllEnabledCountriesAsList();
@@ -179,7 +185,7 @@ class ShippingController extends Controller
             $destinationModel->deliveryTime = $destination['deliveryTime'];
 
             // Check if this is an existing one and set the id accordingly
-            if (strncmp($id, 'new:', 4) !== 0) {
+            if (strncmp($id, 'new', 3) !== 0) {
                 $destinationModel->id = $id;
             }
 
@@ -202,7 +208,36 @@ class ShippingController extends Controller
         Craft::$app->getUrlManager()->setRouteParams(['shippingProfile' => $shippingProfile]);
     }
 
-    // TODO: delete
+    /**
+     * Deletes a shipping profile.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws Exception
+     */
+    public function actionDeleteShippingProfile(): ?Response
+    {
+        $this->requirePostRequest();
+
+        $profileId = $this->request->getRequiredBodyParam('profileId');
+
+        if (!Market::$plugin->getShippingProfiles()->deleteShippingProfileById($profileId)) {
+            if ($this->request->getAcceptsJson()) {
+                return $this->asJson(['success' => false]);
+            }
+
+            $this->setFailFlash(Craft::t('market', 'Couldn’t delete shipping profile.'));
+
+            return null;
+        }
+
+        if ($this->request->getAcceptsJson()) {
+            return $this->asJson(['success' => true]);
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Shipping profile deleted.'));
+        return $this->redirectToPostedUrl();
+    }
 
     /**
      * Endpoint for the shipping profiles CP index table

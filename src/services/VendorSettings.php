@@ -58,7 +58,7 @@ class VendorSettings extends Component
     {
         // Default to the primary site
         if (!$siteId) {
-            $siteId = Craft::$app->getSites()->getPrimarySite()->id;
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
         }
 
         // Get the last added settings record

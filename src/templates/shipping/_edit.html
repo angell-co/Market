@@ -9,8 +9,6 @@
 
 {% set isNewProfile = shippingProfile.id ? false : true %}
 
-{% set vendorSettings = vendor.getSettings() %}
-
 {% set formActions = [
     {
         label: 'Save and continue editing'|t('app'),

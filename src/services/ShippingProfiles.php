@@ -19,6 +19,7 @@ use angellco\market\records\ShippingProfile as ShippingProfileRecord;
 use Craft;
 use craft\base\Component;
 use craft\db\Query;
+use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -131,42 +132,58 @@ class ShippingProfiles extends Component
             // Save it!
             $record->save(false);
 
-            // Now that we have a record ID, save it on the model
-            $model->id = $record->id;
-
-            // Get existing destination IDs direct from the db
-            $query = (new Query());
-            $query->select([
-                'id',
-                'shippingProfileId'
-            ]);
-            $query->from(Table::SHIPPINGDESTINATIONS);
-            $query->where(['shippingProfileId' => $model->id]);
-            $existingIds = $query->column();
-
-            // Now go over each of the destination models
-            foreach ($model->getShippingDestinations() as $destination) {
-
-                // If it saves then remove it from the stack of existing IDs
-                if (Market::$plugin->getShippingDestinations()->saveShippingDestination($destination) && ($key = array_search($destination->id, $existingIds, false)) !== false) {
-                    unset($existingIds[$key]);
-                }
-            }
-
-            // If there are any existing IDs left then they need deleting
-            if (!empty($existingIds)) {
-                foreach ($existingIds as $existingId) {
-                    Market::$plugin->getShippingDestinations()->deleteShippingDestinationById($existingId);
-                }
-            }
-
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();
             throw $e;
         }
 
+        // Now that we have a record ID, save it on the model
+        $model->id = $record->id;
+
+        // Get existing destination IDs direct from the db
+        $query = (new Query());
+        $query->select([
+            'id',
+            'shippingProfileId'
+        ]);
+        $query->from(Table::SHIPPINGDESTINATIONS);
+        $query->where(['shippingProfileId' => $model->id]);
+        $existingIds = $query->column();
+
+        // Now go over each of the destination models
+        foreach ($model->getShippingDestinations() as $destination) {
+            // Set the shipping profile ID on the model
+            $destination->shippingProfileId = $model->id;
+
+            // If it saves then remove it from the stack of existing IDs
+            if (Market::$plugin->getShippingDestinations()->saveShippingDestination($destination) && ($key = array_search($destination->id, $existingIds, false)) !== false) {
+                unset($existingIds[$key]);
+            }
+        }
+
+        // If there are any existing IDs left then they need deleting
+        if (!empty($existingIds)) {
+            foreach ($existingIds as $existingId) {
+                Market::$plugin->getShippingDestinations()->deleteShippingDestinationById($existingId);
+            }
+        }
+
         return true;
+    }
+
+    /**
+     * Deletes a shipping profile.
+     *
+     * @param int $id
+     * @return int
+     * @throws Exception
+     */
+    public function deleteShippingProfileById(int $id): int
+    {
+        return Craft::$app->db->createCommand()
+            ->delete(Table::SHIPPINGPROFILES, ['id' => $id])
+            ->execute();
     }
 
 }
