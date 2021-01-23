@@ -169,18 +169,22 @@ class ShippingController extends Controller
         $destinationsPost = Craft::$app->getRequest()->getBodyParam('destinations');
         $destinations = [];
         foreach ($destinationsPost as $id => $destination) {
+
+            // Set all the basic stuff
             $destinationModel = new ShippingDestination();
-            $destinationModel->id = $id;
             $destinationModel->shippingProfileId = $shippingProfile->id;
             $destinationModel->shippingZoneId = $destination['zone'];
             $destinationModel->primaryRate = $destination['primaryRate'];
             $destinationModel->secondaryRate = $destination['secondaryRate'];
             $destinationModel->deliveryTime = $destination['deliveryTime'];
 
+            // Check if this is an existing one and set the id accordingly
+            if (strncmp($id, 'new:', 4) !== 0) {
+                $destinationModel->id = $id;
+            }
+
             $destinations[] = $destinationModel;
         }
-
-        Craft::dd($destinations);
 
         $shippingProfile->setShippingDestinations($destinations);
 

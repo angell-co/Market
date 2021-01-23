@@ -10,12 +10,15 @@
 
 namespace angellco\market\services;
 
+use angellco\market\db\Table;
+use angellco\market\Market;
 use angellco\market\models\ShippingDestination;
 use angellco\market\models\ShippingProfile;
 use angellco\market\records\ShippingDestination as ShippingDestinationRecord;
 use angellco\market\records\ShippingProfile as ShippingProfileRecord;
 use Craft;
 use craft\base\Component;
+use craft\db\Query;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -132,43 +135,35 @@ class ShippingProfiles extends Component
             $model->id = $record->id;
 
             // If it saved OK we can save the shipping destinations
-            // TODO: here I am
 
 //            // Might as well update our cache of the shipping profile while we have it.
 //            $this->_shippingProfilesById[$shippingProfile->id] = $shippingProfile;
 //
-//            // Get existing destinations
-//            $existingDestinationsById = $shippingProfile->getDestinations('id');
-//
+            // Get existing destination IDs direct from the db
+            $query = (new Query());
+            $query->select([
+                'id',
+                'shippingProfileId'
+            ]);
+            $query->from(Table::SHIPPINGDESTINATIONS);
+            $query->where(['shippingProfileId' => $model->id]);
+            $existingIds = $query->column();
+
             // Now go over each of the destination models
-//            foreach ($shippingProfile->destinations as $rowId => $row) {
-//
-//             TODO: This bit is probably needed in the controller
-//
-//                // Check if this is a new one or not
-//                if (strncmp($rowId, 'new', 3) === 0 || !isset($existingDestinationsById[$rowId])) {
-//                    $shippingDestination = new Marketplace_ShippingDestinationModel();
-//                    $shippingDestination->shippingProfileId = $shippingProfile->id;
-//                } else {
-//                    $shippingDestination = $existingDestinationsById[$rowId];
-//
-//                    // Remove from the stack of existing ones so we know what to remove
-//                    unset($existingDestinationsById[$rowId]);
-//                }
-//
+            foreach ($model->getShippingDestinations() as $destination) {
 
-//
-//                // Save it
-//                craft()->marketplace_shippingDestinations->saveShippingDestination($shippingDestination);
-//            }
-//
-//            // Remove existing destinations not included in this save
-//            if (count($existingDestinationsById)) {
-//                foreach ($existingDestinationsById as $existingDestination) {
-//                    craft()->marketplace_shippingDestinations->deleteShippingDestination($existingDestination);
-//                }
-//            }
+                // If it saves then remove it from the stack of existing IDs
+                if (Market::$plugin->getShippingDestinations()->saveShippingDestination($destination) && ($key = array_search($destination->id, $existingIds, false)) !== false) {
+                    unset($existingIds[$key]);
+                }
+            }
 
+            // If there are any existing IDs left then they need deleting
+            if (!empty($existingIds)) {
+                foreach ($existingIds as $existingId) {
+                    Market::$plugin->getShippingDestinations()->deleteShippingDestinationById($existingId);
+                }
+            }
 
             $transaction->commit();
         } catch (\Throwable $e) {

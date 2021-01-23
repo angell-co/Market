@@ -10,10 +10,12 @@
 
 namespace angellco\market\services;
 
+use angellco\market\db\Table;
 use angellco\market\models\ShippingDestination;
 use angellco\market\records\ShippingDestination as ShippingDestinationRecord;
 use Craft;
 use craft\base\Component;
+use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -83,37 +85,17 @@ class ShippingDestinations extends Component
         return true;
     }
 
-//
-//    /**
-//     * Deletes a shipping destination.
-//     *
-//     * @param Marketplace_ShippingDestinationModel $shippingDestination
-//     *
-//     * @return bool
-//     */
-//    public function deleteShippingDestination(Marketplace_ShippingDestinationModel $shippingDestination)
-//    {
-//
-//        $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
-//        try {
-//
-//            Marketplace_ShippingDestinationRecord::model()->deleteByPk($shippingDestination->id);
-//
-//            if ($transaction !== null)
-//            {
-//                $transaction->commit();
-//            }
-//
-//            return true;
-//
-//        } catch (\Exception $e) {
-//            if ($transaction !== null)
-//            {
-//                $transaction->rollback();
-//            }
-//
-//            return false;
-//        }
-//
-//    }
+    /**
+     * Deletes a shipping destination.
+     *
+     * @param int $id
+     * @return int
+     * @throws Exception
+     */
+    public function deleteShippingDestinationById(int $id): int
+    {
+        return Craft::$app->db->createCommand()
+            ->delete(Table::SHIPPINGDESTINATIONS, ['id' => $id])
+            ->execute();
+    }
 }
