@@ -39,7 +39,7 @@ class OrderGroup extends ActiveRecord
     }
 
     /**
-     * Returns the customer this destination belongs to.
+     * Returns the customer this order group belongs to.
      *
      * @return ActiveQueryInterface
      */
