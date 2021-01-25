@@ -69,7 +69,8 @@ class ShippingProfile extends BaseOptionsField
         // If we have any error when setting the options then just render the error and stop
         if ($error = $this->_setOptionsForVendor($element)) {
             return Craft::$app->getView()->renderTemplate('_special/missing-component', [
-                'error' => $error
+                'error' => $error,
+                'showPlugin' => false
             ]);
         }
 
@@ -100,6 +101,12 @@ class ShippingProfile extends BaseOptionsField
 
     /**
      * @inheritdoc
+     *
+     * @param mixed $value
+     * @param ElementInterface|null $element
+     * @return \craft\fields\data\MultiOptionsFieldData|SingleOptionFieldData|mixed
+     * @throws InvalidFieldException
+     * @throws ServerErrorHttpException
      */
     public function normalizeValue($value, ElementInterface $element = null)
     {
@@ -109,6 +116,12 @@ class ShippingProfile extends BaseOptionsField
 
     /**
      * @inheritdoc
+     *
+     * @param mixed $value
+     * @param ElementInterface $element
+     * @return bool
+     * @throws InvalidFieldException
+     * @throws ServerErrorHttpException
      */
     public function isValueEmpty($value, ElementInterface $element): bool
     {
@@ -118,6 +131,12 @@ class ShippingProfile extends BaseOptionsField
 
     /**
      * @inheritdoc
+     *
+     * @param ElementInterface $element
+     * @param bool $isNew
+     * @return bool
+     * @throws InvalidFieldException
+     * @throws ServerErrorHttpException
      */
     public function beforeElementSave(ElementInterface $element, bool $isNew): bool
     {
@@ -131,11 +150,12 @@ class ShippingProfile extends BaseOptionsField
      * @param ElementInterface|null $element
      * @return string|null
      * @throws InvalidFieldException
-     * @throws ServerErrorHttpException
      */
     private function _setOptionsForVendor(ElementInterface $element = null): ?string
     {
         $error = null;
+        $vendor = null;
+        $shippingProfiles = null;
 
         // Check we are attached to an element
         if (!$element) {
@@ -144,15 +164,21 @@ class ShippingProfile extends BaseOptionsField
 
         // Get the vendor
         /** @var Vendor $vendor */
-        $vendor = $element->getFieldValue('vendor')[0];
-        if (!$vendor) {
-            $error = Craft::t('market', 'Please add a Vendor and save first.');
+        if (!$error) {
+            $vendorQuery = $element->getFieldValue('vendor');
+            $vendor = $vendorQuery->one();
+            if (!$vendor) {
+                $error = Craft::t('market', 'Please add a Vendor and save first.');
+            }
         }
 
         // Get the vendor shipping options
-        $shippingProfiles = $vendor->getShippingProfiles();
-        if (!$shippingProfiles) {
-            $error = Craft::t('market', 'This Vendor doesn’t yet have any shipping profiles, please create some first.');
+        if (!$error) {
+            try {
+                $shippingProfiles = $vendor->getShippingProfiles();
+            } catch (ServerErrorHttpException $e) {
+                $error = Craft::t('market', 'This Vendor doesn’t yet have any shipping profiles, please create some first.');
+            }
         }
 
         // If we had any errors then return the error and stop

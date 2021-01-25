@@ -612,7 +612,7 @@ class Vendor extends Element
         }
 
         if (!$this->_shippingProfiles = Market::$plugin->getShippingProfiles()->getShippingProfilesByVendorId($this->id)) {
-            throw new ServerErrorHttpException('Vendor does not have valid shipping profiles.');
+            throw new ServerErrorHttpException('Vendor does not have any shipping profiles.');
         }
 
         return $this->_shippingProfiles;
