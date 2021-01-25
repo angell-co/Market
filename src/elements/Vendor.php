@@ -11,6 +11,8 @@
 namespace angellco\market\elements;
 
 use angellco\market\elements\db\VendorQuery;
+use angellco\market\errors\VendorSettingsNotFoundException;
+use angellco\market\errors\VendorShippingProfilesNotFoundException;
 use angellco\market\Market;
 use angellco\market\models\ShippingProfile;
 use angellco\market\models\VendorSettings;
@@ -584,7 +586,7 @@ class Vendor extends Element
      * Returns the Vendor Settings for the site this Vendor is in
      *
      * @return VendorSettings
-     * @throws SiteNotFoundException|ServerErrorHttpException
+     * @throws SiteNotFoundException|VendorSettingsNotFoundException
      */
     public function getSettings(): VendorSettings
     {
@@ -593,7 +595,7 @@ class Vendor extends Element
         }
 
         if (!$this->_vendorSettings[$this->siteId] = Market::$plugin->getVendorSettings()->getSettings($this->siteId)) {
-            throw new ServerErrorHttpException('Vendor does not have valid settings.');
+            throw new VendorSettingsNotFoundException('No vendor settings for site ID: '.$this->siteId);
         }
 
         return $this->_vendorSettings[$this->siteId];
@@ -603,7 +605,7 @@ class Vendor extends Element
      * Returns this vendor’s shipping profiles.
      *
      * @return ShippingProfile[]|null
-     * @throws ServerErrorHttpException
+     * @throws VendorShippingProfilesNotFoundException
      */
     public function getShippingProfiles(): ?array
     {
@@ -612,7 +614,7 @@ class Vendor extends Element
         }
 
         if (!$this->_shippingProfiles = Market::$plugin->getShippingProfiles()->getShippingProfilesByVendorId($this->id)) {
-            throw new ServerErrorHttpException('Vendor does not have any shipping profiles.');
+            throw new VendorShippingProfilesNotFoundException('No shipping profiles for Vendor ID: '.$this->id);
         }
 
         return $this->_shippingProfiles;

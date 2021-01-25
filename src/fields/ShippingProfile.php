@@ -11,6 +11,7 @@
 namespace angellco\market\fields;
 
 use angellco\market\elements\Vendor;
+use angellco\market\errors\VendorShippingProfilesNotFoundException;
 use Craft;
 use craft\base\ElementInterface;
 use craft\errors\InvalidFieldException;
@@ -176,7 +177,7 @@ class ShippingProfile extends BaseOptionsField
         if (!$error) {
             try {
                 $shippingProfiles = $vendor->getShippingProfiles();
-            } catch (ServerErrorHttpException $e) {
+            } catch (VendorShippingProfilesNotFoundException $e) {
                 $error = Craft::t('market', 'This Vendor doesn’t yet have any shipping profiles, please create some first.');
             }
         }
