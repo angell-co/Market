@@ -11,6 +11,7 @@
 namespace angellco\market\base;
 
 use angellco\market\elements\Vendor;
+use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
 use angellco\market\services\ShippingDestinations;
 use angellco\market\services\ShippingProfiles;
@@ -145,6 +146,7 @@ trait PluginTrait
             Fields::EVENT_REGISTER_FIELD_TYPES,
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = VendorsField::class;
+                $event->types[] = ShippingProfileField::class;
             }
         );
 

@@ -57,6 +57,40 @@ class ShippingProfiles extends Component
     }
 
     /**
+     * Returns all the shipping profiles for a given vendor ID.
+     *
+     * @param int $vendorId
+     * @return ShippingProfile[]|null
+     */
+    public function getShippingProfilesByVendorId(int $vendorId): ?array
+    {
+        $records = ShippingProfileRecord::find()
+            ->where(['vendorId' =>  $vendorId])
+            ->all();
+
+        if ($records)
+        {
+            $models = [];
+
+            foreach ($records as $record) {
+                $models[] = new ShippingProfile($record->toArray([
+                    'id',
+                    'vendorId',
+                    'originCountryId',
+                    'name',
+                    'processingTime',
+                ]));
+            }
+
+            if (!empty($models)) {
+                return $models;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a profiles's destinations.
      *
      * @param int $profileId

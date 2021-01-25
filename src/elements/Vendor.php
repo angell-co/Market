@@ -12,6 +12,7 @@ namespace angellco\market\elements;
 
 use angellco\market\elements\db\VendorQuery;
 use angellco\market\Market;
+use angellco\market\models\ShippingProfile;
 use angellco\market\models\VendorSettings;
 use angellco\market\records\Vendor as VendorRecord;
 use Craft;
@@ -122,6 +123,11 @@ class Vendor extends Element
      * @var VendorSettings[]
      */
     private $_vendorSettings;
+
+    /**
+     * @var ShippingProfile[]
+     */
+    private $_shippingProfiles;
 
 
     // Public Methods
@@ -591,5 +597,24 @@ class Vendor extends Element
         }
 
         return $this->_vendorSettings[$this->siteId];
+    }
+
+    /**
+     * Returns this vendor’s shipping profiles.
+     *
+     * @return ShippingProfile[]|null
+     * @throws ServerErrorHttpException
+     */
+    public function getShippingProfiles(): ?array
+    {
+        if ($this->_shippingProfiles) {
+            return $this->_shippingProfiles;
+        }
+
+        if (!$this->_shippingProfiles = Market::$plugin->getShippingProfiles()->getShippingProfilesByVendorId($this->id)) {
+            throw new ServerErrorHttpException('Vendor does not have valid shipping profiles.');
+        }
+
+        return $this->_shippingProfiles;
     }
 }

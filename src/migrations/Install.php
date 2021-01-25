@@ -12,6 +12,7 @@ namespace angellco\market\migrations;
 
 use angellco\market\db\Table;
 use angellco\market\elements\Vendor;
+use angellco\market\fields\ShippingProfile;
 use angellco\market\fields\Vendors;
 use Craft;
 use craft\commerce\db\Table as CommerceTable;
@@ -130,8 +131,7 @@ class Install extends Migration
         // Fields
         $this->update(CraftTable::FIELDS, ['type' => Vendors::class], ['type' => 'Marketplace_Vendor']);
         $this->update(CraftTable::FIELDS, ['type' => Vendors::class], ['type' => 'Marketplace_Vendors']);
-        // TODO shipping profiles
-//        $this->update('{{%fields}}', ['type' => ShippingProfile::class], ['type' => 'Marketplace_ShippingProfile']);
+        $this->update(CraftTable::FIELDS, ['type' => ShippingProfile::class], ['type' => 'Marketplace_ShippingProfile']);
 
     }
 

@@ -122,4 +122,8 @@ return [
     'Couldn’t delete shipping profile.' => 'Couldn’t delete shipping profile.',
     'Shipping profile deleted.' => 'Shipping profile deleted.',
     'New shipping profile' => 'New shipping profile',
+    'Shipping Profile Options' => 'Shipping Profile Options',
+    'Shipping Profile' => 'Shipping Profile',
+    'Please add a Vendor and save first.' => 'Please add a Vendor and save first.',
+    'This Vendor doesn’t yet have any shipping profiles, please create some first.' => 'This Vendor doesn’t yet have any shipping profiles, please create some first.',
 ];
