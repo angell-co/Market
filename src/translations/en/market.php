@@ -126,4 +126,7 @@ return [
     'Shipping Profile' => 'Shipping Profile',
     'Please add a Vendor and save first.' => 'Please add a Vendor and save first.',
     'This Vendor doesn’t yet have any shipping profiles, please create some first.' => 'This Vendor doesn’t yet have any shipping profiles, please create some first.',
+    'Date Ordered' => 'Date Ordered',
+    'Search orders by customer name, email, or order number…' => 'Search orders by customer name, email, or order number…',
+    'No orders available.' => 'No orders available.',
 ];
