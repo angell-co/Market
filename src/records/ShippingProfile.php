@@ -5,7 +5,7 @@
  * A fully-stocked multi-vendor solution for Craft Commerce.
  *
  * @link      https://angell.io
- * @copyright Copyright (c) 2020 Angell & Co
+ * @copyright Copyright (c) 2021 Angell & Co
  */
 
 namespace angellco\market\records;
