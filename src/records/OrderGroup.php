@@ -12,7 +12,9 @@ namespace angellco\market\records;
 
 use angellco\market\db\Table;
 use craft\commerce\records\Customer;
+use craft\commerce\records\Order;
 use craft\db\ActiveRecord;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveQueryInterface;
 
 /**
@@ -46,5 +48,17 @@ class OrderGroup extends ActiveRecord
     public function getCustomer(): ActiveQueryInterface
     {
         return $this->hasOne(Customer::class, ['id' => 'customerId']);
+    }
+
+    /**
+     * Returns the orders this group has.
+     *
+     * @return ActiveQueryInterface
+     * @throws InvalidConfigException
+     */
+    public function getOrders(): ActiveQueryInterface
+    {
+        return $this->hasMany(Order::class, ['id' => 'orderId'])
+            ->viaTable(Table::ORDERGROUPS_COMMERCEORDERS, ['orderGroupId' => 'id']);
     }
 }

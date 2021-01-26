@@ -11,8 +11,10 @@
 namespace angellco\market\controllers;
 
 use angellco\market\db\Table;
+use angellco\market\models\OrderGroup;
 use Craft;
 use craft\commerce\db\Table as CommerceTable;
+use craft\commerce\Plugin;
 use craft\db\Query;
 use craft\helpers\AdminTable;
 use craft\web\Controller;
@@ -44,6 +46,7 @@ class OrderGroupsController extends Controller
      */
     public function actionOrdersTable(): Response
     {
+        // DEBUG
 //        $this->requireAcceptsJson();
         $request = Craft::$app->getRequest();
 
@@ -55,11 +58,11 @@ class OrderGroupsController extends Controller
 
         $query = (new Query());
         $query->select([
-            'ordergroups.id as id',
-            'ordergroups.email as email',
-            'ordergroups.dateOrdered as dateOrdered',
-            'CONCAT(billing.firstName, " ", billing.lastName) AS billingName',
-            'orders.reference as reference'
+            '[[ordergroups.id]] as id',
+            '[[ordergroups.customerId]] as customerId',
+            '[[ordergroups.email]] as email',
+            '[[ordergroups.dateOrdered]] as dateOrdered',
+            'CONCAT([[billing.firstName]], " ", [[billing.lastName]]) AS billingName',
         ]);
         $query->from(Table::ORDERGROUPS . ' ordergroups');
 
@@ -76,7 +79,7 @@ class OrderGroupsController extends Controller
                 [$likeOperator, '[[ordergroups.dateOrdered]]', $search],
                 [$likeOperator, '[[orders.reference]]', $search],
                 [$likeOperator, '[[orders.number]]', $search],
-                [$likeOperator, 'CONCAT(billing.firstName, " ", [[billing.lastName]])', $search],
+                [$likeOperator, 'CONCAT([[billing.firstName]], " ", [[billing.lastName]])', $search],
             ]);
         }
 
@@ -100,25 +103,31 @@ class OrderGroupsController extends Controller
         foreach ($query->all() as $row) {
 
             // Make a model so we can use the methods on it
-//            $shippingProfile = new ShippingProfile();
-//            $shippingProfile->id = $row['id'];
-//            $shippingProfile->vendorId = $row['vendorId'];
-//            $shippingProfile->originCountryId = $row['originCountryId'];
-//            $shippingProfile->name = $row['name'];
-//            $shippingProfile->processingTime = $row['processingTime'];
+            $orderGroup = new OrderGroup([
+                'id' => $row['id'],
+                'customerId' => $row['customerId'],
+                'email' => $row['email'],
+                'dateOrdered' => $row['dateOrdered']
+            ]);
 
-//            // Get the vendor
-//            $vendor = $shippingProfile->getVendor();
-//
-//            // Get the origin country
-//            $originCountry = $shippingProfile->getOriginCountry();
+            // Get all the orders off it
+            $orders = [];
+            foreach ($orderGroup->getOrders()->all() as $order) {
+                $orders[] = [
+                    'reference' => $order->reference,
+                    'cpEditUrl' => $order->cpEditUrl,
+                ];
+            }
+
+            $currency = Plugin::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrency();
 
             $rows[] = [
-                'id' => $row['id'],
+                'id' => $orderGroup->id,
                 'title' => $row['billingName'],
-                'email' => $row['email'],
-                'dateOrdered' => $row['dateOrdered'],
-                'reference' => $row['reference'],
+                'email' => $orderGroup->email,
+                'dateOrdered' => $orderGroup->dateOrdered,
+                'total' => Craft::$app->getFormatter()->asCurrency($orderGroup->getTotal(), $currency, [], [], true),
+                'orders' => $orders
             ];
         }
 
