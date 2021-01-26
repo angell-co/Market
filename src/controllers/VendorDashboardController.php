@@ -80,4 +80,14 @@ class VendorDashboardController extends Controller
     {
         return $this->renderTemplate('market/vendor-dashboard/reports/_index.html', [], View::TEMPLATE_MODE_CP);
     }
+
+    /**
+     * Settings index
+     *
+     * @return Response
+     */
+    public function actionSettingsIndex(): Response
+    {
+        return $this->renderTemplate('market/vendor-dashboard/settings/_index.html', [], View::TEMPLATE_MODE_CP);
+    }
 }
