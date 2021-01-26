@@ -11,6 +11,9 @@ module.exports = {
     extend: {
       colors: {
         brand: colors.teal,
+        // brand: colors.emerald,
+        // brand: colors.cyan,
+        // brand: colors.fuchsia,
       },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
