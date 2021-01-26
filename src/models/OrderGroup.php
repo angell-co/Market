@@ -123,4 +123,55 @@ class OrderGroup extends Model
 
         return $total;
     }
+
+// TODO Audit these
+
+//    /**
+//     * @return array
+//     */
+//    public function getNumbers()
+//    {
+//        $return = [];
+//
+//        /** @var Commerce_OrderModel $order */
+//        foreach ($this->getOrders() as $order) {
+//            $return[] = $order->number;
+//        }
+//
+//        return $return;
+//    }
+//
+//
+//
+//    /**
+//     * @return float|int
+//     */
+//    public function getTotalShipping()
+//    {
+//        $total = 0;
+//
+//        /** @var Commerce_OrderModel $order */
+//        foreach ($this->getOrders() as $order) {
+//            $total += $order->totalShippingCost;
+//        }
+//
+//        return $total;
+//    }
+//
+//    /**
+//     * @return float|int
+//     */
+//    public function getTotalCommission()
+//    {
+//        $total = 0;
+//
+//        /** @var Commerce_OrderModel $order */
+//        foreach ($this->getOrders() as $order) {
+//            $itemSubtotal = craft()->commerce_paymentCurrencies->convert($order->itemSubtotal, $order->paymentCurrency);
+//            $total += (0.2 * $itemSubtotal);
+//        }
+//
+//        return $total;
+//    }
+
 }
