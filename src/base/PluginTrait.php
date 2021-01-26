@@ -164,7 +164,13 @@ trait PluginTrait
 
     private function _registerSiteRoutes(): void
     {
-        //
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+            function(RegisterUrlRulesEvent $event) {
+                $event->rules['market'] = 'market/vendor-dashboard/index';
+            }
+        );
     }
 
     private function _registerCpRoutes(): void

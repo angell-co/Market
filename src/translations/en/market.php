@@ -129,4 +129,5 @@ return [
     'Date Ordered' => 'Date Ordered',
     'Search orders by customer name, email, or order number…' => 'Search orders by customer name, email, or order number…',
     'No orders available.' => 'No orders available.',
+    'Dashboard' => 'Dashboard',
 ];

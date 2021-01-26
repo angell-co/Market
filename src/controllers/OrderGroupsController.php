@@ -19,6 +19,8 @@ use craft\db\Query;
 use craft\helpers\AdminTable;
 use craft\web\Controller;
 use craft\web\View;
+use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -42,12 +44,12 @@ class OrderGroupsController extends Controller
      * Endpoint for the order groups CP index table
      *
      * @return Response
+     * @throws InvalidConfigException
      * @throws BadRequestHttpException
      */
     public function actionOrdersTable(): Response
     {
-        // DEBUG
-//        $this->requireAcceptsJson();
+        $this->requireAcceptsJson();
         $request = Craft::$app->getRequest();
 
         $page = $request->getParam('page', 1);
