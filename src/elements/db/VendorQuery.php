@@ -52,32 +52,6 @@ class VendorQuery extends ElementQuery
     // -------------------------------------------------------------------------
 
 
-    // TODO don’t think we need these
-//    /**
-//     * Sets the [[$suspended]] property.
-//     *
-//     * @param bool $value The property value (defaults to true)
-//     * @uses $suspended
-//     * @return static self reference
-//     */
-//    public function suspended(bool $value = true): VendorQuery
-//    {
-//        $this->suspended = $value;
-//        return $this;
-//    }
-//
-//    /**
-//     * Sets the [[$pending]] property.
-//     *
-//     * @param bool $value The property value (defaults to true)
-//     * @uses $pending
-//     * @return static self reference
-//     */
-//    public function pending(bool $value = true): VendorQuery
-//    {
-//        $this->pending = $value;
-//        return $this;
-//    }
 
 
     // Protected Methods
@@ -115,6 +89,7 @@ class VendorQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('market_vendors.code', $this->code));
         }
 
+        // TODO: enable filtering and searching by user params
 //        if ($criteria->username || $criteria->email)
 //        {
 //            $query->join('users users', 'users.id = vendors.userId');
