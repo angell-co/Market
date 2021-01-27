@@ -37,7 +37,7 @@
                                 Total
                             </th>
                             <th scope="col" class="relative px-6 py-3">
-                                <span class="sr-only">Edit</span>
+                                <span class="sr-only">View</span>
                             </th>
                         </tr>
                     </thead>
@@ -69,7 +69,7 @@
                                 {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ url('market/orders/'~order.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                <a href="{{ url('market/orders/'~order.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
                             </td>
                         </tr>
                     {% endfor %}
