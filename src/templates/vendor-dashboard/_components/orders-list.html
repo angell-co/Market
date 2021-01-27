@@ -1,4 +1,3 @@
-{% set paymentCurrency = craft.commerce.paymentCurrencies.primaryPaymentcurrency %}
 {% set page = page ?? 1 %}
 {% set limit = limit ?? 10 %}
 
@@ -67,10 +66,10 @@
                                 {{ order.dateOrdered.nice }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ order.storedTotalPrice|currency(paymentCurrency.iso, [], [], true) }}
+                                {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                <a href="{{ url('market/orders/'~order.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
                             </td>
                         </tr>
                     {% endfor %}

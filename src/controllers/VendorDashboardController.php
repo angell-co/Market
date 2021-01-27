@@ -10,8 +10,13 @@
 
 namespace angellco\market\controllers;
 
+use angellco\market\Market;
+use angellco\market\models\ShippingProfile;
+use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
 use craft\web\Controller;
 use craft\web\View;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -40,6 +45,29 @@ class VendorDashboardController extends Controller
     {
         return $this->renderTemplate('market/vendor-dashboard/orders/_index.html', [], View::TEMPLATE_MODE_CP);
     }
+
+    /**
+     * Edit order
+     *
+     * @param int|null $orderId
+     * @param Order|null $order
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionEditOrder(int $orderId = null, Order $order = null): Response
+    {
+        // Sort out the main model
+        if ($orderId !== null && $order === null) {
+            $order = Commerce::getInstance()->getOrders()->getOrderById($orderId);
+
+            if (!$order) {
+                throw new NotFoundHttpException('Order not found');
+            }
+        }
+
+        return $this->renderTemplate('market/vendor-dashboard/orders/_edit.html', compact('order'), View::TEMPLATE_MODE_CP);
+    }
+
 
     /**
      * Products index

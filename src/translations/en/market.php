@@ -141,4 +141,7 @@ return [
     'Vendor suspended.' => 'Vendor suspended.',
     'Couldn’t set vendor as pending.' => 'Couldn’t set vendor as pending.',
     'Vendor set as pending.' => 'Vendor set as pending.',
+    'Order #{reference}' => 'Order #{reference}',
+    'Settings' => 'Settings',
+    'Logout' => 'Logout',
 ];

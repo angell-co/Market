@@ -170,6 +170,7 @@ trait PluginTrait
             function(RegisterUrlRulesEvent $event) {
                 $event->rules['market'] = 'market/vendor-dashboard/index';
                 $event->rules['market/orders'] = 'market/vendor-dashboard/orders-index';
+                $event->rules['market/orders/<orderId:\d+>'] = 'market/vendor-dashboard/edit-order';
                 $event->rules['market/products'] = 'market/vendor-dashboard/products-index';
                 $event->rules['market/files'] = 'market/vendor-dashboard/files-index';
                 $event->rules['market/shipping'] = 'market/vendor-dashboard/shipping-index';

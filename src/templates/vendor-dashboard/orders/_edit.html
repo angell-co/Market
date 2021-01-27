@@ -1,17 +1,21 @@
 {% extends "market/vendor-dashboard/_layouts/main" %}
 
-{% set title = 'Orders'|t('market') %}
+{% set title = 'Order #{reference}'|t('market', {reference: order.reference}) %}
 
 {% set breadcrumbs = [
     {
         url: url('market/orders'),
         label: 'Orders'|t('market')
+    },
+    {
+        url: url('market/orders/'~order.id),
+        label: title
     }
 ] %}
 
 {% block main %}
     <div class="py-4">
-        {{ sprig('market\\Orders') }}
+
     </div>
 {% endblock %}
 
