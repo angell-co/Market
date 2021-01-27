@@ -42,35 +42,42 @@ class VendorQuery extends ElementQuery
      */
     public $pending = false;
 
+    /**
+     * @var string The vendor code
+     */
+    public $code;
+
 
     // Element criteria parameter setters
     // -------------------------------------------------------------------------
 
-    /**
-     * Sets the [[$suspended]] property.
-     *
-     * @param bool $value The property value (defaults to true)
-     * @uses $suspended
-     * @return static self reference
-     */
-    public function suspended(bool $value = true): VendorQuery
-    {
-        $this->suspended = $value;
-        return $this;
-    }
 
-    /**
-     * Sets the [[$pending]] property.
-     *
-     * @param bool $value The property value (defaults to true)
-     * @uses $pending
-     * @return static self reference
-     */
-    public function pending(bool $value = true): VendorQuery
-    {
-        $this->pending = $value;
-        return $this;
-    }
+    // TODO don’t think we need these
+//    /**
+//     * Sets the [[$suspended]] property.
+//     *
+//     * @param bool $value The property value (defaults to true)
+//     * @uses $suspended
+//     * @return static self reference
+//     */
+//    public function suspended(bool $value = true): VendorQuery
+//    {
+//        $this->suspended = $value;
+//        return $this;
+//    }
+//
+//    /**
+//     * Sets the [[$pending]] property.
+//     *
+//     * @param bool $value The property value (defaults to true)
+//     * @uses $pending
+//     * @return static self reference
+//     */
+//    public function pending(bool $value = true): VendorQuery
+//    {
+//        $this->pending = $value;
+//        return $this;
+//    }
 
 
     // Protected Methods
@@ -103,10 +110,10 @@ class VendorQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('market_vendors.userId', $this->userId));
         }
 
-//        if ($criteria->code)
-//        {
-//            $query->andWhere(DbHelper::parseParam('vendors.code', $criteria->code, $query->params));
-//        }
+        if ($this->code)
+        {
+            $this->subQuery->andWhere(Db::parseParam('market_vendors.code', $this->code));
+        }
 
 //        if ($criteria->username || $criteria->email)
 //        {

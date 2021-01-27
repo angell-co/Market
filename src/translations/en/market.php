@@ -133,4 +133,12 @@ return [
     'Files' => 'Files',
     'Reports' => 'Reports',
     'Products' => 'Products',
+    'Activate vendor' => 'Activate vendor',
+    'Couldn’t unsuspend vendor.' => 'Couldn’t unsuspend vendor.',
+    'Vendor unsuspended.' => 'Vendor unsuspended.',
+    'Set as pending' => 'Set as pending',
+    'Couldn’t suspend vendor.' => 'Couldn’t suspend vendor.',
+    'Vendor suspended.' => 'Vendor suspended.',
+    'Couldn’t set vendor as pending.' => 'Couldn’t set vendor as pending.',
+    'Vendor set as pending.' => 'Vendor set as pending.',
 ];

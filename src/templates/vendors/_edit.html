@@ -119,7 +119,29 @@
     </div>
 
     {% if vendor.id %}
-        <div class="meta read-only">
+        <div class="meta read-only" method="post" accept-charset="UTF-8">
+            <div class="data first">
+                <h5 class="heading">{{ "Status"|t('app') }}</h5>
+                <div class="value flex">
+                    <div class="flex-grow"><span class="status {{ vendor.getStatus() }}"></span> {{ statusLabel }}</div>
+
+                    {% if statusActions|length %}
+                        <div>
+                            <button type="button" id="action-menubtn" class="btn menubtn" data-icon="settings" title="{{ 'Actions'|t('app') }}" aria-label="{{ 'Actions'|t('app') }}"></button>
+                            <div class="menu">
+                                <ul>
+                                {% for actionItem in statusActions %}
+                                    <li>
+                                        <a class="formsubmit{% if actionItem.id is defined and actionItem.id == 'suspend' %} error{% endif %}" data-action="{{ actionItem.action }}" data-redirect="{{ continueEditingUrl|replace('{id}', vendor.id)|replace('{slug}', vendor.slug)|hash }}">{{ actionItem.label }}</a>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            <div id="action-spinner" class="spinner hidden"></div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
             <div class="data">
                 <h5 class="heading">{{ "Date Created"|t('app') }}</h5>
                 <div class="value">{{ vendor.dateCreated|datetime('short') }}</div>

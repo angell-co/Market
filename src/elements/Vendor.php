@@ -39,8 +39,9 @@ use yii\web\ServerErrorHttpException;
 
 /**
  * @property Asset|null $profilePicture
- * @property-read bool $hasCheckeredThumb
- * @property-read VendorSettings $settings
+ * @property bool $hasCheckeredThumb
+ * @property VendorSettings $settings
+ * @property null|ShippingProfile[] $shippingProfiles
  * @property User|null|bool|false $user
  *
  * @author    Angell & Co

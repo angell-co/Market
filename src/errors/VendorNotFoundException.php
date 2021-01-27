@@ -10,18 +10,18 @@
 
 namespace angellco\market\errors;
 
-use yii\base\Exception;
+use craft\errors\ElementNotFoundException;
 
 /**
- * Class VendorSettingsNotFoundException
+ * Class VendorNotFoundException
  */
-class VendorSettingsNotFoundException extends Exception
+class VendorNotFoundException extends ElementNotFoundException
 {
     /**
      * @return string the user-friendly name of this exception
      */
-    public function getName(): string
+    public function getName()
     {
-        return 'Vendor settings not found';
+        return 'Vendor not found';
     }
 }

@@ -11,7 +11,9 @@
 namespace angellco\market\services;
 
 use angellco\market\elements\Vendor;
+use angellco\market\errors\VendorNotFoundException;
 use angellco\market\Market;
+use angellco\market\records\Vendor as VendorRecord;
 use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
@@ -27,6 +29,8 @@ use yii\web\ServerErrorHttpException;
 
 /**
  * Vendors service
+ *
+ * @property null|bool|array|ElementInterface $currentVendor
  *
  * @author    Angell & Co
  * @package   Market
@@ -106,13 +110,128 @@ class Vendors extends Component
     }
 
     /**
+     * Activates a vendor.
+     *
+     * @param Vendor $vendor The vendor.
+     * @return bool Whether the vendor was marked as pending successfully.
+     * @throws \Throwable if reasons
+     */
+    public function activateVendor(Vendor $vendor): bool
+    {
+        $transaction = Craft::$app->getDb()->beginTransaction();
+
+        try {
+            $vendorRecord = $this->_getVendorRecordById($vendor->id);
+            $vendorRecord->pending = false;
+            $vendorRecord->save();
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+
+        // Update the Vendor model too
+        $vendor->pending = false;
+
+        return true;
+    }
+
+    /**
+     * Sets a vendor as pending.
+     *
+     * @param Vendor $vendor The vendor.
+     * @return bool Whether the vendor was marked as pending successfully.
+     * @throws \Throwable if reasons
+     */
+    public function setVendorPending(Vendor $vendor): bool
+    {
+        $transaction = Craft::$app->getDb()->beginTransaction();
+
+        try {
+            $vendorRecord = $this->_getVendorRecordById($vendor->id);
+            $vendorRecord->pending = true;
+            $vendorRecord->save();
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+
+        // Update the Vendor model too
+        $vendor->pending = true;
+
+        return true;
+    }
+
+    /**
+     * Suspends a vendor.
+     *
+     * @param Vendor $vendor The vendor.
+     * @return bool Whether the vendor was suspended successfully.
+     * @throws \Throwable if reasons
+     */
+    public function suspendVendor(Vendor $vendor): bool
+    {
+        $transaction = Craft::$app->getDb()->beginTransaction();
+
+        try {
+            $vendorRecord = $this->_getVendorRecordById($vendor->id);
+            $vendorRecord->suspended = true;
+            $vendorRecord->save();
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+
+        // Update the Vendor model too
+        $vendor->suspended = true;
+
+        return true;
+    }
+
+    /**
+     * Unsuspends a vendor.
+     *
+     * @param Vendor $vendor The vendor.
+     * @return bool Whether the vendor was unsuspended successfully.
+     * @throws \Throwable if reasons
+     */
+    public function unsuspendVendor(Vendor $vendor): bool
+    {
+        $transaction = Craft::$app->getDb()->beginTransaction();
+
+        try {
+            $vendorRecord = $this->_getVendorRecordById($vendor->id);
+            $vendorRecord->suspended = false;
+            $vendorRecord->save();
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+
+        // Update the Vendor model too
+        $vendor->suspended = false;
+
+        return true;
+    }
+
+    /**
      * Creates the volume folders for the vendor and saves their IDs on to it.
      *
      * @param Vendor $vendor
      * @return bool
      * @throws ElementNotFoundException
      * @throws Exception
-     * @throws ServerErrorHttpException
      * @throws SiteNotFoundException
      * @throws VolumeObjectExistsException
      * @throws \Throwable
@@ -190,6 +309,24 @@ class Vendors extends Component
         }
 
         return $folder;
+    }
+
+    /**
+     * Gets a vendor record by its ID.
+     *
+     * @param int $vendorId
+     * @return VendorRecord
+     * @throws VendorNotFoundException if $vendorId is invalid
+     */
+    private function _getVendorRecordById(int $vendorId): VendorRecord
+    {
+        $vendorRecord = VendorRecord::findOne($vendorId);
+
+        if (!$vendorRecord) {
+            throw new VendorNotFoundException("No vendor exists with the ID '{$vendorId}'");
+        }
+
+        return $vendorRecord;
     }
 
 }

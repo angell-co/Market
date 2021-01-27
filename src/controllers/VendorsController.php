@@ -11,6 +11,7 @@
 namespace angellco\market\controllers;
 
 use angellco\market\elements\Vendor;
+use angellco\market\errors\VendorNotFoundException;
 use angellco\market\Market;
 use Craft;
 use craft\base\Element;
@@ -126,6 +127,56 @@ class VendorsController extends Controller
             }
         }
 
+        // Status variables
+        // ---------------------------------------------------------------------
+
+        $statusLabel = null;
+        $statusActions = [];
+
+        switch ($variables['vendor']->getStatus()) {
+            case Vendor::STATUS_PENDING:
+                $statusLabel = Craft::t('app', 'Pending');
+                $statusActions[] = [
+                    'action' => 'market/vendors/activate-vendor',
+                    'label' => Craft::t('market', 'Activate vendor')
+                ];
+                $statusActions[] = [
+                    'id' => 'suspend',
+                    'action' => 'market/vendors/suspend-vendor',
+                    'label' => Craft::t('app', 'Suspend')
+                ];
+                break;
+
+            case Vendor::STATUS_SUSPENDED:
+                $statusLabel = Craft::t('app', 'Suspended');
+                $statusActions[] = [
+                    'action' => 'market/vendors/unsuspend-vendor',
+                    'label' => Craft::t('app', 'Unsuspend')
+                ];
+                break;
+
+            case Vendor::STATUS_ACTIVE:
+                $statusLabel = Craft::t('app', 'Active');
+                $statusActions[] = [
+                    'action' => 'market/vendors/set-vendor-pending',
+                    'label' => Craft::t('market', 'Set as pending')
+                ];
+                $statusActions[] = [
+                    'id' => 'suspend',
+                    'action' => 'market/vendors/suspend-vendor',
+                    'label' => Craft::t('app', 'Suspend')
+                ];
+
+                break;
+
+            case Vendor::STATUS_DISABLED:
+                $statusLabel = Craft::t('app', 'Disabled');
+
+                break;
+        }
+
+        $variables['statusLabel'] = $statusLabel;
+        $variables['statusActions'] = $statusActions;
 
         // Variables
         // ---------------------------------------------------------------------
@@ -247,8 +298,6 @@ class VendorsController extends Controller
         $this->requirePostRequest();
 
         $vendor = $this->_getVendorModel();
-
-        $isNew = !$vendor->id;
 
         // Permission enforcement
         $this->_enforceEditVendorPermissions($vendor);
@@ -454,6 +503,118 @@ class VendorsController extends Controller
         }
 
         return $this->_showVendor($vendor);
+    }
+
+    /**
+     * Activates a vendor.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws VendorNotFoundException
+     * @throws \Throwable
+     */
+    public function actionActivateVendor(): ?Response
+    {
+        $this->requirePostRequest();
+
+        $vendorId = $this->request->getRequiredBodyParam('vendorId');
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId);
+
+        if (!$vendor) {
+            throw new VendorNotFoundException('Vendor not found');
+        }
+
+        if (!Market::$plugin->getVendors()->activateVendor($vendor)) {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t set vendor as pending.'));
+            return null;
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Vendor set as pending.'));
+        return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Sets a vendor as pending.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws VendorNotFoundException
+     * @throws \Throwable
+     */
+    public function actionSetVendorPending(): ?Response
+    {
+        $this->requirePostRequest();
+
+        $vendorId = $this->request->getRequiredBodyParam('vendorId');
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId);
+
+        if (!$vendor) {
+            throw new VendorNotFoundException('Vendor not found');
+        }
+
+        if (!Market::$plugin->getVendors()->setVendorPending($vendor)) {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t set vendor as pending.'));
+            return null;
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Vendor set as pending.'));
+        return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Suspends a vendor.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws VendorNotFoundException
+     * @throws \Throwable
+     */
+    public function actionSuspendVendor(): ?Response
+    {
+        $this->requirePostRequest();
+
+        $vendorId = $this->request->getRequiredBodyParam('vendorId');
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId);
+
+        if (!$vendor) {
+            throw new VendorNotFoundException('Vendor not found');
+        }
+
+        if (!Market::$plugin->getVendors()->suspendVendor($vendor)) {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t suspend vendor.'));
+            return null;
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Vendor suspended.'));
+        return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Unsuspends a vendor.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws VendorNotFoundException
+     * @throws \Throwable
+     */
+    public function actionUnsuspendVendor(): ?Response
+    {
+        $this->requirePostRequest();
+
+        $vendorId = $this->request->getRequiredBodyParam('vendorId');
+        $vendor = Market::$plugin->getVendors()->getVendorById($vendorId);
+
+        if (!$vendor) {
+            throw new VendorNotFoundException('Vendor not found');
+        }
+
+        if (!Market::$plugin->getVendors()->unsuspendVendor($vendor)) {
+            $this->setFailFlash(Craft::t('market', 'Couldn’t unsuspend vendor.'));
+            return null;
+        }
+
+        $this->setSuccessFlash(Craft::t('market', 'Vendor unsuspended.'));
+        return $this->redirectToPostedUrl();
     }
 
     /**
