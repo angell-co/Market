@@ -10,10 +10,13 @@
 
 namespace sprig\components\market;
 
+use angellco\market\elements\Vendor;
 use angellco\market\Market;
 use Craft;
+use craft\commerce\elements\Order;
 use craft\web\View;
 use putyourlightson\sprig\base\Component;
+use putyourlightson\sprig\variables\PaginateVariable;
 
 /**
  * Class Orders
@@ -24,12 +27,27 @@ use putyourlightson\sprig\base\Component;
  */
 class Orders extends Component
 {
-
-    public $currentVendor;
+    /**
+     * @var int
+     */
     public $page;
-    public $limit;
+
+    /**
+     * @var int
+     */
+    protected $_limit;
+
+    /**
+     * @var PaginateVariable
+     */
     public $pageInfo;
-    public $orders;
+
+    /**
+     * @var Vendor
+     */
+    public $currentVendor;
+    public $sort;
+    public $sortDir;
 
     /**
      * @inheritdoc
