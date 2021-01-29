@@ -101,7 +101,7 @@
                                 Date
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {{ order.dateOrdered.nice }}
+                                {{ order.dateOrdered|datetime('d M Y, g:i A') }}
                             </dd>
                         </div>
                         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -121,11 +121,8 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                         {{ 'Shipping Address'|t('market') }}
                     </h3>
-                    {#                    <p class="mt-1 max-w-2xl text-sm text-gray-500">#}
-                    {#                        TODO#}
-                    {#                    </p>#}
                 </div>
-                <div class="w-full border-t border-gray-200 px-4 sm:p-0">
+                <div class="px-4 py-5 sm:px-6 border-t border-gray-200">
                     {% include 'market/vendor-dashboard/_includes/address' with {
                         address : order.shippingAddress
                     } %}
@@ -137,11 +134,8 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                         {{ 'Billing Address'|t('market') }}
                     </h3>
-                    {#                    <p class="mt-1 max-w-2xl text-sm text-gray-500">#}
-                    {#                        TODO#}
-                    {#                    </p>#}
                 </div>
-                <div class="w-full border-t border-gray-200 px-4 sm:p-0">
+                <div class="px-4 py-5 sm:px-6 border-t border-gray-200">
                     {% include 'market/vendor-dashboard/_includes/address' with {
                         address : order.billingAddress
                     } %}
@@ -150,17 +144,22 @@
         </div>
 
 
-{#        <div class="bg-white p-6 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">#}
-{#            <h3>{{ 'Shipping Address'|t('market') }}</h3>#}
+        {# WIP #}
+        {% for item in order.lineItems %}
+            {% if item.purchasable.product is defined  %}
+                {% set product = item.purchasable.product %}
+                <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}">{{ product.title }}</a>
+            {% else %}
+                {{ item.description }}
+            {% endif %}
+            <br>
 
-{#        </div>#}
-
-{#        <div class="bg-white p-6 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">#}
-{#            <h3>{{ 'Billing Address'|t('market') }}</h3>#}
-{#            {% include 'market/vendor-dashboard/_includes/address' with {#}
-{#                address : order.billingAddress#}
-{#            } %}#}
-{#        </div>#}
+            {{ item.sku }}<br>
+            x{{ item.qty }}<br>
+            {{ item.note }}<br>
+            {{ item.subTotal|currency(order.currency, [], [], true) }}<br>
+            <br>
+        {% endfor %}
 
 
     </div>
