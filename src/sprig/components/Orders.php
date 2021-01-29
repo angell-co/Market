@@ -46,8 +46,21 @@ class Orders extends Component
      * @var Vendor
      */
     public $currentVendor;
+
+    /**
+     * @var string
+     */
     public $sort;
+
+    /**
+     * @var string
+     */
     public $sortDir;
+
+    /**
+     * @var string
+     */
+    public $query;
 
     /**
      * @inheritdoc
@@ -64,7 +77,7 @@ class Orders extends Component
      */
     public function render(): string
     {
-        return Craft::$app->getView()->renderTemplate('market/vendor-dashboard/_components/orders-list', $this->getAttributes(), View::TEMPLATE_MODE_CP);
+        return Craft::$app->getView()->renderTemplate('market/vendor-dashboard/_components/orders-index', $this->getAttributes(), View::TEMPLATE_MODE_CP);
     }
 
 }

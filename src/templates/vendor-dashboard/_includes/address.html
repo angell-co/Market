@@ -6,7 +6,7 @@
             {% if key in boldKeys %}
             <strong>{% if key == 'attention' %}Attn:{% endif %}
                 {% endif %}
-                {{ line }}
+                {{ key == 'name' ? line|title : line }}
                 {% if key in boldKeys %}
             </strong>
             {% endif %}

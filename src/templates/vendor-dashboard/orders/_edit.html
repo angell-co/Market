@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
-            <a href="{{ order.getPdfUrl() }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <a href="{{ order.getPdfUrl() }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
                 {# Heroicon name: arrow-circle-down #}
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
@@ -68,23 +68,17 @@
             </button>
         </div>
     </div>
-
 {% endblock %}
-
 
 {% block main %}
     <div class="py-4">
 
-        <!-- This example requires Tailwind CSS v2.0+ -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            <div class="relative shadow rounded-lg bg-white">
-                <div class="px-4 py-5 sm:px-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="relative shadow rounded-lg bg-white sm:col-span-full lg:col-auto overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                         Order Details
                     </h3>
-{#                    <p class="mt-1 max-w-2xl text-sm text-gray-500">#}
-{#                        TODO#}
-{#                    </p>#}
                 </div>
                 <div class="w-full border-t border-gray-200 px-4 sm:p-0">
                     <dl class="sm:divide-y sm:divide-gray-200">
@@ -108,16 +102,16 @@
                             <dt class="text-sm font-medium text-gray-500">
                                 Customer
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                <a href="mailto:{{ order.email }}">{{ order.email }}</a>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 truncate">
+                                <a href="mailto:{{ order.email }}" class="text-indigo-600 hover:text-indigo-900">{{ order.email }}</a>
                             </dd>
                         </div>
                     </dl>
                 </div>
             </div>
 
-            <div class="relative shadow rounded-lg bg-white">
-                <div class="px-4 py-5 sm:px-6">
+            <div class="relative shadow rounded-lg bg-white overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                         {{ 'Shipping Address'|t('market') }}
                     </h3>
@@ -129,8 +123,8 @@
                 </div>
             </div>
 
-            <div class="relative shadow rounded-lg bg-white">
-                <div class="px-4 py-5 sm:px-6">
+            <div class="relative shadow rounded-lg bg-white overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                         {{ 'Billing Address'|t('market') }}
                     </h3>
@@ -142,26 +136,129 @@
                 </div>
             </div>
         </div>
-
-
-        {# WIP #}
-        {% for item in order.lineItems %}
-            {% if item.purchasable.product is defined  %}
-                {% set product = item.purchasable.product %}
-                <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}">{{ product.title }}</a>
-            {% else %}
-                {{ item.description }}
-            {% endif %}
-            <br>
-
-            {{ item.sku }}<br>
-            x{{ item.qty }}<br>
-            {{ item.note }}<br>
-            {{ item.subTotal|currency(order.currency, [], [], true) }}<br>
-            <br>
-        {% endfor %}
-
-
     </div>
+
+    {# Order table #}
+    <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Item
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    SKU
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Price
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Qty
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Total
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.lineItems %}
+                                <tr class="{{ loop.index is odd ? 'bg-white' : 'bg-gray-50' }}">
+                                    <td class="px-6 py-4 max-w-xs text-sm font-medium text-gray-900">
+                                        {% if item.purchasable.product is defined  %}
+                                            {% set product = item.purchasable.product %}
+                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-indigo-600 hover:text-indigo-900">{{ product.title }}</a>
+                                        {% else %}
+                                            {{ item.description }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        {{ item.sku }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ item.salePrice|currency(order.currency, [], [], true) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ item.qty }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
+                                        {{ item.subTotal|currency(order.currency, [], [], true) }}
+                                    </td>
+                                </tr>
+
+                                {% if item.note %}
+                                    <tr class="{{ loop.index is odd ? 'bg-white' : 'bg-gray-50' }}">
+                                        <td colspan="5" class="px-6 py-4 max-w-xs text-sm text-gray-500">
+                                            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Customer Note</h3>
+                                            {{ item.note|nl2br }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="bg-gray-50">
+                            <tr>
+                                <th colspan="4" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Sub Total
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
+                                    {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
+                                </td>
+                            </tr>
+
+                            {# Shipping #}
+                            {% set shippingAdjusters = order.getAdjustmentsByType('shipping') %}
+
+                            {# Handle old style adjusters #}
+                            {% set oldShippingAdjusterName = null %}
+                            {% if shippingAdjusters %}
+                                {% set sourceSnapshot = shippingAdjusters[0].getSourceSnapshot() %}
+                                {% if sourceSnapshot and sourceSnapshot['OldAdjustments'] is defined %}
+                                    {% set oldShippingAdjusterName = sourceSnapshot['OldAdjustments'][0].name %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% if oldShippingAdjusterName %}
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Shipping
+                                    </th>
+                                    <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ oldShippingAdjusterName }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">{{ order.storedTotalShippingCost|currency(order.currency, [], [], true) }}</td>
+                                </tr>
+                            {% else %}
+                                {% for adjustment in shippingAdjusters %}
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Shipping
+                                        </th>
+                                        <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ adjustment.name }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">{{ adjustment.amount|currency(order.currency, [], [], true) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+
+                            <tr class="bg-gray-100 border-t border-gray-200">
+                                <th colspan="4" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    Total
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-right text-sm text-gray-500">
+                                    {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
