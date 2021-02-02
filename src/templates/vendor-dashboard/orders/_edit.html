@@ -115,28 +115,6 @@
                 </svg>
                 {{ 'Refund'|t('market') }}
             </button>
-
-{#            <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ statusMap[order.orderStatus.color] }} focus:outline-none focus:ring-2 focus:ring-offset-2">#}
-{#                {% switch order.orderStatus.handle %}#}
-{#                    {% case 'refunded' %}#}
-{#                        #}{# Heroicon name: receipt-refund #}
-{#                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">#}
-{#                            <path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clip-rule="evenodd" />#}
-{#                        </svg>#}
-{#                    {% case 'new' %}#}
-{#                        #}{# Heroicon name: sparkles #}
-{#                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">#}
-{#                            <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />#}
-{#                        </svg>#}
-{#                    {% case 'posted' %}#}
-{#                        #}{# Heroicon name: check #}
-{#                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">#}
-{#                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />#}
-{#                        </svg>#}
-{#                {% endswitch %}#}
-
-{#                {{ order.orderStatus }}#}
-{#            </button>#}
         </div>
     </div>
 {% endblock %}
@@ -155,7 +133,7 @@
                     <dl class="sm:divide-y sm:divide-gray-200">
                         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                                Reference
+                                {{ 'Reference'|t('market') }}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                 #{{ order.reference }}
@@ -163,7 +141,7 @@
                         </div>
                         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                                Date
+                                {{ 'Date'|t('market') }}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                 {{ order.dateOrdered|datetime('d M Y, g:i A') }}
@@ -171,7 +149,7 @@
                         </div>
                         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                                Customer
+                                {{ 'Customer'|t('market') }}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 truncate">
                                 <a href="mailto:{{ order.email }}" class="text-indigo-600 hover:text-indigo-900">{{ order.email }}</a>
@@ -218,19 +196,19 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Item
+                                    {{ 'Item'|t('market') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    SKU
+                                    {{ 'SKU'|t('market') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Price
+                                    {{ 'Price'|t('market') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Qty
+                                    {{ 'Qty'|t('market') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Total
+                                    {{ 'Total'|t('market') }}
                                 </th>
                             </tr>
                         </thead>
@@ -273,10 +251,10 @@
                         <tfoot class="bg-gray-50">
                             <tr>
                                 <th colspan="4" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Sub Total
+                                    {{ 'Sub Total'|t('market') }}
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                                    {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
+                                    {{ order.itemSubtotal|currency(order.currency, [], [], true) }}
                                 </td>
                             </tr>
 
@@ -295,7 +273,7 @@
                             {% if oldShippingAdjusterName %}
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Shipping
+                                        {{ 'Shipping'|t('market') }}
                                     </th>
                                     <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ oldShippingAdjusterName }}
@@ -306,7 +284,7 @@
                                 {% for adjustment in shippingAdjusters %}
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Shipping
+                                            {{ 'Shipping'|t('market') }}
                                         </th>
                                         <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ adjustment.name }}
@@ -318,7 +296,7 @@
 
                             <tr class="bg-gray-100 border-t border-gray-200">
                                 <th colspan="4" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    Total
+                                    {{ 'Total'|t('market') }}
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap font-medium text-right text-sm text-gray-500">
                                     {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
