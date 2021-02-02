@@ -13,6 +13,7 @@ module.exports = {
         blue: colors.indigo,
         red: colors.rose,
         green: colors.emerald,
+        orange: colors.orange,
       },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],

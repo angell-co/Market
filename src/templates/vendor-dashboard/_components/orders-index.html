@@ -167,7 +167,7 @@
                                     {% set billingAddress = order.billingAddress %}
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ url('market/orders/'~order.id) }}" class="text-indigo-600 hover:text-indigo-900">{{ order.reference }}</a>
+                                            <a href="{{ url('market/orders/'~order.id) }}" class="text-blue-600 hover:text-blue-900">{{ order.reference }}</a>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">
@@ -179,7 +179,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[order.orderStatus.color] is defined ? statusMap[order.orderStatus.color] : statusMap.default }}">
-                                              {{ order.orderStatus }}
+                                                {{ order.orderStatus }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -198,7 +198,9 @@
             </div>
 
             {# Pagination #}
-            {% include 'market/vendor-dashboard/_includes/pagination' %}
+            {% include 'market/vendor-dashboard/_includes/pagination' with {
+                itemType: 'orders'
+            } %}
         {% else %}
             {# No results #}
             <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">

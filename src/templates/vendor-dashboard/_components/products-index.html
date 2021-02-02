@@ -138,101 +138,101 @@
                         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="p-0">
-                                        <button sprig
-                                                s-val:sort="title"
-                                                s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
-                                                type="button"
-                                                class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
-                                        >
-                                            Title
-                                            {% if sort == 'title' and sortDir == 'desc' %}
-                                                {# Heroicon name: chevron-down #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% elseif sort == 'title' and sortDir == 'asc' %}
-                                                {# Heroicon name: chevron-up #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% endif %}
-                                        </button>
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col" class="p-0">
-                                        <button sprig
-                                                s-val:sort="defaultSku"
-                                                s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
-                                                type="button"
-                                                class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
-                                        >
-                                            SKU
-                                            {% if sort == 'defaultSku' and sortDir == 'desc' %}
-                                                {# Heroicon name: chevron-down #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% elseif sort == 'defaultSku' and sortDir == 'asc' %}
-                                                {# Heroicon name: chevron-up #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% endif %}
-                                        </button>
-                                    </th>
-                                    <th scope="col" class="p-0">
-                                        <button sprig
-                                                s-val:sort="defaultPrice"
-                                                s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
-                                                type="button"
-                                                class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
-                                        >
-                                            Price
-                                            {% if sort == 'defaultPrice' and sortDir == 'desc' %}
-                                                {# Heroicon name: chevron-down #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% elseif sort == 'defaultPrice' and sortDir == 'asc' %}
-                                                {# Heroicon name: chevron-up #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% endif %}
-                                        </button>
-                                    </th>
-                                    <th scope="col" class="p-0">
-                                        <button sprig
-                                                s-val:sort="postDate"
-                                                s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
-                                                type="button"
-                                                class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
-                                        >
-                                            Post Date
-                                            {% if sort == 'postDate' and sortDir == 'desc' %}
-                                                {# Heroicon name: chevron-down #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% elseif sort == 'postDate' and sortDir == 'asc' %}
-                                                {# Heroicon name: chevron-up #}
-                                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            {% endif %}
-                                        </button>
-                                    </th>
-                                </tr>
+                                    <tr>
+                                        <th scope="col" class="p-0">
+                                            <button sprig
+                                                    s-val:sort="title"
+                                                    s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
+                                                    type="button"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
+                                            >
+                                                Title
+                                                {% if sort == 'title' and sortDir == 'desc' %}
+                                                    {# Heroicon name: chevron-down #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% elseif sort == 'title' and sortDir == 'asc' %}
+                                                    {# Heroicon name: chevron-up #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% endif %}
+                                            </button>
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th scope="col" class="p-0">
+                                            <button sprig
+                                                    s-val:sort="defaultSku"
+                                                    s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
+                                                    type="button"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
+                                            >
+                                                SKU
+                                                {% if sort == 'defaultSku' and sortDir == 'desc' %}
+                                                    {# Heroicon name: chevron-down #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% elseif sort == 'defaultSku' and sortDir == 'asc' %}
+                                                    {# Heroicon name: chevron-up #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% endif %}
+                                            </button>
+                                        </th>
+                                        <th scope="col" class="p-0">
+                                            <button sprig
+                                                    s-val:sort="defaultPrice"
+                                                    s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
+                                                    type="button"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
+                                            >
+                                                Price
+                                                {% if sort == 'defaultPrice' and sortDir == 'desc' %}
+                                                    {# Heroicon name: chevron-down #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% elseif sort == 'defaultPrice' and sortDir == 'asc' %}
+                                                    {# Heroicon name: chevron-up #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% endif %}
+                                            </button>
+                                        </th>
+                                        <th scope="col" class="p-0">
+                                            <button sprig
+                                                    s-val:sort="postDate"
+                                                    s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
+                                                    type="button"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
+                                            >
+                                                Post Date
+                                                {% if sort == 'postDate' and sortDir == 'desc' %}
+                                                    {# Heroicon name: chevron-down #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% elseif sort == 'postDate' and sortDir == 'asc' %}
+                                                    {# Heroicon name: chevron-up #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% endif %}
+                                            </button>
+                                        </th>
+                                    </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                 {% for product in products %}
                                     <tr>
                                         <td class="px-6 py-4 max-w-xs text-sm font-medium">
-                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-indigo-600 hover:text-indigo-900">{{ product.title }}</a>
+                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-blue-600 hover:text-blue-900">{{ product.title }}</a>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[product.status] }}">
@@ -258,7 +258,9 @@
             </div>
 
             {# Pagination #}
-            {% include 'market/vendor-dashboard/_includes/pagination' %}
+            {% include 'market/vendor-dashboard/_includes/pagination' with {
+                itemType: 'products'
+            } %}
         {% else %}
             {# No results #}
             <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">

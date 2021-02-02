@@ -152,4 +152,10 @@ return [
     'Packing Slip' => 'Packing Slip',
     'Refund' => 'Refund',
     'Create new product' => 'Create new product',
+    'Create new shipping profile' => 'Create new shipping profile',
+    'Account {status}' => 'Account {status}',
+    'Recent orders' => 'Recent orders',
+    'View all' => 'View all',
+    'Overview' => 'Overview',
+    'Setup Payments' => 'Setup Payments',
 ];

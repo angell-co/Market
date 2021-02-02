@@ -4,6 +4,7 @@
 
 {% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
 {% set profilePicture = currentVendor.getProfilePicture() %}
+{% set extendHeader = extendHeader ?? false %}
 
 <!doctype html>
 <html lang="en">
@@ -127,7 +128,7 @@
                     </a>
                     <nav class="mt-4 flex-1 flex flex-col divide-y divide-brand-800 overflow-y-auto" aria-label="Sidebar">
                         <div class="px-2 space-y-1">
-                            <a href="{{ url('market') }}" class="{{ craft.app.request.getSegment(2) is empty ? 'bg-brand-00 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            <a href="{{ url('market') }}" class="{{ craft.app.request.getSegment(2) is empty ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                                 {# Heroicon name: home #}
                                 <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -168,9 +169,9 @@
                             </a>
 
                             <a href="{{ url('market/reports') }}" class="{{ craft.app.request.getSegment(2) == 'reports' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: chart-bar #}
+                                {# Heroicon name: document-report #}
                                 <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 {{ 'Reports'|t('market') }}
                             </a>
@@ -200,7 +201,7 @@
             </div>
         </div>
         <div class="flex flex-col w-0 flex-1 overflow-hidden">
-            <div class="relative z-30 flex-shrink-0 flex h-16 bg-white shadow">
+            <div class="relative z-30 flex-shrink-0 flex h-16 bg-white {{ extendHeader ? 'border-b' : 'shadow' }}">
                 <button class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 md:hidden">
                     <span class="sr-only">Open sidebar</span>
                     {# Heroicon name: menu-alt-2 #}
@@ -257,11 +258,11 @@
                                         id="user-menu" aria-haspopup="true" x-bind:aria-expanded="open"
                                 >
                                     {% if profilePicture %}
-                                        <img class="h-8 w-8 rounded-full" src="{{ currentVendor.getThumbUrl(256) }}" alt="">
+                                        <img class="h-8 w-8 rounded-full" src="{{ profilePicture.url({width:256, height: 256}) }}" alt="">
                                     {% endif %}
                                     <span class="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
                                         <span class="sr-only">Open user menu for </span>
-                                        {{ currentVendor.user.name }}
+                                        {{ currentUser.name }}
                                     </span>
                                     {# Heroicon name: chevron-down #}
                                     <svg class="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -310,8 +311,8 @@
             </div>
 
             <main class="flex-1 relative overflow-y-auto focus:outline-none" tabindex="0">
-                <div class="py-6">
-                    {% block content %}
+                {% block content %}
+                    <div class="py-6">
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                             {% block header %}
                                 <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ title }}</h1>
@@ -320,8 +321,8 @@
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                             {% block main %}{% endblock %}
                         </div>
-                    {% endblock %}
-                </div>
+                    </div>
+                {% endblock %}
             </main>
         </div>
     </div>
