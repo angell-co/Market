@@ -30,6 +30,7 @@ module.exports = {
       colors: {
         brand: colors.teal,
         blue: colors.indigo,
+        rose: colors.rose,
       },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
