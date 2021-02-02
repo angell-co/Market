@@ -172,4 +172,5 @@ return [
     'Total Orders' => 'Total Orders',
     'Increased by' => 'Increased by',
     'Decreased by' => 'Decreased by',
+    'Upload' => 'Upload',
 ];
