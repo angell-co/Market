@@ -35,7 +35,7 @@ class Products extends Component
     /**
      * @var int
      */
-    protected $_limit;
+    public $limit;
 
     /**
      * @var PaginateVariable
@@ -56,6 +56,11 @@ class Products extends Component
      * @var string
      */
     public $sortDir;
+
+    /**
+     * @var string
+     */
+    public $status;
 
     /**
      * @var string

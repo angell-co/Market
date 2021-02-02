@@ -13,6 +13,12 @@
     }
 ] %}
 
+{% set statusMap = {
+    green: 'bg-green-600 hover:bg-green-700 focus:ring-green-500',
+    blue: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+    pink: 'bg-pink-600 hover:bg-pink-700 focus:ring-pink-500',
+} %}
+
 {% block header %}
     <div class="lg:flex lg:items-center lg:justify-between mb-4">
         <div class="flex-1 min-w-0">
@@ -45,7 +51,7 @@
                 </svg>
                 Packing Slip
             </a>
-            <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-{{ order.orderStatus.color }}-600 hover:bg-{{ order.orderStatus.color }}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-{{ order.orderStatus.color }}-500">
+            <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ statusMap[order.orderStatus.color] }} focus:outline-none focus:ring-2 focus:ring-offset-2">
                 {% switch order.orderStatus.handle %}
                     {% case 'refunded' %}
                         {# Heroicon name: receipt-refund #}
