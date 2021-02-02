@@ -148,4 +148,8 @@ return [
     'Edit shop front' => 'Edit shop front',
     'View shop' => 'View shop',
     'Signed in as' => 'Signed in as',
+    'Update Status' => 'Update Status',
+    'Packing Slip' => 'Packing Slip',
+    'Refund' => 'Refund',
+    'Create new product' => 'Create new product',
 ];

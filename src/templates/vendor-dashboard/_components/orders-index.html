@@ -28,6 +28,7 @@
     green: 'bg-green-100 text-green-800',
     blue: 'bg-blue-100 text-blue-800',
     pink: 'bg-pink-100 text-pink-800',
+    default: 'bg-gray-100 text-gray-800',
 } %}
 
 {# Header #}
@@ -177,7 +178,7 @@
                                             <a href="mailto:{{ order.email }}" class="text-sm text-gray-500 hover:underline">{{ order.email }}</a>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[order.orderStatus.color] }}">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[order.orderStatus.color] is defined ? statusMap[order.orderStatus.color] : statusMap.default }}">
                                               {{ order.orderStatus }}
                                             </span>
                                         </td>
@@ -213,8 +214,12 @@
                             Oh no!
                         </h3>
                         <div class="mt-2 text-sm text-red-700 space-y-2">
-                            <p>We couldn’t find anything for <strong>“{{ query }}”</strong>, try being less specific or using different keywords.</p>
-                            <p>You can search for most things including order numbers, customer names, email addresses and billing or shipping addresses.</p>
+                            {% if query %}
+                                <p>We couldn’t find anything for <strong>“{{ query }}”</strong>, try being less specific or using different keywords.</p>
+                                <p>You can search for most things including order numbers, customer names, email addresses and billing or shipping addresses.</p>
+                            {% elseif status %}
+                                <p>We couldn’t find any <strong>{{ status }}</strong> orders.</p>
+                            {% endif %}
                         </div>
                         <div class="mt-4">
                             <div class="-mx-2 -my-1.5 flex">
