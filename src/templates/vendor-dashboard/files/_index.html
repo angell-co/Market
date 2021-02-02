@@ -11,7 +11,20 @@
 
 {% block main %}
     <div class="py-4">
-        <div class="border-4 border-dashed border-gray-200 rounded-lg h-96"></div>
+        <ul class="grid grid-cols-2 gap-6 lg:grid-cols-6 lg:gap-8">
+            {% for asset in craft.assets.limit(36).folderId(currentVendor.filesFolderId).all() %}
+                <li class="col-span-1 flex flex-col bg-white rounded-lg overflow-hidden shadow divide-y divide-gray-200">
+                    <div class="flex-1 flex flex-col">
+                        <div class="aspect-w-1 aspect-h-1">
+                            <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="">
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col p-2">
+                        <h3 class="text-gray-900 text-sm font-medium truncate">{{ asset.title }}</h3>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}
 
