@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     {# TODO: favicon #}
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
 </head>
 <body>
     <div class="h-screen flex overflow-hidden bg-gray-100">
@@ -190,7 +191,7 @@
                                     <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                     </svg>
-                                    {{ 'Logout'|t('market') }}
+                                    {{ 'Sign out'|t('market') }}
                                 </a>
                             </div>
                         </div>
@@ -243,42 +244,66 @@
                     {% endif %}
 
                     <div class="ml-4 flex items-center md:ml-6">
-                        <a href="{{ currentVendor.url }}" target="_blank" class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-gray-700 bg-white border border-white hover:border-gray-300 hover:shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
-                            {# Heroicon name: external-link #}
-                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                            </svg>
-                            View Shop
-                        </a>
 
                         {# Profile dropdown #}
-                        <div class="ml-3 relative">
+                        <div class="ml-3 relative"
+                             x-data="{ open: false }"
+                             @keydown.window.escape="open = false"
+                             @click.away="open = false"
+                        >
                             <div>
-                                <button class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500" id="user-menu" aria-haspopup="true">
-                                    <span class="sr-only">Open user menu</span>
+                                <button @click="open = !open"
+                                        class="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50"
+                                        id="user-menu" aria-haspopup="true" x-bind:aria-expanded="open"
+                                >
                                     {% if profilePicture %}
                                         <img class="h-8 w-8 rounded-full" src="{{ currentVendor.getThumbUrl(256) }}" alt="">
                                     {% endif %}
+                                    <span class="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
+                                        <span class="sr-only">Open user menu for </span>
+                                        {{ currentVendor.user.name }}
+                                    </span>
+                                    {# Heroicon name: chevron-down #}
+                                    <svg class="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block" x-description="Heroicon name: chevron-down" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
                                 </button>
                             </div>
-                            {#
-                              Profile dropdown panel, show/hide based on dropdown state.
-
-                              Entering: "transition ease-out duration-100"
-                                From: "transform opacity-0 scale-95"
-                                To: "transform opacity-100 scale-100"
-                              Leaving: "transition ease-in duration-75"
-                                From: "transform opacity-100 scale-100"
-                                To: "transform opacity-0 scale-95"
-                            #}
-{#                            <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">#}
-{#                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Your Profile</a>#}
-
-{#                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Settings</a>#}
-
-{#                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>#}
-{#                            </div>#}
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+                                 role="menu" aria-orientation="vertical" aria-labelledby="user-menu"
+                            >
+                                <div class="px-4 py-3">
+                                    <p class="text-sm">
+                                        {{ 'Signed in as'|t('market') }}
+                                    </p>
+                                    <p class="text-sm font-medium text-gray-900 truncate">
+                                        {{ currentVendor.title }}
+                                    </p>
+                                </div>
+                                <div class="py-1">
+                                    <a href="{{ currentVendor.url }}" target="_blank" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                        {{ 'View shop'|t('market') }}
+                                    </a>
+                                    <a href="{{ url('market/settings') }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                        {{ 'Edit shop front'|t('market') }}
+                                    </a>
+                                    <a href="{{ url('market/settings') }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                        {{ 'Account settings'|t('market') }}
+                                    </a>
+                                </div>
+                                <div class="py-1">
+                                    <a href="{{ url('logout') }}" class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900" role="menuitem">
+                                        {{ 'Sign out'|t('market') }}
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

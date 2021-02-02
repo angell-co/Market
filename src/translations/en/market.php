@@ -143,5 +143,9 @@ return [
     'Vendor set as pending.' => 'Vendor set as pending.',
     'Order #{reference}' => 'Order #{reference}',
     'Settings' => 'Settings',
-    'Logout' => 'Logout',
+    'Sign out' => 'Sign out',
+    'Account settings' => 'Account settings',
+    'Edit shop front' => 'Edit shop front',
+    'View shop' => 'View shop',
+    'Signed in as' => 'Signed in as',
 ];
