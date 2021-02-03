@@ -1,17 +1,16 @@
 {% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
-{% set sort = sort ?? 'dateCreated' %}
-{% set sortDir = sortDir ?? 'desc' %}
+{% set sort = sort ?? 'dateCreated desc' %}
 {% set limit = limit ?? 36 %}
 {% if limit > 60 %}{% set limit = 60 %}{% endif %}
 {% set query = query ?? '' %}
 {% set status = status ?? '' %}
-{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&sortDir='~sortDir~'&status='~status~'&query='~query) %}
+{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&status='~status~'&query='~query) %}
 
 {% set assetsQuery = craft.assets
     .limit(limit)
     .search(query)
-    .orderBy(sort~' '~sortDir)
+    .orderBy(sort)
     .folderId(currentVendor.filesFolderId)
 %}
 
@@ -66,15 +65,16 @@
             </div>
         </div>
 
-        {# Status #}
-        {# TODO: convert to sort #}
+        {# Sort #}
         <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
-            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-            <select sprig id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
-                <option value="" {{ status == '' ? 'selected' }}>View all</option>
-                {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
-                    <option value="{{ orderStatus.handle }}" {{ status == orderStatus.handle ? 'selected' }}>{{ orderStatus.name }}</option>
-                {% endfor %}
+            <label for="sort" class="block text-sm font-medium text-gray-700">Sort</label>
+            <select sprig id="sort" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+                <option value="title asc" {{ sort == 'title asc' ? 'selected' }}>A-Z</option>
+                <option value="title desc" {{ sort == 'title desc' ? 'selected' }}>Z-A</option>
+                <option value="dateCreated desc" {{ sort == 'dateCreated desc' ? 'selected' }}>Date Created (↓)</option>
+                <option value="dateCreated asc" {{ sort == 'dateCreated asc' ? 'selected' }}>Date Created (↑)</option>
+                <option value="dateUpdated desc" {{ sort == 'dateUpdated desc' ? 'selected' }}>Date Updated (↓)</option>
+                <option value="dateUpdated asc" {{ sort == 'dateUpdated asc' ? 'selected' }}>Date Updated (↑)</option>
             </select>
         </div>
 
