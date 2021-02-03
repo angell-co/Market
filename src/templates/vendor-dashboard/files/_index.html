@@ -1,4 +1,4 @@
-{% extends "market/vendor-dashboard/_layouts/main" %}
+{% extends "_market/_layouts/main" %}
 
 {% set title = 'Files'|t('market') %}
 
@@ -11,6 +11,6 @@
 
 {% block content %}
     <div class="py-6">
-        {{ sprig('market\\Assets') }}
+        {{ sprig('_market/_components/assets-index') }}
     </div>
 {% endblock %}

@@ -21,12 +21,14 @@ use angellco\market\services\VendorSettings;
 use Craft;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\fieldlayoutelements\TitleField;
 use craft\models\FieldLayout;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\web\UrlManager;
+use craft\web\View;
 use yii\base\Event;
 
 /**
@@ -160,6 +162,15 @@ trait PluginTrait
             ->onAdd($stripeSettingsPath, [$this->stripeSettings, 'handleChangedSettings'])
             ->onUpdate($stripeSettingsPath, [$this->stripeSettings, 'handleChangedSettings'])
             ->onRemove($stripeSettingsPath, [$this->stripeSettings, 'handleDeletedSettings']);
+
+        // Vendor dashboard template root
+        Event::on(
+            View::class,
+            View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
+            function(RegisterTemplateRootsEvent $event) {
+                $event->roots['_market'] = __DIR__ . '/../templates/vendor-dashboard';
+            }
+        );
     }
 
     private function _registerSiteRoutes(): void
@@ -168,14 +179,16 @@ trait PluginTrait
             UrlManager::class,
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
-                $event->rules['market'] = 'market/vendor-dashboard/index';
-                $event->rules['market/orders'] = 'market/vendor-dashboard/orders-index';
-                $event->rules['market/orders/<orderId:\d+>'] = 'market/vendor-dashboard/edit-order';
-                $event->rules['market/products'] = 'market/vendor-dashboard/products-index';
-                $event->rules['market/files'] = 'market/vendor-dashboard/files-index';
-                $event->rules['market/shipping'] = 'market/vendor-dashboard/shipping-index';
-                $event->rules['market/reports'] = 'market/vendor-dashboard/reports-index';
-                $event->rules['market/settings'] = 'market/vendor-dashboard/settings-index';
+                $event->rules['market'] = ['template' => '_market/_index'];
+                $event->rules['market/orders'] = ['template' => '_market/orders/_index'];
+                $event->rules['market/orders/<orderId:\d+>'] = ['template' => '_market/orders/_edit'];
+                $event->rules['market/products'] = ['template' => '_market/products/_index'];
+                $event->rules['market/files'] = ['template' => '_market/files/_index'];
+                $event->rules['market/files/<assetId:\d+>'] = ['template' => '_market/files/_edit'];
+                $event->rules['market/shipping'] = ['template' => '_market/shipping/_index'];
+                $event->rules['market/shipping/<profileId:\d+>'] = ['template' => '_market/shipping/_edit'];
+                $event->rules['market/reports'] = ['template' => '_market/reports/_index'];
+                $event->rules['market/settings'] = ['template' => '_market/settings/_index'];
             }
         );
     }

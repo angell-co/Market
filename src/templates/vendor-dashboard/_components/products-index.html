@@ -1,3 +1,4 @@
+{% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
 {% set sort = sort ?? 'postDate' %}
 {% set sortDir = sortDir ?? 'desc' %}
@@ -259,7 +260,7 @@
             </div>
 
             {# Pagination #}
-            {% include 'market/vendor-dashboard/_includes/pagination' with {
+            {% include '_market/_includes/pagination' with {
                 itemType: 'products'
             } %}
         {% else %}

@@ -26,28 +26,9 @@ use yii\web\Response;
  */
 class VendorDashboardController extends Controller
 {
-    /**
-     * Shipping index
-     *
-     * @return Response
-     */
-    public function actionIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
 
     /**
-     * Orders index
-     *
-     * @return Response
-     */
-    public function actionOrdersIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/orders/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
-
-    /**
-     * Edit order
+     * Edit order - TODO, bail this?
      *
      * @param int|null $orderId
      * @param Order|null $order
@@ -68,54 +49,4 @@ class VendorDashboardController extends Controller
         return $this->renderTemplate('market/vendor-dashboard/orders/_edit.html', compact('order'), View::TEMPLATE_MODE_CP);
     }
 
-
-    /**
-     * Products index
-     *
-     * @return Response
-     */
-    public function actionProductsIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/products/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
-
-    /**
-     * Files index
-     *
-     * @return Response
-     */
-    public function actionFilesIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/files/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
-
-    /**
-     * Shipping index
-     *
-     * @return Response
-     */
-    public function actionShippingIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/shipping/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
-
-    /**
-     * Reports index
-     *
-     * @return Response
-     */
-    public function actionReportsIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/reports/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
-
-    /**
-     * Settings index
-     *
-     * @return Response
-     */
-    public function actionSettingsIndex(): Response
-    {
-        return $this->renderTemplate('market/vendor-dashboard/settings/_index.html', [], View::TEMPLATE_MODE_CP);
-    }
 }

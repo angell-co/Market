@@ -1,3 +1,4 @@
+{% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
 {% set sort = sort ?? 'dateCreated' %}
 {% set sortDir = sortDir ?? 'desc' %}
@@ -93,25 +94,95 @@
     <div id="results">
         {% if assets %}
             {# Results list #}
-            <ul class="grid grid-cols-2 gap-4 lg:grid-cols-6">
+            <ul class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                 {% for asset in assets %}
                     <li class="col-span-1 flex flex-col">
-                        <a href="#" class="bg-white rounded-md overflow-hidden shadow hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-500">
+                        <label for="asset-checkbox-{{ asset.id }}"
+                               class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50">
+
+                            {# Options menu #}
+                            <div x-data="{ open: false }"
+                                 x-on:keydown.window.escape="open = false"
+                                 x-on:click.away="open = false"
+                                 class="absolute top-2 right-2 z-10"
+                            >
+                                <button x-on:click="open = !open"
+                                        class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                        id="asset-options-menu-{{ asset.id }}"
+                                        aria-haspopup="true"
+                                        x-bind:aria-expanded="open"
+                                >
+                                    <span class="sr-only">Open options menu</span>
+                                    <span class="flex items-center justify-center h-full w-full rounded-full">
+                                        {# Heroicon name: dots-vertical #}
+                                        <svg class="w-5 h-5 text-brand-400 group-hover:text-brand-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                        </svg>
+                                    </span>
+                                </button>
+
+                                <div x-show="open"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="origin-top-right absolute z-10 top-10 right-0 w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+                                     role="menu" aria-orientation="vertical" aria-labelledby="asset-options-menu-{{ asset.id }}"
+                                >
+                                    <div class="py-1">
+                                        <a href="{{ url('market/files/'~asset.id) }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                            {# Heroicon name: eye #}
+                                            <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            View
+                                        </a>
+                                    </div>
+                                    <div class="py-1">
+                                        <a href="#" class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900" role="menuitem">
+                                            {# Heroicon name: trash #}
+                                            <svg class="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                            Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Image #}
                             <div class="flex-1 flex flex-col">
                                 <div class="aspect-w-1 aspect-h-1">
                                     <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="">
                                 </div>
                             </div>
+
+                            {# Checkbox and title #}
                             <div class="flex-1 flex flex-col p-2">
-                                <h3 class="text-gray-900 text-sm font-medium truncate">{{ asset.title }}</h3>
+                                <div class="flex items-start">
+                                    <div class="h-5 flex items-center">
+                                        <input id="asset-checkbox-{{ asset.id }}"
+                                               name="assets[]"
+                                               type="checkbox"
+                                               value="{{ asset.id }}"
+                                               class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                        >
+                                    </div>
+                                    <div class="ml-3 text-sm truncate">
+                                        <span class="font-medium text-gray-700">{{ asset.title }}</span>
+                                    </div>
+                                </div>
                             </div>
-                        </a>
+                        </label>
                     </li>
                 {% endfor %}
             </ul>
 
             {# Pagination #}
-            {% include 'market/vendor-dashboard/_includes/pagination' with {
+            {% include '_market/_includes/pagination' with {
                 itemType: 'files'
             } %}
         {% elseif query %}

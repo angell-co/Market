@@ -18,6 +18,12 @@ module.exports = {
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
+      maxHeight: {
+        'screen-minus-header': 'calc(100vh - 13rem)',
+      },
+      screens: {
+        'smh': {'raw': '(min-height: 560px)'},
+      }
     },
   },
   variants: {
