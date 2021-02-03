@@ -174,4 +174,6 @@ return [
     'Decreased by' => 'Decreased by',
     'Upload' => 'Upload',
     'Download' => 'Download',
+    'New Orders' => 'New Orders',
+    'Overview' => 'Overview',
 ];

@@ -37,10 +37,18 @@
 
     {% set totalOrdersDiff = (totalOrders - totalOrdersPrev30) %}
 
+    {# Total new orders #}
+    {% set totalNewOrders = ordersQuery
+        .orderStatus('new')
+        .dateOrdered(null)
+        .total()
+    %}
+
     {# Main orders loop #}
     {% set recentOrders = ordersQuery
         .withCustomer(true)
         .withAddresses(true)
+        .orderStatus(null)
         .dateOrdered(null)
         .orderBy('dateOrdered desc')
         .limit(6)
@@ -209,8 +217,39 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div class="max-w-6xl mx-auto">
-                <h2 class="text-lg leading-6 font-medium text-gray-900">{{ 'Last 30 days'|t('market') }}</h2>
+                <h2 class="text-lg leading-6 font-medium text-gray-900">{{ 'Overview'|t('market') }}</h2>
                 <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+                    {# Total New Orders #}
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
+                                    {# Heroicon name: sparkles #}
+                                    <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        {{ 'New Orders'|t('market') }}
+                                    </dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900">
+                                            {{ totalNewOrders }}
+                                        </div>
+                                    </dd>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-5 py-3">
+                            <div class="text-sm">
+                                <a href="{{ url('market/orders', {status: 'new'}) }}" class="font-medium text-blue-700 hover:text-blue-900">
+                                    {{ 'View all'|t('market') }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
                     {# Total Orders #}
                     <div class="bg-white overflow-hidden shadow rounded-lg">
@@ -253,10 +292,11 @@
                             </div>
                         </div>
                         <div class="bg-gray-50 px-5 py-3">
-                            <div class="text-sm">
-                                <a href="{{ url('market/orders') }}" class="font-medium text-blue-700 hover:text-blue-900">
+                            <div class="flex items-center">
+                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-blue-700 hover:text-blue-900">
                                     {{ 'View all'|t('market') }}
                                 </a>
+                                <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
                             </div>
                         </div>
                     </div>
@@ -302,10 +342,11 @@
                             </div>
                         </div>
                         <div class="bg-gray-50 px-5 py-3">
-                            <div class="text-sm">
-                                <a href="{{ url('market/orders') }}" class="font-medium text-blue-700 hover:text-blue-900">
+                            <div class="flex items-center">
+                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-blue-700 hover:text-blue-900">
                                     {{ 'View all'|t('market') }}
                                 </a>
+                                <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
                             </div>
                         </div>
                     </div>
