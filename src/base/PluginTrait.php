@@ -189,6 +189,8 @@ trait PluginTrait
                 $event->rules['market/shipping/<profileId:\d+>'] = ['template' => '_market/shipping/_edit'];
                 $event->rules['market/reports'] = ['template' => '_market/reports/_index'];
                 $event->rules['market/settings'] = ['template' => '_market/settings/_index'];
+
+                $event->rules['market/login'] = ['template' => '_market/account/_login'];
             }
         );
     }

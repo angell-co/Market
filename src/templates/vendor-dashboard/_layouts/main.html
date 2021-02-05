@@ -1,250 +1,252 @@
 {# @var craft \craft\web\twig\variables\CraftVariable #}
 
-{% do view.registerAssetBundle('angellco\\market\\web\\assets\\vendordashboard\\VendorDashboardAsset') -%}
-
+{# TODO: permissions #}
 {% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
+{% if not currentVendor %}
+    {% redirect url('market/login') %}
+{% endif %}
+
 {% set profilePicture = currentVendor.getProfilePicture() %}
 {% set extendHeader = extendHeader ?? false %}
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-    {# TODO: favicon #}
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
-</head>
-<body>
-    <div class="h-screen flex overflow-hidden bg-gray-100">
-        {# Off-canvas menu for mobile, show/hide based on off-canvas menu state. #}
-        {# md:hidden #}
-        <div class="hidden">
-            <div class="fixed inset-0 flex z-40">
-                {#
-                  Off-canvas menu overlay, show/hide based on off-canvas menu state.
+{% include '_market/_layouts/_top.html' %}
 
-                  Entering: "transition-opacity ease-linear duration-300"
-                    From: "opacity-0"
-                    To: "opacity-100"
-                  Leaving: "transition-opacity ease-linear duration-300"
-                    From: "opacity-100"
-                    To: "opacity-0"
-                #}
-                <div class="fixed inset-0" aria-hidden="true">
-                    <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
-                </div>
-                {#
-                  Off-canvas menu, show/hide based on off-canvas menu state.
+<div class="h-screen flex overflow-hidden bg-gray-100">
+    {# Off-canvas menu for mobile, show/hide based on off-canvas menu state. #}
+    {# md:hidden #}
+    <div class="hidden">
+        <div class="fixed inset-0 flex z-40">
+            {#
+              Off-canvas menu overlay, show/hide based on off-canvas menu state.
 
-                  Entering: "transition ease-in-out duration-300 transform"
-                    From: "-translate-x-full"
-                    To: "translate-x-0"
-                  Leaving: "transition ease-in-out duration-300 transform"
-                    From: "translate-x-0"
-                    To: "-translate-x-full"
-                #}
-                <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-brand-700">
-                    <div class="absolute top-0 right-0 -mr-12 pt-2">
-                        <button class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                            <span class="sr-only">Close sidebar</span>
-                            {# Heroicon name: x #}
-                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="flex-shrink-0 flex items-center px-4">
-                        <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-brand-300-mark-white-text.svg" alt="Workflow">
-                    </div>
-                    <div class="mt-5 flex-1 h-0 overflow-y-auto">
-                        <nav class="px-2 space-y-1">
-                            {# Current: "bg-brand-800 text-white", Default: "text-brand-100 hover:bg-brand-600" #}
-                            <a href="{{ url('market') }}" class="bg-brand-800 text-white group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                {# Heroicon name: home #}
-                                <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                                Dashboard
-                            </a>
-
-                            <a href="{{ url('market/orders') }}" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                {# Heroicon name: users #}
-                                <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                                Team
-                            </a>
-
-                            <a href="{{ url('market') }}" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                {# Heroicon name: folder #}
-                                <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                </svg>
-                                Projects
-                            </a>
-
-                            <a href="#" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                {# Heroicon name: calendar #}
-                                <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                Calendar
-                            </a>
-
-                            <a href="#" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                {# Heroicon name: inbox #}
-                                <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                </svg>
-                                Documents
-                            </a>
-
-                            <a href="#" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                {# Heroicon name: chart-bar #}
-                                <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                                Reports
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-                <div class="flex-shrink-0 w-14" aria-hidden="true">
-                    {# Dummy element to force sidebar to shrink to fit close icon #}
-                </div>
+              Entering: "transition-opacity ease-linear duration-300"
+                From: "opacity-0"
+                To: "opacity-100"
+              Leaving: "transition-opacity ease-linear duration-300"
+                From: "opacity-100"
+                To: "opacity-0"
+            #}
+            <div class="fixed inset-0" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
             </div>
-        </div>
+            {#
+              Off-canvas menu, show/hide based on off-canvas menu state.
 
-        {# Static sidebar for desktop #}
-        <div class="hidden bg-brand-700 md:flex md:flex-shrink-0">
-            <div class="flex flex-col w-64">
-                <div class="flex flex-col flex-grow pb-4 overflow-y-auto">
-                    <a href="{{ url('market') }}" class="flex items-center flex-shrink-0 py-2 px-4 text-brand-100 font-bold text-2xl bg-brand-900 text-uppercase">
-                        <svg class="mr-4 h-12 w-12 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 100 100" stroke="none" aria-hidden="true">
-                            <g><path d="M24.263,79.733c3.687,0,6.736-2.749,7.226-6.303h7.229c0.49,3.554,3.539,6.303,7.226,6.303s6.736-2.749,7.226-6.303h3.303   c0.552,0,1-0.447,1-1v-18.75h2.122c0.552,0,1-0.447,1-1v-3.875c0-0.553-0.448-1-1-1H49.247l-0.002-15.75h14.163   c0.005,0,0.009,0.003,0.015,0.003c0.552,0,1-0.447,1-1c0-7.549-7.258-13.69-16.18-13.69h0l0,0c-4.545,0-8.65,1.602-11.591,4.166   c-0.042,0.035-0.082,0.068-0.118,0.11c-1.32,1.177-2.406,2.544-3.169,4.058c-0.008,0.017-0.018,0.03-0.025,0.047   c-0.815,1.634-1.267,3.428-1.267,5.31c0,0.553,0.448,1,1,1c0.005,0,0.009-0.003,0.015-0.003h14.158l0.002,15.75H10.721   c-0.552,0-1,0.447-1,1v3.875c0,0.553,0.448,1,1,1h2.123v18.75c0,0.553,0.448,1,1,1h3.194   C17.527,76.984,20.576,79.733,24.263,79.733z M37.676,23.296h9.567v1.828H36.055C36.524,24.471,37.066,23.859,37.676,23.296z    M49.242,19.41c2.491,0.145,4.807,0.813,6.78,1.886h-6.779L49.242,19.41z M47.242,21.296h-6.775   c1.972-1.072,4.286-1.741,6.775-1.886L47.242,21.296z M49.243,23.296h9.188c0.111,0,0.214-0.03,0.314-0.063   c0.638,0.581,1.205,1.214,1.692,1.892H49.243V23.296z M61.577,27.124c0.405,0.93,0.677,1.91,0.783,2.932H49.244l0-2.932H61.577z    M34.133,30.056c0.106-1.021,0.377-2.002,0.782-2.932h12.328l0,2.932H34.133z M24.263,77.733c-2.92,0-5.296-2.374-5.302-5.293   c0-0.004,0.002-0.007,0.002-0.01s-0.002-0.006-0.002-0.01c0.005-2.919,2.381-5.293,5.302-5.293s5.296,2.374,5.302,5.293   c0,0.004-0.002,0.007-0.002,0.01s0.002,0.006,0.002,0.01C29.56,75.359,27.184,77.733,24.263,77.733z M45.944,77.733   c-2.921,0-5.298-2.376-5.302-5.296c0-0.003,0.001-0.005,0.001-0.007s-0.001-0.004-0.001-0.007c0.004-2.92,2.381-5.296,5.302-5.296   c2.92,0,5.296,2.374,5.302,5.293c0,0.004-0.002,0.007-0.002,0.01s0.002,0.006,0.002,0.01C51.24,75.359,48.864,77.733,45.944,77.733   z M11.721,49.806h46.875v1.875h-2.122h-42.63h-2.123V49.806z M14.843,53.681h40.63v17.75H53.17   c-0.49-3.554-3.539-6.303-7.226-6.303s-6.736,2.749-7.226,6.303h-7.229c-0.49-3.554-3.539-6.303-7.226-6.303   s-6.736,2.749-7.226,6.303h-2.194V53.681z"></path><path d="M24.263,69.128c-1.821,0-3.303,1.481-3.303,3.303s1.481,3.303,3.303,3.303s3.303-1.481,3.303-3.303   S26.084,69.128,24.263,69.128z M24.263,73.733c-0.718,0-1.303-0.584-1.303-1.303s0.584-1.303,1.303-1.303s1.303,0.584,1.303,1.303   S24.981,73.733,24.263,73.733z"></path><path d="M45.944,69.128c-1.821,0-3.303,1.481-3.303,3.303s1.481,3.303,3.303,3.303s3.303-1.481,3.303-3.303   S47.765,69.128,45.944,69.128z M45.944,73.733c-0.718,0-1.303-0.584-1.303-1.303s0.584-1.303,1.303-1.303s1.303,0.584,1.303,1.303   S46.662,73.733,45.944,73.733z"></path><path d="M89.279,45.799H73.113c-0.552,0-1,0.447-1,1v29.5v5.333c0,0.553,0.448,1,1,1s1-0.447,1-1v-4.333h14.167V81.4   c0,0.553,0.448,1,1,1s1-0.447,1-1v-5.102v-0.231V46.799C90.279,46.246,89.832,45.799,89.279,45.799z M74.113,47.799h14.167v27.5   H74.113V47.799z"></path><path d="M75.654,53.133h11.083c0.552,0,1-0.447,1-1s-0.448-1-1-1H75.654c-0.552,0-1,0.447-1,1S75.102,53.133,75.654,53.133z"></path><path d="M86.738,55.966H75.655c-0.552,0-1,0.447-1,1s0.448,1,1,1h11.083c0.552,0,1-0.447,1-1S87.29,55.966,86.738,55.966z"></path><path d="M86.737,60.8H75.654c-0.552,0-1,0.447-1,1s0.448,1,1,1h11.083c0.552,0,1-0.447,1-1S87.29,60.8,86.737,60.8z"></path><path d="M86.737,65.633H75.654c-0.552,0-1,0.447-1,1s0.448,1,1,1h11.083c0.552,0,1-0.447,1-1S87.29,65.633,86.737,65.633z"></path></g>
+              Entering: "transition ease-in-out duration-300 transform"
+                From: "-translate-x-full"
+                To: "translate-x-0"
+              Leaving: "transition ease-in-out duration-300 transform"
+                From: "translate-x-0"
+                To: "-translate-x-full"
+            #}
+            <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-brand-700">
+                <div class="absolute top-0 right-0 -mr-12 pt-2">
+                    <button class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <span class="sr-only">Close sidebar</span>
+                        {# Heroicon name: x #}
+                        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        {{ 'Market'|t('market') }}
-                    </a>
-                    <nav class="mt-4 flex-1 flex flex-col divide-y divide-brand-800 overflow-y-auto" aria-label="Sidebar">
-                        <div class="px-2 space-y-1">
-                            <a href="{{ url('market') }}" class="{{ craft.app.request.getSegment(2) is empty ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: home #}
-                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                                {{ 'Dashboard'|t('market') }}
-                            </a>
+                    </button>
+                </div>
+                <div class="flex-shrink-0 flex items-center px-4">
+                    <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-brand-300-mark-white-text.svg" alt="Workflow">
+                </div>
+                <div class="mt-5 flex-1 h-0 overflow-y-auto">
+                    <nav class="px-2 space-y-1">
+                        {# Current: "bg-brand-800 text-white", Default: "text-brand-100 hover:bg-brand-600" #}
+                        <a href="{{ url('market') }}" class="bg-brand-800 text-white group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            {# Heroicon name: home #}
+                            <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Dashboard
+                        </a>
 
-                            <a href="{{ url('market/orders') }}" class="{{ craft.app.request.getSegment(2) == 'orders' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: clipboard-list #}
-                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />" />
-                                </svg>
-                                {{ 'Orders'|t('market') }}
-                            </a>
+                        <a href="{{ url('market/orders') }}" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            {# Heroicon name: users #}
+                            <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            Team
+                        </a>
 
-                            <a href="{{ url('market/products') }}" class="{{ craft.app.request.getSegment(2) == 'products' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: gift #}
-                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                                </svg>
-                                {{ 'Products'|t('market') }}
-                            </a>
+                        <a href="{{ url('market') }}" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            {# Heroicon name: folder #}
+                            <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            </svg>
+                            Projects
+                        </a>
 
-                            <a href="{{ url('market/files') }}" class="{{ craft.app.request.getSegment(2) == 'files' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: photograph #}
-                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                {{ 'Files'|t('market') }}
-                            </a>
+                        <a href="#" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            {# Heroicon name: calendar #}
+                            <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Calendar
+                        </a>
 
-                            <a href="{{ url('market/shipping') }}" class="{{ craft.app.request.getSegment(2) == 'shipping' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: truck #}
-                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                                </svg>
-                                {{ 'Shipping'|t('market') }}
-                            </a>
+                        <a href="#" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            {# Heroicon name: inbox #}
+                            <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                            Documents
+                        </a>
 
-                            <a href="{{ url('market/reports') }}" class="{{ craft.app.request.getSegment(2) == 'reports' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                {# Heroicon name: document-report #}
-                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                {{ 'Reports'|t('market') }}
-                            </a>
-                        </div>
-
-                        <div class="mt-6 pt-6">
-                            <div class="px-2 space-y-1">
-                                <a href="{{ url('market/settings') }}" class="{{ craft.app.request.getSegment(2) == 'settings' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                    {# Heroicon name: cog #}
-                                    <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    {{ 'Settings'|t('market') }}
-                                </a>
-                                <a href="{{ url('logout') }}" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                                    {# Heroicon name: logout #}
-                                    <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    {{ 'Sign out'|t('market') }}
-                                </a>
-                            </div>
-                        </div>
+                        <a href="#" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            {# Heroicon name: chart-bar #}
+                            <svg class="mr-4 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Reports
+                        </a>
                     </nav>
                 </div>
             </div>
+            <div class="flex-shrink-0 w-14" aria-hidden="true">
+                {# Dummy element to force sidebar to shrink to fit close icon #}
+            </div>
         </div>
-        <div class="flex flex-col w-0 flex-1 overflow-hidden">
-            <div class="relative z-30 flex-shrink-0 flex h-16 bg-white {{ extendHeader ? 'border-b' : 'shadow' }}">
-                <button class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 md:hidden">
-                    <span class="sr-only">Open sidebar</span>
-                    {# Heroicon name: menu-alt-2 #}
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+    </div>
+
+    {# Static sidebar for desktop #}
+    <div class="hidden bg-brand-700 md:flex md:flex-shrink-0">
+        <div class="flex flex-col w-64">
+            <div class="flex flex-col flex-grow pb-4 overflow-y-auto">
+                <a href="{{ url('market') }}" class="flex items-center flex-shrink-0 py-2 px-4 text-brand-100 font-bold text-2xl bg-brand-900 text-uppercase">
+                    <svg class="mr-4 py-2 h-12 w-12 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 82 66" stroke="none" aria-hidden="true">
+                        <path d="M15.263,62.733 C18.95,62.733 21.999,59.984 22.489,56.43 L29.718,56.43 C30.208,59.984 33.257,62.733 36.944,62.733 C40.631,62.733 43.68,59.984 44.17,56.43 L47.473,56.43 C48.025,56.43 48.473,55.983 48.473,55.43 L48.473,36.68 L50.595,36.68 C51.147,36.68 51.595,36.233 51.595,35.68 L51.595,31.805 C51.595,31.252 51.147,30.805 50.595,30.805 L40.247,30.805 L40.245,15.055 L54.408,15.055 C54.413,15.055 54.417,15.058 54.423,15.058 C54.975,15.058 55.423,14.611 55.423,14.058 C55.423,6.509 48.165,0.368 39.243,0.368 L39.243,0.368 L39.243,0.368 C34.698,0.368 30.593,1.97 27.652,4.534 C27.61,4.569 27.57,4.602 27.534,4.644 C26.214,5.821 25.128,7.188 24.365,8.702 C24.357,8.719 24.347,8.732 24.34,8.749 C23.525,10.383 23.073,12.177 23.073,14.059 C23.073,14.612 23.521,15.059 24.073,15.059 C24.078,15.059 24.082,15.056 24.088,15.056 L38.246,15.056 L38.248,30.806 L1.721,30.806 C1.169,30.806 0.721,31.253 0.721,31.806 L0.721,35.681 C0.721,36.234 1.169,36.681 1.721,36.681 L3.844,36.681 L3.844,55.431 C3.844,55.984 4.292,56.431 4.844,56.431 L8.038,56.431 C8.527,59.984 11.576,62.733 15.263,62.733 Z M28.676,6.296 L38.243,6.296 L38.243,8.124 L27.055,8.124 C27.524,7.471 28.066,6.859 28.676,6.296 Z M40.242,2.41 C42.733,2.555 45.049,3.223 47.022,4.296 L40.243,4.296 L40.242,2.41 Z M38.242,4.296 L31.467,4.296 C33.439,3.224 35.753,2.555 38.242,2.41 L38.242,4.296 Z M40.243,6.296 L49.431,6.296 C49.542,6.296 49.645,6.266 49.745,6.233 C50.383,6.814 50.95,7.447 51.437,8.125 L40.243,8.125 L40.243,6.296 Z M52.577,10.124 C52.982,11.054 53.254,12.034 53.36,13.056 L40.244,13.056 L40.244,10.124 L52.577,10.124 Z M25.133,13.056 C25.239,12.035 25.51,11.054 25.915,10.124 L38.243,10.124 L38.243,13.056 L25.133,13.056 Z M15.263,60.733 C12.343,60.733 9.967,58.359 9.961,55.44 C9.961,55.436 9.963,55.433 9.963,55.43 C9.963,55.427 9.961,55.424 9.961,55.42 C9.966,52.501 12.342,50.127 15.263,50.127 C18.184,50.127 20.559,52.501 20.565,55.42 C20.565,55.424 20.563,55.427 20.563,55.43 C20.563,55.433 20.565,55.436 20.565,55.44 C20.56,58.359 18.184,60.733 15.263,60.733 Z M36.944,60.733 C34.023,60.733 31.646,58.357 31.642,55.437 C31.642,55.434 31.643,55.432 31.643,55.43 C31.643,55.428 31.642,55.426 31.642,55.423 C31.646,52.503 34.023,50.127 36.944,50.127 C39.864,50.127 42.24,52.501 42.246,55.42 C42.246,55.424 42.244,55.427 42.244,55.43 C42.244,55.433 42.246,55.436 42.246,55.44 C42.24,58.359 39.864,60.733 36.944,60.733 Z M2.721,32.806 L49.596,32.806 L49.596,34.681 L47.474,34.681 L4.844,34.681 L2.721,34.681 L2.721,32.806 Z M5.843,36.681 L46.473,36.681 L46.473,54.431 L44.17,54.431 C43.68,50.877 40.631,48.128 36.944,48.128 C33.257,48.128 30.208,50.877 29.718,54.431 L22.489,54.431 C21.999,50.877 18.95,48.128 15.263,48.128 C11.576,48.128 8.527,50.877 8.037,54.431 L5.843,54.431 L5.843,36.681 Z" id="Shape"></path>
+                        <path d="M15.263,52.128 C13.442,52.128 11.96,53.609 11.96,55.431 C11.96,57.253 13.441,58.734 15.263,58.734 C17.085,58.734 18.566,57.253 18.566,55.431 C18.566,53.609 17.084,52.128 15.263,52.128 Z M15.263,56.733 C14.545,56.733 13.96,56.149 13.96,55.43 C13.96,54.711 14.544,54.127 15.263,54.127 C15.982,54.127 16.566,54.711 16.566,55.43 C16.566,56.149 15.981,56.733 15.263,56.733 Z" id="Shape"></path>
+                        <path d="M36.944,52.128 C35.123,52.128 33.641,53.609 33.641,55.431 C33.641,57.253 35.122,58.734 36.944,58.734 C38.766,58.734 40.247,57.253 40.247,55.431 C40.247,53.609 38.765,52.128 36.944,52.128 Z M36.944,56.733 C36.226,56.733 35.641,56.149 35.641,55.43 C35.641,54.711 36.225,54.127 36.944,54.127 C37.663,54.127 38.247,54.711 38.247,55.43 C38.247,56.149 37.662,56.733 36.944,56.733 Z" id="Shape"></path>
+                        <path d="M80.279,28.799 L64.113,28.799 C63.561,28.799 63.113,29.246 63.113,29.799 L63.113,59.299 L63.113,64.632 C63.113,65.185 63.561,65.632 64.113,65.632 C64.665,65.632 65.113,65.185 65.113,64.632 L65.113,60.299 L79.28,60.299 L79.28,64.4 C79.28,64.953 79.728,65.4 80.28,65.4 C80.832,65.4 81.28,64.953 81.28,64.4 L81.28,59.298 L81.28,59.067 L81.28,29.799 C81.279,29.246 80.832,28.799 80.279,28.799 Z M65.113,30.799 L79.28,30.799 L79.28,58.299 L65.113,58.299 L65.113,30.799 Z" id="Shape"></path>
+                        <path d="M66.654,36.133 L77.737,36.133 C78.289,36.133 78.737,35.686 78.737,35.133 C78.737,34.58 78.289,34.133 77.737,34.133 L66.654,34.133 C66.102,34.133 65.654,34.58 65.654,35.133 C65.654,35.686 66.102,36.133 66.654,36.133 Z" id="Path"></path>
+                        <path d="M77.738,38.966 L66.655,38.966 C66.103,38.966 65.655,39.413 65.655,39.966 C65.655,40.519 66.103,40.966 66.655,40.966 L77.738,40.966 C78.29,40.966 78.738,40.519 78.738,39.966 C78.738,39.413 78.29,38.966 77.738,38.966 Z" id="Path"></path>
+                        <path d="M77.737,43.8 L66.654,43.8 C66.102,43.8 65.654,44.247 65.654,44.8 C65.654,45.353 66.102,45.8 66.654,45.8 L77.737,45.8 C78.289,45.8 78.737,45.353 78.737,44.8 C78.737,44.247 78.29,43.8 77.737,43.8 Z" id="Path"></path>
+                        <path d="M77.737,48.633 L66.654,48.633 C66.102,48.633 65.654,49.08 65.654,49.633 C65.654,50.186 66.102,50.633 66.654,50.633 L77.737,50.633 C78.289,50.633 78.737,50.186 78.737,49.633 C78.737,49.08 78.29,48.633 77.737,48.633 Z" id="Path"></path>
                     </svg>
-                </button>
-                <div class="flex-1 px-4 flex justify-between">
+                    {{ 'Market'|t('market') }}
+                </a>
+                <nav class="mt-4 flex-1 flex flex-col divide-y divide-brand-800 overflow-y-auto" aria-label="Sidebar">
+                    <div class="px-2 space-y-1">
+                        <a href="{{ url('market') }}" class="{{ craft.app.request.getSegment(2) is empty ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: home #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            {{ 'Dashboard'|t('market') }}
+                        </a>
 
-                    {% if breadcrumbs is defined %}
-                        <nav class="flex-1 flex" aria-label="Breadcrumb">
-                            <ol class="flex items-center space-x-4">
-                                <li>
-                                    <div>
-                                        <a href="{{ url('market') }}" class="text-gray-400 hover:text-gray-500">
-                                            {# Heroicon name: home #}
-                                            <svg class="flex-shrink-0 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                                            </svg>
-                                            <span class="sr-only">Home</span>
-                                        </a>
-                                    </div>
-                                </li>
+                        <a href="{{ url('market/orders') }}" class="{{ craft.app.request.getSegment(2) == 'orders' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: clipboard-list #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />" />
+                            </svg>
+                            {{ 'Orders'|t('market') }}
+                        </a>
 
-                                {% for crumb in breadcrumbs %}
-                                <li>
-                                    <div class="flex items-center">
-                                        {# Heroicon name: chevron-right #}
-                                        <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        <a href="{{ url('market/products') }}" class="{{ craft.app.request.getSegment(2) == 'products' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: gift #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                            </svg>
+                            {{ 'Products'|t('market') }}
+                        </a>
+
+                        <a href="{{ url('market/files') }}" class="{{ craft.app.request.getSegment(2) == 'files' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: photograph #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {{ 'Files'|t('market') }}
+                        </a>
+
+                        <a href="{{ url('market/shipping') }}" class="{{ craft.app.request.getSegment(2) == 'shipping' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: truck #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                            </svg>
+                            {{ 'Shipping'|t('market') }}
+                        </a>
+
+                        <a href="{{ url('market/reports') }}" class="{{ craft.app.request.getSegment(2) == 'reports' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: document-report #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {{ 'Reports'|t('market') }}
+                        </a>
+                    </div>
+
+                    <div class="mt-6 pt-6">
+                        <div class="px-2 space-y-1">
+                            <a href="{{ url('market/settings') }}" class="{{ craft.app.request.getSegment(2) == 'settings' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                                {# Heroicon name: cog #}
+                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {{ 'Settings'|t('market') }}
+                            </a>
+                            <a href="{{ url('logout') }}" class="text-brand-100 hover:bg-brand-600 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                                {# Heroicon name: logout #}
+                                <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                {{ 'Sign out'|t('market') }}
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col w-0 flex-1 overflow-hidden">
+        <div class="relative z-30 flex-shrink-0 flex h-16 bg-white {{ extendHeader ? 'border-b' : 'shadow' }}">
+            <button class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 md:hidden">
+                <span class="sr-only">Open sidebar</span>
+                {# Heroicon name: menu-alt-2 #}
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+            </button>
+            <div class="flex-1 px-4 flex justify-between">
+
+                {% if breadcrumbs is defined %}
+                    <nav class="flex-1 flex" aria-label="Breadcrumb">
+                        <ol class="flex items-center space-x-4">
+                            <li>
+                                <div>
+                                    <a href="{{ url('market') }}" class="text-gray-400 hover:text-gray-500">
+                                        {# Heroicon name: home #}
+                                        <svg class="flex-shrink-0 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                                         </svg>
-
-                                    <a href="{{ crumb.url }}" {% if loop.last %}aria-current="page"{% endif %} class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">{{ crumb.label }}</a>
+                                        <span class="sr-only">Home</span>
+                                    </a>
                                 </div>
                             </li>
-                            {% endfor %}
-                        </ol>
-                    </nav>
-                    {% else %}
-                        <div class="flex-1 flex"></div>
-                    {% endif %}
 
-                    <div class="ml-4 flex items-center md:ml-6">
+                            {% for crumb in breadcrumbs %}
+                            <li>
+                                <div class="flex items-center">
+                                    {# Heroicon name: chevron-right #}
+                                    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+
+                                <a href="{{ crumb.url }}" {% if loop.last %}aria-current="page"{% endif %} class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">{{ crumb.label }}</a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </nav>
+                {% else %}
+                    <div class="flex-1 flex"></div>
+                {% endif %}
+
+                <div class="ml-4 flex items-center md:ml-6">
 {#                        <button class="relative bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">#}
 {#                            <span class="sr-only">View notifications</span>#}
 {#                            #}{# Heroicon name: bell #}
@@ -254,86 +256,85 @@
 {#                            <span class="absolute top-1 right-1 block h-1.5 w-1.5 rounded-full ring-2 ring-white bg-red-400"></span>#}
 {#                        </button>#}
 
-                        {# Profile dropdown #}
-                        <div class="ml-3 relative"
-                             x-data="{ open: false }"
-                             x-on:keydown.window.escape="open = false"
-                             x-on:click.away="open = false"
-                        >
-                            <div>
-                                <button x-on:click="open = !open"
-                                        class="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50"
-                                        id="user-menu" aria-haspopup="true" x-bind:aria-expanded="open"
-                                >
-                                    {% if profilePicture %}
-                                        <img class="h-8 w-8 rounded-full" src="{{ profilePicture.url({width:256, height: 256}) }}" alt="">
-                                    {% endif %}
-                                    <span class="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                                        <span class="sr-only">Open user menu for </span>
-                                        {{ currentUser.name }}
-                                    </span>
-                                    {# Heroicon name: chevron-down #}
-                                    <svg class="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div x-show="open"
-                                 x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
-                                 role="menu" aria-orientation="vertical" aria-labelledby="user-menu"
+                    {# Profile dropdown #}
+                    <div class="ml-3 relative"
+                         x-data="{ open: false }"
+                         x-on:keydown.window.escape="open = false"
+                         x-on:click.away="open = false"
+                    >
+                        <div>
+                            <button x-on:click="open = !open"
+                                    class="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50"
+                                    id="user-menu" aria-haspopup="true" x-bind:aria-expanded="open"
                             >
-                                <div class="px-4 py-3">
-                                    <p class="text-sm">
-                                        {{ 'Signed in as'|t('market') }}
-                                    </p>
-                                    <p class="text-sm font-medium text-gray-900 truncate">
-                                        {{ currentVendor.title }}
-                                    </p>
-                                </div>
-                                <div class="py-1">
-                                    <a href="{{ currentVendor.url }}" target="_blank" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                        {{ 'View shop'|t('market') }}
-                                    </a>
-                                    <a href="{{ url('market/settings') }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                        {{ 'Edit shop front'|t('market') }}
-                                    </a>
-                                    <a href="{{ url('market/settings') }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                        {{ 'Account settings'|t('market') }}
-                                    </a>
-                                </div>
-                                <div class="py-1">
-                                    <a href="{{ url('logout') }}" class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900" role="menuitem">
-                                        {{ 'Sign out'|t('market') }}
-                                    </a>
-                                </div>
+                                {% if profilePicture %}
+                                    <img class="h-8 w-8 rounded-full" src="{{ profilePicture.url({width:256, height: 256}) }}" alt="">
+                                {% endif %}
+                                <span class="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
+                                    <span class="sr-only">Open user menu for </span>
+                                    {{ currentUser.name }}
+                                </span>
+                                {# Heroicon name: chevron-down #}
+                                <svg class="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div x-show="open"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+                             role="menu" aria-orientation="vertical" aria-labelledby="user-menu"
+                        >
+                            <div class="px-4 py-3">
+                                <p class="text-sm">
+                                    {{ 'Signed in as'|t('market') }}
+                                </p>
+                                <p class="text-sm font-medium text-gray-900 truncate">
+                                    {{ currentVendor.title }}
+                                </p>
+                            </div>
+                            <div class="py-1">
+                                <a href="{{ currentVendor.url }}" target="_blank" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                    {{ 'View shop'|t('market') }}
+                                </a>
+                                <a href="{{ url('market/settings') }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                    {{ 'Edit shop front'|t('market') }}
+                                </a>
+                                <a href="{{ url('market/settings') }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                    {{ 'Account settings'|t('market') }}
+                                </a>
+                            </div>
+                            <div class="py-1">
+                                <a href="{{ url('logout') }}" class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900" role="menuitem">
+                                    {{ 'Sign out'|t('market') }}
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <main class="flex-1 relative overflow-y-auto focus:outline-none" tabindex="0">
-                {% block content %}
-                    <div class="py-6">
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                            {% block header %}
-                                <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ title }}</h1>
-                            {% endblock %}
-                        </div>
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                            {% block main %}{% endblock %}
-                        </div>
-                    </div>
-                {% endblock %}
-            </main>
         </div>
-    </div>
 
-    {{ sprig.script }}
-</body>
+        <main class="flex-1 relative overflow-y-auto focus:outline-none" tabindex="0">
+            {% block content %}
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        {% block header %}
+                            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ title }}</h1>
+                        {% endblock %}
+                    </div>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        {% block main %}{% endblock %}
+                    </div>
+                </div>
+            {% endblock %}
+        </main>
+    </div>
+</div>
+
+{% include '_market/_layouts/_bottom.html' %}

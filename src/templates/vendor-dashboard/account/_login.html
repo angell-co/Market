@@ -1,0 +1,91 @@
+{% extends "_market/_layouts/auth" %}
+
+{% set title = 'Login'|t('market') %}
+
+{% block main %}
+    <main class="min-h-screen flex relative">
+        <div class="relative z-10 bg-white bg-opacity-80 flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+            <div class="mx-auto w-full max-w-sm lg:w-96">
+                <div>
+                    <svg class="h-12 w-auto" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 82 66" stroke="none" aria-hidden="true">
+                        <path d="M15.263,62.733 C18.95,62.733 21.999,59.984 22.489,56.43 L29.718,56.43 C30.208,59.984 33.257,62.733 36.944,62.733 C40.631,62.733 43.68,59.984 44.17,56.43 L47.473,56.43 C48.025,56.43 48.473,55.983 48.473,55.43 L48.473,36.68 L50.595,36.68 C51.147,36.68 51.595,36.233 51.595,35.68 L51.595,31.805 C51.595,31.252 51.147,30.805 50.595,30.805 L40.247,30.805 L40.245,15.055 L54.408,15.055 C54.413,15.055 54.417,15.058 54.423,15.058 C54.975,15.058 55.423,14.611 55.423,14.058 C55.423,6.509 48.165,0.368 39.243,0.368 L39.243,0.368 L39.243,0.368 C34.698,0.368 30.593,1.97 27.652,4.534 C27.61,4.569 27.57,4.602 27.534,4.644 C26.214,5.821 25.128,7.188 24.365,8.702 C24.357,8.719 24.347,8.732 24.34,8.749 C23.525,10.383 23.073,12.177 23.073,14.059 C23.073,14.612 23.521,15.059 24.073,15.059 C24.078,15.059 24.082,15.056 24.088,15.056 L38.246,15.056 L38.248,30.806 L1.721,30.806 C1.169,30.806 0.721,31.253 0.721,31.806 L0.721,35.681 C0.721,36.234 1.169,36.681 1.721,36.681 L3.844,36.681 L3.844,55.431 C3.844,55.984 4.292,56.431 4.844,56.431 L8.038,56.431 C8.527,59.984 11.576,62.733 15.263,62.733 Z M28.676,6.296 L38.243,6.296 L38.243,8.124 L27.055,8.124 C27.524,7.471 28.066,6.859 28.676,6.296 Z M40.242,2.41 C42.733,2.555 45.049,3.223 47.022,4.296 L40.243,4.296 L40.242,2.41 Z M38.242,4.296 L31.467,4.296 C33.439,3.224 35.753,2.555 38.242,2.41 L38.242,4.296 Z M40.243,6.296 L49.431,6.296 C49.542,6.296 49.645,6.266 49.745,6.233 C50.383,6.814 50.95,7.447 51.437,8.125 L40.243,8.125 L40.243,6.296 Z M52.577,10.124 C52.982,11.054 53.254,12.034 53.36,13.056 L40.244,13.056 L40.244,10.124 L52.577,10.124 Z M25.133,13.056 C25.239,12.035 25.51,11.054 25.915,10.124 L38.243,10.124 L38.243,13.056 L25.133,13.056 Z M15.263,60.733 C12.343,60.733 9.967,58.359 9.961,55.44 C9.961,55.436 9.963,55.433 9.963,55.43 C9.963,55.427 9.961,55.424 9.961,55.42 C9.966,52.501 12.342,50.127 15.263,50.127 C18.184,50.127 20.559,52.501 20.565,55.42 C20.565,55.424 20.563,55.427 20.563,55.43 C20.563,55.433 20.565,55.436 20.565,55.44 C20.56,58.359 18.184,60.733 15.263,60.733 Z M36.944,60.733 C34.023,60.733 31.646,58.357 31.642,55.437 C31.642,55.434 31.643,55.432 31.643,55.43 C31.643,55.428 31.642,55.426 31.642,55.423 C31.646,52.503 34.023,50.127 36.944,50.127 C39.864,50.127 42.24,52.501 42.246,55.42 C42.246,55.424 42.244,55.427 42.244,55.43 C42.244,55.433 42.246,55.436 42.246,55.44 C42.24,58.359 39.864,60.733 36.944,60.733 Z M2.721,32.806 L49.596,32.806 L49.596,34.681 L47.474,34.681 L4.844,34.681 L2.721,34.681 L2.721,32.806 Z M5.843,36.681 L46.473,36.681 L46.473,54.431 L44.17,54.431 C43.68,50.877 40.631,48.128 36.944,48.128 C33.257,48.128 30.208,50.877 29.718,54.431 L22.489,54.431 C21.999,50.877 18.95,48.128 15.263,48.128 C11.576,48.128 8.527,50.877 8.037,54.431 L5.843,54.431 L5.843,36.681 Z" id="Shape"></path>
+                        <path d="M15.263,52.128 C13.442,52.128 11.96,53.609 11.96,55.431 C11.96,57.253 13.441,58.734 15.263,58.734 C17.085,58.734 18.566,57.253 18.566,55.431 C18.566,53.609 17.084,52.128 15.263,52.128 Z M15.263,56.733 C14.545,56.733 13.96,56.149 13.96,55.43 C13.96,54.711 14.544,54.127 15.263,54.127 C15.982,54.127 16.566,54.711 16.566,55.43 C16.566,56.149 15.981,56.733 15.263,56.733 Z" id="Shape"></path>
+                        <path d="M36.944,52.128 C35.123,52.128 33.641,53.609 33.641,55.431 C33.641,57.253 35.122,58.734 36.944,58.734 C38.766,58.734 40.247,57.253 40.247,55.431 C40.247,53.609 38.765,52.128 36.944,52.128 Z M36.944,56.733 C36.226,56.733 35.641,56.149 35.641,55.43 C35.641,54.711 36.225,54.127 36.944,54.127 C37.663,54.127 38.247,54.711 38.247,55.43 C38.247,56.149 37.662,56.733 36.944,56.733 Z" id="Shape"></path>
+                        <path d="M80.279,28.799 L64.113,28.799 C63.561,28.799 63.113,29.246 63.113,29.799 L63.113,59.299 L63.113,64.632 C63.113,65.185 63.561,65.632 64.113,65.632 C64.665,65.632 65.113,65.185 65.113,64.632 L65.113,60.299 L79.28,60.299 L79.28,64.4 C79.28,64.953 79.728,65.4 80.28,65.4 C80.832,65.4 81.28,64.953 81.28,64.4 L81.28,59.298 L81.28,59.067 L81.28,29.799 C81.279,29.246 80.832,28.799 80.279,28.799 Z M65.113,30.799 L79.28,30.799 L79.28,58.299 L65.113,58.299 L65.113,30.799 Z" id="Shape"></path>
+                        <path d="M66.654,36.133 L77.737,36.133 C78.289,36.133 78.737,35.686 78.737,35.133 C78.737,34.58 78.289,34.133 77.737,34.133 L66.654,34.133 C66.102,34.133 65.654,34.58 65.654,35.133 C65.654,35.686 66.102,36.133 66.654,36.133 Z" id="Path"></path>
+                        <path d="M77.738,38.966 L66.655,38.966 C66.103,38.966 65.655,39.413 65.655,39.966 C65.655,40.519 66.103,40.966 66.655,40.966 L77.738,40.966 C78.29,40.966 78.738,40.519 78.738,39.966 C78.738,39.413 78.29,38.966 77.738,38.966 Z" id="Path"></path>
+                        <path d="M77.737,43.8 L66.654,43.8 C66.102,43.8 65.654,44.247 65.654,44.8 C65.654,45.353 66.102,45.8 66.654,45.8 L77.737,45.8 C78.289,45.8 78.737,45.353 78.737,44.8 C78.737,44.247 78.29,43.8 77.737,43.8 Z" id="Path"></path>
+                        <path d="M77.737,48.633 L66.654,48.633 C66.102,48.633 65.654,49.08 65.654,49.633 C65.654,50.186 66.102,50.633 66.654,50.633 L77.737,50.633 C78.289,50.633 78.737,50.186 78.737,49.633 C78.737,49.08 78.29,48.633 77.737,48.633 Z" id="Path"></path>
+                    </svg>
+                    <h2 class="mt-4 text-3xl font-extrabold text-gray-900">
+                        Sign in to your account
+                    </h2>
+                    <p class="mt-2 text-sm text-gray-600 max-w">
+                        Or
+                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            apply to sell with us
+                        </a>
+                    </p>
+                </div>
+
+                <div class="mt-8">
+                    <div class="mt-6">
+                        <form method="POST" class="space-y-6">
+                            {{ getCsrfInput() }}
+                            {{ actionInput('users/login') }}
+                            {{ redirectInput('market') }}
+                            <div>
+                                <label for="loginName" class="block text-sm font-medium text-gray-700">
+                                    Email address
+                                </label>
+                                <div class="mt-1">
+                                    <input id="loginName" name="loginName" type="email" autocomplete="email" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="password" class="block text-sm font-medium text-gray-700">
+                                    Password
+                                </label>
+                                <div class="mt-1">
+                                    <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded">
+                                    <label for="remember_me" class="ml-2 block text-sm text-gray-900">
+                                        Remember me
+                                    </label>
+                                </div>
+
+                                <div class="text-sm">
+                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                        Forgot your password?
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                        {# Heroicon name: solid/lock-closed #}
+                                        <svg class="h-5 w-5 text-brand-500 group-hover:text-brand-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                    Sign in
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden lg:block absolute top-0 left-0 right-0 bottom-0">
+            <img class="absolute inset-0 h-full w-full object-cover" src="https://cheerfully-given.imgix.net/files/CG-Group.jpg?auto=format%2Ccompress&w=1080&dpr=3&s=97882ceb8c751a89d9a96e3a807cdb59" alt="">
+        </div>
+    </main>
+{% endblock %}
+
