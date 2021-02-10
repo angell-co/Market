@@ -180,9 +180,14 @@ trait PluginTrait
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
                 $event->rules['market'] = ['template' => '_market/_index'];
+
                 $event->rules['market/orders'] = ['template' => '_market/orders/_index'];
                 $event->rules['market/orders/<orderId:\d+>'] = ['template' => '_market/orders/_edit'];
+
                 $event->rules['market/products'] = ['template' => '_market/products/_index'];
+                $event->rules['market/products/<productTypeHandle:{handle}>/new'] = ['template' => '_market/products/_edit'];
+                $event->rules['market/products/<productTypeHandle:{handle}>/<productId:\d+><slug:(?:-[^\/]*)?>'] = ['template' => '_market/products/_edit'];
+
                 $event->rules['market/files'] = ['template' => '_market/files/_index'];
                 $event->rules['market/files/<assetId:\d+>'] = ['template' => '_market/files/_edit'];
                 $event->rules['market/shipping'] = ['template' => '_market/shipping/_index'];

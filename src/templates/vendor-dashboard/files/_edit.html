@@ -16,7 +16,7 @@
         label: 'Files'|t('market')
     },
     {
-        url: url('market/files/'~asset.id),
+        url: craft.app.request.getUrl,
         label: title
     }
 ] %}

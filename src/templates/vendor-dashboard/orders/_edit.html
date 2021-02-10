@@ -16,7 +16,7 @@
         label: 'Orders'|t('market')
     },
     {
-        url: url('market/orders/'~order.id),
+        url: craft.app.request.getUrl,
         label: title
     }
 ] %}
