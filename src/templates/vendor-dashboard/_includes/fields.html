@@ -1,0 +1,22 @@
+<div>
+{% switch className(element) %}
+    {% case 'craft\\commerce\\fieldlayoutelements\\ProductTitleField' %}
+
+    <div>{{ className(element) }}</div>
+
+    {% case 'craft\\fieldlayoutelements\\CustomField' %}
+
+        {% set field = element.getField() %}
+        {% switch className(field) %}
+            {% case 'craft\\fields\\Lightswitch' %}
+                {% include '_market/_includes/fields/lightswitch.html' %}
+
+            {% default %}
+                <div>{{ className(field) }}</div>
+
+        {% endswitch %}
+
+    {% default %}
+        <div>{{ className(element) }}</div>
+{% endswitch  %}
+</div>
