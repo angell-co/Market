@@ -1,0 +1,54 @@
+{% set value = '' %}
+{% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
+
+<div>
+    <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
+        {{ field.name }}
+        {% if field.required %} <span class="text-red-500">*</span>{% endif %}
+    </label>
+    <div class="mt-1 relative" x-data="{
+        value: '{{ value }}',
+        limit: {{ field.charLimit }},
+        get remaining() {
+            return this.limit - this.value.length
+        },
+        resize: ($event) => {
+            $event.target.style.height = 'auto';
+            $event.target.style.height = ($event.target.scrollHeight + 2) + 'px'
+        }
+    }">
+        {% if field.multiline %}
+            <textarea id="field-{{ field.id }}"
+                      name="fields[{{ field.handle }}]"
+                      rows="{{ field.initialRows }}"
+                      class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md resize-none"
+                      placeholder="{{ field.placeholder }}"
+                      x-model="value"
+                      x-init="resize($event)"
+                      x-on:input="resize($event)"
+            ></textarea>
+        {% else %}
+            <input type="text"
+                   id="field-{{ field.id }}"
+                   name="fields[{{ field.handle }}]"
+                   x-model="value"
+                   {% if field.required %}required{% endif %}
+                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+            >
+        {% endif %}
+
+        {% if field.charLimit %}
+            <span class="absolute bottom-1 right-1 block text-sm"
+                  :class="{
+                      'text-red-500': remaining < 0,
+                      'text-gray-500': remaining >= 0
+                  }"
+                  x-text="remaining"
+            ></span>
+        {% endif %}
+    </div>
+
+    {% if field.instructions %}
+        <p class="mt-2 text-sm text-gray-500">{{ field.instructions }}</p>
+    {% endif %}
+</div>

@@ -1,22 +1,24 @@
 <div>
-{% switch className(element) %}
+{% switch className(uielement) %}
     {% case 'craft\\commerce\\fieldlayoutelements\\ProductTitleField' %}
-
-    <div>{{ className(element) }}</div>
+        {% include '_market/_includes/fields/title.html' %}
 
     {% case 'craft\\fieldlayoutelements\\CustomField' %}
 
-        {% set field = element.getField() %}
+        {% set field = uielement.getField() %}
         {% switch className(field) %}
             {% case 'craft\\fields\\Lightswitch' %}
                 {% include '_market/_includes/fields/lightswitch.html' %}
 
+            {% case 'craft\\fields\\PlainText' %}
+                {% include '_market/_includes/fields/plaintext.html' %}
+
             {% default %}
-                <div>{{ className(field) }}</div>
+                <div class="p-4 rounded border-2 border-red-500">{{ className(field) }}</div>
 
         {% endswitch %}
 
     {% default %}
-        <div>{{ className(element) }}</div>
+        <div class="p-4 rounded border-2 border-red-500">{{ className(uielement) }}</div>
 {% endswitch  %}
 </div>

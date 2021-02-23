@@ -84,7 +84,10 @@
             <div id="{{ tab.name|kebab }}" class="shadow sm:rounded-md sm:overflow-hidden mt-4">
                 <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                     {% for element in tab.elements %}
-                        {% include '_market/_includes/fields' with {element:element} only %}
+                        {% include '_market/_includes/fields' with {
+                            uielement: element,
+                            element: product is defined ? product : null
+                        } only %}
                     {% endfor %}
                 </div>
             </div>
