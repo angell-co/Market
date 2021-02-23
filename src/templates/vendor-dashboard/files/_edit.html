@@ -63,7 +63,7 @@
         {# Actions #}
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
             {# Download #}
-            <form method="post">
+            <form method="POST">
                 {{ getCsrfInput() }}
                 {{ actionInput('assets/download-asset') }}
                 {{ hiddenInput('assetId', asset.id) }}
