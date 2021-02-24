@@ -77,8 +77,12 @@
 
         {# Main #}
         {% set fl = productType.getFieldLayout() %}
+        {% set tabs = fl.getTabs() %}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <div class="py-4">
+            <div x-data="{
+                     tab: window.location.hash ? window.location.hash.substring(1) : '{{ (tabs|first).name|kebab }}'
+                 }"
+                 class="py-4">
                 <div>
                     <div class="sm:hidden">
                         <label for="tabs" class="sr-only">Select a tab</label>
@@ -90,23 +94,40 @@
                     </div>
                     <div class="hidden sm:block">
                         <nav class="relative z-0 rounded-lg shadow flex divide-x divide-gray-200" aria-label="Tabs">
-                            {% for tab in fl.getTabs()  %}
+                            {% for tab in tabs %}
                                 {# TODO: Current page state #}
-                                {#                        <a href="#" aria-current="page" class="text-gray-900 rounded-l-lg group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">#}
+                                {#                        <a href="#" >#}
                                 {#                            <span>{{ tab.name }}</span>#}
                                 {#                            <span aria-hidden="true" class="bg-indigo-500 absolute inset-x-0 bottom-0 h-0.5"></span>#}
                                 {#                        </a>#}
-                                <a href="#{{ tab.name|kebab }}" aria-current="false" class="text-gray-500 hover:text-gray-700 {{ loop.first ? 'rounded-l-lg' }} {{ loop.last ? 'rounded-r-lg' }} group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                                <a href="#{{ tab.name|kebab }}"
+                                   aria-current="false"
+                                   x-on:click.prevent="tab = '{{ tab.name|kebab }}'; window.location.hash = '{{ tab.name|kebab }}'"
+                                   class="{{ loop.first ? 'rounded-l-lg' }} {{ loop.last ? 'rounded-r-lg' }} group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center hover:bg-gray-50 focus:z-10"
+                                   :class="{
+                                       'text-gray-500 hover:text-gray-700': tab !== '{{ tab.name|kebab }}',
+                                       'text-gray-900': tab === '{{ tab.name|kebab }}'
+                                   }"
+                                >
                                     <span>{{ tab.name }}</span>
-                                    <span aria-hidden="true" class="bg-transparent absolute inset-x-0 bottom-0 h-0.5"></span>
+                                    <span aria-hidden="true"
+                                          class="absolute inset-x-0 bottom-0 h-0.5"
+                                          :class="{
+                                              'bg-transparent': tab !== '{{ tab.name|kebab }}',
+                                              'bg-blue-500': tab === '{{ tab.name|kebab }}'
+                                          }"
+                                    ></span>
                                 </a>
                             {% endfor %}
                         </nav>
                     </div>
                 </div>
 
-                {% for tab in fl.getTabs()  %}
-                    <div id="{{ tab.name|kebab }}" class="shadow sm:rounded-md sm:overflow-hidden mt-4">
+                {% for tab in tabs  %}
+                    <div x-show="tab === '{{ tab.name|kebab }}'"
+                         id="{{ tab.name|kebab }}"
+                         class="shadow sm:rounded-md sm:overflow-hidden mt-4"
+                    >
                         <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                             {% for element in tab.elements %}
                                 {% include '_market/_includes/fields' with {
