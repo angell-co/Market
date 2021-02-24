@@ -16,6 +16,7 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\errors\InvalidFieldException;
 use craft\fields\BaseOptionsField;
+use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\SingleOptionFieldData;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -58,7 +59,6 @@ class ShippingProfile extends BaseOptionsField
      * @throws SyntaxError
      * @throws InvalidFieldException
      * @throws Exception
-     * @throws ServerErrorHttpException
      */
     protected function inputHtml($value, ElementInterface $element = null): string
     {
@@ -68,7 +68,7 @@ class ShippingProfile extends BaseOptionsField
         }
 
         // If we have any error when setting the options then just render the error and stop
-        if ($error = $this->_setOptionsForVendor($element)) {
+        if ($error = $this->setOptionsForVendor($element)) {
             return Craft::$app->getView()->renderTemplate('_special/missing-component', [
                 'error' => $error,
                 'showPlugin' => false
@@ -105,13 +105,12 @@ class ShippingProfile extends BaseOptionsField
      *
      * @param mixed $value
      * @param ElementInterface|null $element
-     * @return \craft\fields\data\MultiOptionsFieldData|SingleOptionFieldData|mixed
+     * @return MultiOptionsFieldData|SingleOptionFieldData|mixed
      * @throws InvalidFieldException
-     * @throws ServerErrorHttpException
      */
     public function normalizeValue($value, ElementInterface $element = null)
     {
-        $this->_setOptionsForVendor($element);
+        $this->setOptionsForVendor($element);
         return parent::normalizeValue($value, $element);
     }
 
@@ -122,11 +121,10 @@ class ShippingProfile extends BaseOptionsField
      * @param ElementInterface $element
      * @return bool
      * @throws InvalidFieldException
-     * @throws ServerErrorHttpException
      */
     public function isValueEmpty($value, ElementInterface $element): bool
     {
-        $this->_setOptionsForVendor($element);
+        $this->setOptionsForVendor($element);
         return parent::isValueEmpty($value, $element);
     }
 
@@ -137,11 +135,10 @@ class ShippingProfile extends BaseOptionsField
      * @param bool $isNew
      * @return bool
      * @throws InvalidFieldException
-     * @throws ServerErrorHttpException
      */
     public function beforeElementSave(ElementInterface $element, bool $isNew): bool
     {
-        $this->_setOptionsForVendor($element);
+        $this->setOptionsForVendor($element);
         return parent::beforeElementSave($element, $isNew);
     }
 
@@ -152,7 +149,7 @@ class ShippingProfile extends BaseOptionsField
      * @return string|null
      * @throws InvalidFieldException
      */
-    private function _setOptionsForVendor(ElementInterface $element = null): ?string
+    public function setOptionsForVendor(ElementInterface $element = null): ?string
     {
         $error = null;
         $vendor = null;

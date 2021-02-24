@@ -3,15 +3,29 @@
 {% if productTypeHandle is not defined %}{% exit 403 %}{% endif %}
 {% set productType = craft.commerce.productTypes.getProductTypeByHandle(productTypeHandle) %}
 {% if not productType %}{% exit 404 %}{% endif %}
+{% set site = craft.app.getSites().currentSite %}
 
 {% set title = 'Create new {productType} product'|t('market', {productType: productType.name}) %}
 
+{# Sort out the product model #}
 {% if productId is defined and productId != null %}
     {% if product is not defined %}
         {% set product = craft.commerce.products.getProductById(productId) %}
     {% endif %}
     {% if not product %}{% exit 404 %}{% endif %}
     {% set title = product.title %}
+{% elseif product is not defined %}
+    {% set product = create({
+        class: 'craft\\commerce\\elements\\Product',
+        typeId: productType.id,
+        taxCategoryId: productType.getTaxCategories()|keys|first,
+        shippingCategoryId: productType.getShippingCategories()|keys|first,
+        enabled: true,
+        siteId: site.id,
+        promotable: true,
+        availableForPurchase: true,
+        freeShipping: false
+    }) %}
 {% endif %}
 
 {# TODO: permissions check #}
@@ -28,6 +42,9 @@
 ] %}
 
 {% block content %}
+    {# Set the vendor #}
+    {% do product.setFieldValue('vendor', [currentVendor.id]) %}
+
     <form method="POST" class="py-6">
         {{ getCsrfInput() }}
         {{ actionInput('commerce/products/save-product') }}

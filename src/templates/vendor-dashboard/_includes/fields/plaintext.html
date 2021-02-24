@@ -6,6 +6,7 @@
         {{ field.name }}
         {% if field.required %} <span class="text-red-500">*</span>{% endif %}
     </label>
+
     <div class="mt-1 relative" x-data="{
         value: '{{ value }}',
         limit: {{ field.charLimit }},
