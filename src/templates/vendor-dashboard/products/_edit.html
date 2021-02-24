@@ -86,7 +86,7 @@
                     <div class="sm:hidden">
                         <label for="tabs" class="sr-only">Select a tab</label>
                         <select x-on:change.prevent="tab = $event.target.value; window.location.hash = $event.target.value"
-                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                class="block w-full focus:ring-blue-500 focus:border-blue-500 border-gray-300 rounded-md"
                         >
                             {% for tab in tabs  %}
                                 <option value="{{ tab.name|kebab }}"
@@ -98,27 +98,22 @@
 
                     {# Larger tab nav #}
                     <div class="hidden sm:block">
-                        <nav class="relative z-0 rounded-lg shadow flex divide-x divide-gray-200" aria-label="Tabs">
+                        <nav class="flex space-x-4" aria-label="Tabs">
                             {% for tab in tabs %}
+                                {# TODO: focus ring #}
                                 <a href="#{{ tab.name|kebab }}"
                                    x-on:click.prevent="tab = '{{ tab.name|kebab }}'; window.location.hash = '{{ tab.name|kebab }}'"
-                                   class="{{ loop.first ? 'rounded-l-lg' }} {{ loop.last ? 'rounded-r-lg' }} group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center hover:bg-gray-50 focus:z-10"
+                                   class="px-3 py-2 font-medium text-sm rounded-md"
                                    :class="{
                                        'text-gray-500 hover:text-gray-700': tab !== '{{ tab.name|kebab }}',
-                                       'text-gray-900': tab === '{{ tab.name|kebab }}'
+                                       'bg-brand-600 text-white': tab === '{{ tab.name|kebab }}'
                                    }"
                                 >
-                                    <span>{{ tab.name }}</span>
-                                    <span aria-hidden="true"
-                                          class="absolute inset-x-0 bottom-0 h-0.5"
-                                          :class="{
-                                              'bg-transparent': tab !== '{{ tab.name|kebab }}',
-                                              'bg-blue-500': tab === '{{ tab.name|kebab }}'
-                                          }"
-                                    ></span>
+                                    {{ tab.name }}
                                 </a>
                             {% endfor %}
                         </nav>
+
                     </div>
                 </div>
 
