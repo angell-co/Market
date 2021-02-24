@@ -4,14 +4,19 @@
 
 {% js %}
     ClassicEditor
-        .create( document.querySelector( '#field-{{ field.id }}' ) )
-        .then( editor => {
-            console.log( editor );
-        } )
-        .catch( error => {
-            console.error( error );
-        } );
+        .create(document.querySelector('#field-{{ field.id }}'))
+        .then(editor => {
+            // https://stackoverflow.com/a/45145797/1688568
+            editor.model.document.on('change:data', () => {
+                editor.updateSourceElement();
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
 {% endjs %}
+
+{# TODO - sort buttons / options and format the internal text x#}
 
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
