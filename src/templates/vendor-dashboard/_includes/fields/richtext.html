@@ -1,0 +1,31 @@
+{% set value = '' %}
+{% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
+{% js "https://cdn.ckeditor.com/ckeditor5/25.0.0/classic/ckeditor.js" %}
+
+{% js %}
+    ClassicEditor
+        .create( document.querySelector( '#field-{{ field.id }}' ) )
+        .then( editor => {
+            console.log( editor );
+        } )
+        .catch( error => {
+            console.error( error );
+        } );
+{% endjs %}
+
+<div>
+    <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
+        {{ field.name }}
+        {% if field.required %} <span class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="mt-1">
+        <textarea id="field-{{ field.id }}" name="fields[{{ field.handle }}]">
+            {{ value|e }}
+        </textarea>
+    </div>
+
+    {% if field.instructions %}
+        <p class="mt-2 text-sm text-gray-500">{{ field.instructions }}</p>
+    {% endif %}
+</div>

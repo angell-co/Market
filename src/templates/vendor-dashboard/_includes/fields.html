@@ -17,14 +17,17 @@
             {% case 'craft\\fields\\PlainText' %}
                 {% include '_market/_includes/fields/plaintext.html' %}
 
+            {% case 'craft\\redactor\\Field' %}
+                {% include '_market/_includes/fields/richtext.html' %}
+
             {% case 'angellco\\market\\fields\\ShippingProfile' %}
                 {% include '_market/_includes/fields/dropdown.html' %}
 
             {% default %}
-                <div class="p-4 rounded border-2 border-red-500">{{ className(field) }}</div>
+                <div class="p-4 rounded border-2 border-red-600">{{ className(field) }}</div>
 
         {% endswitch %}
 
     {% default %}
-        <div class="p-4 rounded border-2 border-red-500">{{ className(uielement) }}</div>
+        <div class="p-4 rounded border-2 border-red-600">{{ className(uielement) }}</div>
 {% endswitch  %}

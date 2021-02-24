@@ -4,7 +4,7 @@
 <div>
     <label for="{{ uielement.attribute }}" class="block text-sm font-medium text-gray-700">
         {{ 'Title'|t('app') }}
-        {% if uielement.required %} <span class="text-red-500">*</span>{% endif %}
+        {% if uielement.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
     <input type="text"
            name="{{ uielement.attribute }}"

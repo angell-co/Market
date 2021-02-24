@@ -4,7 +4,7 @@
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
         {{ field.name }}
-        {% if field.required %} <span class="text-red-500">*</span>{% endif %}
+        {% if field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
     <div class="mt-1 relative" x-data="{
@@ -41,7 +41,7 @@
         {% if field.charLimit %}
             <span class="absolute bottom-1 right-1 block text-sm"
                   :class="{
-                      'text-red-500': remaining < 0,
+                      'text-red-600': remaining < 0,
                       'text-gray-500': remaining >= 0
                   }"
                   x-text="remaining"
