@@ -4,7 +4,9 @@
 
 {% js %}
     ClassicEditor
-        .create(document.querySelector('#field-{{ field.id }}'))
+        .create(document.querySelector('#field-{{ field.id }}'), {
+            toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ],
+        })
         .then(editor => {
             // https://stackoverflow.com/a/45145797/1688568
             editor.model.document.on('change:data', () => {
@@ -16,7 +18,7 @@
         });
 {% endjs %}
 
-{# TODO - sort buttons / options and format the internal text x#}
+{# TODO - sort buttons / options and format the internal text #}
 
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">

@@ -64,7 +64,7 @@
                 {# Actions #}
                 <div class="mt-5 flex lg:mt-0 lg:ml-4">
                     {# Save #}
-                    <button type="submit" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
                         {# Heroicon name: save #}
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
@@ -78,30 +78,29 @@
         {# Main #}
         {% set fl = productType.getFieldLayout() %}
         {% set tabs = fl.getTabs() %}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <div x-data="{
-                     tab: window.location.hash ? window.location.hash.substring(1) : '{{ (tabs|first).name|kebab }}'
-                 }"
-                 class="py-4">
-                <div>
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-4 grid grid-cols-1 gap-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+            <div x-data="{tab: window.location.hash ? window.location.hash.substring(1) : '{{ (tabs|first).name|kebab }}'}" class="lg:col-start-1 lg:col-span-2">
+
+                <div class="mb-4">
+                    {# Mobile tab nav #}
                     <div class="sm:hidden">
                         <label for="tabs" class="sr-only">Select a tab</label>
-                        <select id="tabs" name="tabs" class="block w-full focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md">
-                            {% for tab in fl.getTabs()  %}
-                                <option{% if loop.first %} selected{% endif %}>{{ tab.name }}</option>
+                        <select x-on:change.prevent="tab = $event.target.value; window.location.hash = $event.target.value"
+                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        >
+                            {% for tab in tabs  %}
+                                <option value="{{ tab.name|kebab }}"
+                                        :selected="tab === '{{ tab.name|kebab }}'"
+                                >{{ tab.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
+
+                    {# Larger tab nav #}
                     <div class="hidden sm:block">
                         <nav class="relative z-0 rounded-lg shadow flex divide-x divide-gray-200" aria-label="Tabs">
                             {% for tab in tabs %}
-                                {# TODO: Current page state #}
-                                {#                        <a href="#" >#}
-                                {#                            <span>{{ tab.name }}</span>#}
-                                {#                            <span aria-hidden="true" class="bg-indigo-500 absolute inset-x-0 bottom-0 h-0.5"></span>#}
-                                {#                        </a>#}
                                 <a href="#{{ tab.name|kebab }}"
-                                   aria-current="false"
                                    x-on:click.prevent="tab = '{{ tab.name|kebab }}'; window.location.hash = '{{ tab.name|kebab }}'"
                                    class="{{ loop.first ? 'rounded-l-lg' }} {{ loop.last ? 'rounded-r-lg' }} group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center hover:bg-gray-50 focus:z-10"
                                    :class="{
@@ -123,10 +122,11 @@
                     </div>
                 </div>
 
+                {# Tab content #}
                 {% for tab in tabs  %}
                     <div x-show="tab === '{{ tab.name|kebab }}'"
                          id="{{ tab.name|kebab }}"
-                         class="shadow sm:rounded-md sm:overflow-hidden mt-4"
+                         class="shadow rounded-md overflow-hidden"
                     >
                         <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                             {% for element in tab.elements %}
@@ -138,6 +138,14 @@
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+
+            <div class="lg:col-start-3 lg:col-span-1">
+                <div class="shadow rounded-md overflow-hidden">
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        <p>HEY</p>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
