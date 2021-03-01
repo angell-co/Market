@@ -1,0 +1,15 @@
+{% set value = '' %}
+{% if element %}{% set value = element.getFieldValue(field.handle).ids() %}{% endif %}
+
+<div>
+    <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
+        {{ field.name }}
+        {% if field.required %} <span class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <pre>{{ dump(value) }}</pre>
+
+    {% if field.instructions %}
+        <p class="mt-2 text-sm text-gray-500">{{ field.instructions }}</p>
+    {% endif %}
+</div>

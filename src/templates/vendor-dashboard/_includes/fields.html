@@ -6,6 +6,7 @@
 
         {% set field = uielement.getField() %}
         {% switch className(field) %}
+
             {% case 'angellco\\market\\fields\\Vendors' %}
                 {% include '_market/_includes/fields/hidden.html' with {
                     value: element ? element.getFieldValue(field.handle).ids() : []
@@ -22,6 +23,12 @@
 
             {% case 'angellco\\market\\fields\\ShippingProfile' %}
                 {% include '_market/_includes/fields/dropdown.html' %}
+
+            {% case 'craft\\fields\\Assets' %}
+                {% include '_market/_includes/fields/assets.html' %}
+
+            {% case 'craft\\fields\\Categories' %}
+                {% include '_market/_includes/fields/categories.html' %}
 
             {% default %}
                 <div class="p-4 rounded border-2 border-red-600">{{ className(field) }}</div>
