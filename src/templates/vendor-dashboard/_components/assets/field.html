@@ -19,19 +19,12 @@
         {% set selectedIds = selectedIds|split(',') %}
     {% endif %}
 
-    {# Keep assets currently in the field #}
-{#    {% if fields is defined and fields[field.handle] is defined  %}#}
-{#        {% for id in fields[field.handle] %}#}
-{#            {% set selectedIds = selectedIds|push(id) %}#}
-{#        {% endfor %}#}
-{#    {% endif %}#}
-
     {# De-dupe #}
     {% set selectedIds = selectedIds|unique %}
 
     {# Fetch the assets #}
     {% set assets = craft.assets.id(selectedIds).fixedOrder().all() %}
-{% elseif value %}
+{% elseif value and selectedIds is not defined %}
     {# We have no incoming selected IDs, so fall back to the stored value #}
     {% set assets = value.all() %}
 {% endif %}
