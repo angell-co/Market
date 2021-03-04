@@ -7,12 +7,42 @@
 {% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
 
 {% set assets = [] %}
-{% if value %}{% set assets = value.all() %}{% endif %}
+
+{# TODO: maintain original sort order #}
+{# TODO: add sortable on field to change sort-order #}
+
+{# Check if we have selected asset IDs incoming #}
+{% if selectedIds is defined and selectedIds is not empty %}
+    {# Keep assets currently in the field #}
+    {% if fields is defined and fields[field.handle] is defined  %}
+        {% for id in fields[field.handle] %}
+            {% set selectedIds = selectedIds|push(id) %}
+        {% endfor %}
+    {% endif %}
+
+    {# De-dupe #}
+    {% set selectedIds = selectedIds|unique %}
+
+    {# Fetch the assetss #}
+    {% set assets = craft.assets.id(selectedIds).all() %}
+{% elseif value %}
+    {# We have on incoming selected IDs, so fall back to the stored value #}
+    {% set assets = value.all() %}
+{% endif %}
+
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
 
 <div id="field-{{ field.id }}" class="mt-1">
     {% if assets %}
         <ul class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
             {% for asset in assets %}
+                {% if asset.id not in selectedIds %}
+                    {% set selectedIds = selectedIds|merge([asset.id]) %}
+                {% endif %}
+
                 <li class="col-span-1 flex flex-col">
                     <div class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50">
 
@@ -39,6 +69,7 @@
                             </button>
 
                             <div x-show="open"
+                                 x-cloak
                                  x-transition:enter="transition ease-out duration-100"
                                  x-transition:enter-start="transform opacity-0 scale-95"
                                  x-transition:enter-end="transform opacity-100 scale-100"
@@ -94,8 +125,36 @@
         </ul>
     {% endif %}
 
+    {# Asset browser #}
     {% if field.limit > assets|length %}
-        <div x-data="{ open: false }">
+
+        {% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
+        {% set page = page ?? 1 %}
+        {% set sort = sort ?? 'dateCreated desc' %}
+        {% set limit = limit ?? 12 %}
+        {% if limit > 60 %}{% set limit = 60 %}{% endif %}
+        {% set query = query ?? '' %}
+        {% set status = status ?? '' %}
+
+        {% set assetsQuery = craft.assets
+            .limit(limit)
+            .search(query)
+            .orderBy(sort)
+        %}
+
+        {# TODO: debugging .folderId(currentVendor.filesFolderId) #}
+
+        {% set pageInfo = sprig.paginate(assetsQuery, page) %}
+        {% set vendorAssets = pageInfo.pageResults %}
+
+        <pre>{{ dump(selectedIds) }}</pre>
+
+        <div id="field-{{ field.id }}-assets-index"
+             s-preserve="true"
+             x-data="{ open: false }"
+        >
+
+            {# Action button to trigger it #}
             <button type="button"
                     x-on:click.prevent="open = !open"
                     class="mt-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -107,10 +166,14 @@
                 Add a file
             </button>
 
-            <div x-show="open" id="field-{{ field.id }}-asset-index">
+            {# The actual asset browser / index #}
+            <div x-show="open"
+                 x-cloak
+            >
                 <div class="fixed inset-0 overflow-hidden z-40">
                     <div class="absolute inset-0 overflow-hidden">
 
+                        {# Overlay #}
                         <div x-transition:enter="ease-in-out duration-500"
                              x-transition:enter-start="opacity-0"
                              x-transition:enter-end="opacity-100"
@@ -122,6 +185,7 @@
                              x-show="open"
                         ></div>
 
+                        {# Panel #}
                         <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="slide-over-heading">
                             <div class="w-screen max-w-2xl"
                                  x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -134,6 +198,7 @@
                                  x-on:click.away="open = false"
                                  x-show="open"
                             >
+                                {# Panel header #}
                                 <div class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl">
                                     <div class="flex-shrink-0 flex justify-start">
                                         <div class="py-6 px-4 bg-brand-700 sm:px-6 w-full">
@@ -154,25 +219,179 @@
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div class="mt-1">
-                                                <p class="text-sm text-brand-300">
-                                                    Get started by filling in the information below to create your new project.
-                                                </p>
-                                            </div>
+{#                                            <div class="mt-1">#}
+{#                                                <p class="text-sm text-brand-300">#}
+{#                                                    Choose a file, or upload a new one right here.#}
+{#                                                </p>#}
+{#                                            </div>#}
                                         </div>
                                     </div>
 
+                                    {# Panel middle #}
                                     <div class="flex-grow overflow-y-auto py-6 px-4 sm:px-6">
-                                        {{ sprig('_market/_components/assets/field-index', {
-                                            fieldId: field.id
-                                        }) }}
+                                        {# Search and filters #}
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                            {# Search #}
+                                            <div class="col-span-2 md:col-span-2">
+                                                <label for="query" class="block text-sm font-medium text-gray-700">Search</label>
+                                                <div class="mt-1 relative rounded-md shadow-sm">
+                                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        {# Heroicon name: search #}
+                                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                    <input sprig
+                                                           s-trigger="keyup changed delay:250ms"
+                                                           s-replace="#field-{{ fieldId }}-asset-index-results"
+                                                           type="text" name="query" id="query"
+                                                           class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                                           placeholder="Search files"
+                                                           value="{{ query }}"
+                                                    >
+                                                </div>
+                                            </div>
+
+                                            {# Sort #}
+                                            <div class="md:col-span-1">
+                                                <label for="sort" class="block text-sm font-medium text-gray-700">Sort</label>
+                                                <select sprig id="sort" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+                                                    <option value="title asc" {{ sort == 'title asc' ? 'selected' }}>A-Z</option>
+                                                    <option value="title desc" {{ sort == 'title desc' ? 'selected' }}>Z-A</option>
+                                                    <option value="dateCreated desc" {{ sort == 'dateCreated desc' ? 'selected' }}>Date Created (↓)</option>
+                                                    <option value="dateCreated asc" {{ sort == 'dateCreated asc' ? 'selected' }}>Date Created (↑)</option>
+                                                    <option value="dateUpdated desc" {{ sort == 'dateUpdated desc' ? 'selected' }}>Date Updated (↓)</option>
+                                                    <option value="dateUpdated asc" {{ sort == 'dateUpdated asc' ? 'selected' }}>Date Updated (↑)</option>
+                                                </select>
+                                            </div>
+
+                                            {# Limit #}
+                                            <div class="md:col-span-1">
+                                                <label for="limit" class="block text-sm font-medium text-gray-700">Limit</label>
+                                                <select sprig id="limit" name="limit" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+                                                    <option value="12" {{ limit == 12 ? 'selected' }}>12</option>
+                                                    <option value="24" {{ limit == 24 ? 'selected' }}>24</option>
+                                                    <option value="36" {{ limit == 36 ? 'selected' }}>36</option>
+                                                    <option value="60" {{ limit == 60 ? 'selected' }}>60</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {# Results container #}
+                                        <div id="field-{{ fieldId }}-asset-index-results">
+                                            {% if vendorAssets %}
+                                                {# Results list #}
+                                                <ul class="grid gap-4 grid-cols-3 sm:grid-cols-4">
+                                                    {% for vendorAsset in vendorAssets %}
+                                                        <li class="col-span-1 flex flex-col">
+                                                            <label for="field-{{ fieldId }}-asset-{{ vendorAsset.id }}-checkbox"
+                                                                   class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50">
+
+                                                                {# Image #}
+                                                                <div class="flex-1 flex flex-col">
+                                                                    <div class="aspect-w-1 aspect-h-1">
+                                                                        <img class="object-cover" src="{{ vendorAsset.url({ width: 500, height: 500 }) }}" alt="{{ vendorAsset.title }}">
+                                                                    </div>
+                                                                </div>
+
+                                                                {# Checkbox and title #}
+                                                                <div class="flex-1 flex flex-col p-2">
+                                                                    <div class="flex items-start">
+                                                                        <div class="h-5 flex items-center">
+                                                                            <input id="field-{{ fieldId }}-asset-{{ vendorAsset.id }}-checkbox"
+                                                                                   type="checkbox"
+                                                                                   name="selectedIds[]"
+                                                                                   value="{{ vendorAsset.id }}"
+                                                                                   class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                                                            >
+                                                                        </div>
+                                                                        <div class="ml-3 text-sm truncate">
+                                                                            <span class="font-medium text-gray-700">{{ vendorAsset.title }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+
+                                                {# Pagination #}
+                                                {% include '_market/_includes/pagination' with {
+                                                    itemType: 'files'
+                                                } %}
+                                            {% elseif query %}
+
+                                                {# No results #}
+                                                <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">
+                                                    <div class="flex">
+                                                        <div class="flex-shrink-0">
+                                                            {# Heroicon name: emoji-sad #}
+                                                            <svg class="h-5 w-5 text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="ml-3">
+                                                            <h3 class="text-sm font-medium text-red-800">
+                                                                Oh no!
+                                                            </h3>
+                                                            <div class="mt-2 text-sm text-red-700 space-y-2">
+                                                                <p>We couldn’t find anything for <strong>“{{ query }}”</strong>, try being less specific or using different keywords.</p>
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                <div class="-mx-2 -my-1.5 flex">
+                                                                    <a href="{{ url('market/files') }}" class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600">
+                                                                        Reset search
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            {% else %}
+                                                {# No assets at all yet #}
+                                                <div class="rounded-md shadow-md bg-orange-100 border border-orange-300 p-4">
+                                                    <div class="flex">
+                                                        <div class="flex-shrink-0">
+                                                            {# Heroicon name: light-bulb #}
+                                                            <svg class="h-5 w-5 text-orange-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="ml-3">
+                                                            <h3 class="text-sm font-medium text-orange-800">
+                                                                Nothing here …
+                                                            </h3>
+                                                            <div class="mt-2 text-sm text-orange-700 space-y-2">
+                                                                <p>You don’t have any files yet, go ahead and add some!</p>
+                                                            </div>
+                                                            <div class="mt-4">
+                                                                <div class="-mx-2 -my-1.5 flex">
+                                                                    <button type="button" class="bg-orange-100 px-2 py-1.5 rounded-md text-sm font-medium text-orange-800 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-orange-100 focus:ring-orange-600">
+                                                                        Upload
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
 
+                                    {# Panel footer #}
                                     <div class="flex-shrink-0 py-6 px-4 sm:px-6 flex justify-end">
-                                        <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <button x-on:click="open = false"
+                                                type="button"
+                                                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        >
                                             Cancel
                                         </button>
-                                        <button type="submit" class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        {# TODO: at this point we want to also close the panel with AlpineJS #}
+                                        <button sprig
+                                                type="button"
+                                                class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        >
                                             Save
                                         </button>
                                     </div>
@@ -181,7 +400,6 @@
                         </section>
                     </div>
                 </div>
-
             </div>
         </div>
     {% endif %}

@@ -120,6 +120,7 @@
                 {# Tab content #}
                 {% for tab in tabs  %}
                     <div x-show="tab === '{{ tab.name|kebab }}'"
+                         x-cloak
                          id="{{ tab.name|kebab }}"
                          class="shadow rounded-md overflow-hidden"
                     >
