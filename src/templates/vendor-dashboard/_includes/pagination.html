@@ -1,7 +1,9 @@
+{% set replace = replace ?? false %}
 <div class="flex items-center justify-between mt-4">
     <div class="flex-1 flex justify-between sm:hidden">
         <button sprig
                 s-val:page="{{ page - 1 }}"
+                {% if replace %}s-replace="{{ replace }}"{% endif %}
                 {% if page == 1 %}disabled{% endif %}
                 class="focus:outline-none focus:ring focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 focus:border-gray-300 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white {% if page == 1 %}opacity-50{% else %}hover:text-gray-500{% endif %}"
         >
@@ -9,6 +11,7 @@
         </button>
         <button sprig
                 s-val:page="{{ page + 1 }}"
+                {% if replace %}s-replace="{{ replace }}"{% endif %}
                 {% if page == pageInfo.totalPages %}disabled{% endif %}
                 class="ml-3 focus:outline-none focus:ring focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 focus:border-gray-300 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white {% if page == pageInfo.totalPages %}opacity-50{% else %}hover:text-gray-500{% endif %}"
         >
@@ -31,6 +34,7 @@
             <nav class="relative z-0 inline-flex shadow-sm -space-x-px" aria-label="Pagination">
                 <button sprig
                         s-val:page="{{ page - 1 }}"
+                        {% if replace %}s-replace="{{ replace }}"{% endif %}
                         {% if page == 1 %}disabled{% endif %}
                         class="focus:outline-none focus:ring focus:ring-inset focus:ring-brand-500 focus:border-brand-500 relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 {% if page == 1 %}opacity-50{% else %}hover:bg-gray-50{% endif %}"
                 >
@@ -47,6 +51,7 @@
                     {% else %}
                         <button sprig
                                 s-val:page="{{ i }}"
+                                {% if replace %}s-replace="{{ replace }}"{% endif %}
                                 class="focus:outline-none focus:ring focus:ring-inset focus:ring-brand-500 focus:border-brand-500 relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                         >{{ i }}</button>
                     {% endif %}
@@ -54,6 +59,7 @@
 
                 <button sprig
                         s-val:page="{{ page + 1 }}"
+                        {% if replace %}s-replace="{{ replace }}"{% endif %}
                         {% if page == pageInfo.totalPages %}disabled{% endif %}
                         class="focus:outline-none focus:ring focus:ring-inset focus:ring-brand-500 focus:border-brand-500 relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 {% if page == pageInfo.totalPages %}opacity-50{% else %}hover:bg-gray-50{% endif %}"
                 >

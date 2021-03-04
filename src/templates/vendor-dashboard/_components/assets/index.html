@@ -4,8 +4,7 @@
 {% set limit = limit ?? 36 %}
 {% if limit > 60 %}{% set limit = 60 %}{% endif %}
 {% set query = query ?? '' %}
-{% set status = status ?? '' %}
-{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&status='~status~'&query='~query) %}
+{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&query='~query) %}
 
 {% set assetsQuery = craft.assets
     .limit(limit)
