@@ -425,7 +425,6 @@
                                                   sprig
                                                   s-method="post"
                                                   s-action="assets/upload"
-                                                  s-replace="#field-{{ field.id }}-asset-index"
                                                   hx-encoding="multipart/form-data"
                                                   hx-ext="asset-uploader"
                                             >
@@ -438,12 +437,7 @@
                                                 </button>
                                                 <progress id="field-{{ field.id }}-uploader-progress" value="0" max="100"></progress>
                                             </form>
-                                            {# TODO: when progress is 100 or done then show spinner as that will be S3 / asset element creation #}
-                                            <script>
-                                                htmx.on('#field-{{ field.id }}-uploader', 'htmx:xhr:progress', function(evt) {
-                                                    htmx.find('#field-{{ field.id }}-uploader-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
-                                                });
-                                            </script>
+
                                             {# /TODO #}
 
                                             <button x-on:click.prevent="open = false"
@@ -475,27 +469,30 @@
 </div>
 
 <script type="application/javascript">
+    // Add the asset uploader extension
     htmx.defineExtension('asset-uploader', {
-        handleSwap : function(swapStyle, target, fragment, settleInfo) {
-            console.log(swapStyle, target, fragment, settleInfo);
-            return false;
-        },
-        // transformResponse : function(text, xhr, elt) {
-        //     console.log(text, xhr, elt);
-        // },
-        // onEvent : function(name, evt) {
-        //     console.log("Fired event: " + name, evt);
-        //     // Stop the processing at this point
-        //     if (name === 'htmx:afterOnLoad') {
-        //         console.log('HIHIHHIHIHIH');
-        //         evt.preventDefault();
-        //         return true;
-        //         // Trigger a refresh and replace only the asset index
-        //
-        //     }
-        // }
+        onEvent : function(name, evt) {
+            // Stop the processing at this point
+            if (name === 'htmx:beforeOnLoad') {
+                evt.preventDefault();
+                evt.stopPropagation();
+
+                // TODO Trigger a refresh and replace only the asset index
+                // sprig/components/render
+                // htmx.ajax('GET', '{{ sprig.url }}', '#field-{{ field.id }}-asset-index');
+                // htmx.trigger('#field-{{ field.id }}-asset-index', 'refresh');
+                return false;
+            }
+        }
     });
 
+    // TODO: when progress is 100 or done then show spinner as that will be S3 / asset element creation
+    htmx.on('#field-{{ field.id }}-uploader', 'htmx:xhr:progress', function(evt) {
+        htmx.find('#field-{{ field.id }}-uploader-progress')
+            .setAttribute('value', evt.detail.loaded/evt.detail.total * 100);
+    });
+
+    // Sortable
     htmx.onLoad(function(content) {
         var el = content.querySelector("#field-{{ field.id }}-list");
         if (el) {
