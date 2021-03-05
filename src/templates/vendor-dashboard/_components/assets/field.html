@@ -246,8 +246,8 @@
                                                 .limit(12)
                                                 .search(query)
                                                 .orderBy(sort)
+                                                .folderId(currentVendor.filesFolderId)
                                             %}
-                                            {# TODO: debugging .folderId(currentVendor.filesFolderId) #}
 
                                             {% set pageInfo = sprig.paginate(assetsQuery, page) %}
                                             {% set vendorAssets = pageInfo.pageResults %}
@@ -419,6 +419,33 @@
                                         <div class="flex-shrink-0 flex justify-end py-6 px-4 sm:px-6">
                                             {# TODO #}
                                             <div class="htmx-indicator">SPIN</div>
+
+                                            {# TODO uploading! Sort of works ... need to figure out how to not replace and instead request a refresh #}
+                                            <form id="field-{{ field.id }}-uploader"
+                                                  sprig
+                                                  s-method="post"
+                                                  s-action="assets/upload"
+                                                  s-replace="#field-{{ field.id }}-asset-index"
+                                                  hx-encoding="multipart/form-data"
+                                                  hx-ext="asset-uploader"
+                                            >
+                                                <input type="file" name="assets-upload">
+                                                {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
+                                                <button type="submit"
+                                                        class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                >
+                                                    Upload
+                                                </button>
+                                                <progress id="field-{{ field.id }}-uploader-progress" value="0" max="100"></progress>
+                                            </form>
+                                            {# TODO: when progress is 100 or done then show spinner as that will be S3 / asset element creation #}
+                                            <script>
+                                                htmx.on('#field-{{ field.id }}-uploader', 'htmx:xhr:progress', function(evt) {
+                                                    htmx.find('#field-{{ field.id }}-uploader-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
+                                                });
+                                            </script>
+                                            {# /TODO #}
+
                                             <button x-on:click.prevent="open = false"
                                                     type="button"
                                                     class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -448,6 +475,27 @@
 </div>
 
 <script type="application/javascript">
+    htmx.defineExtension('asset-uploader', {
+        handleSwap : function(swapStyle, target, fragment, settleInfo) {
+            console.log(swapStyle, target, fragment, settleInfo);
+            return false;
+        },
+        // transformResponse : function(text, xhr, elt) {
+        //     console.log(text, xhr, elt);
+        // },
+        // onEvent : function(name, evt) {
+        //     console.log("Fired event: " + name, evt);
+        //     // Stop the processing at this point
+        //     if (name === 'htmx:afterOnLoad') {
+        //         console.log('HIHIHHIHIHIH');
+        //         evt.preventDefault();
+        //         return true;
+        //         // Trigger a refresh and replace only the asset index
+        //
+        //     }
+        // }
+    });
+
     htmx.onLoad(function(content) {
         var el = content.querySelector("#field-{{ field.id }}-list");
         if (el) {
@@ -455,5 +503,5 @@
                 ghostClass: 'opacity-10'
             });
         }
-    })
+    });
 </script>
