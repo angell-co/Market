@@ -45,21 +45,33 @@
         {# Then output the assets #}
         <ul class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
             {% for asset in assets %}
-                <li class="col-span-1 flex flex-col">
-                    <div class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50">
+                <li x-data="{
+                        visible: true,
+                        showOptions: false
+                    }"
+                    class="col-span-1 flex flex-col"
+                >
+                    <div x-show="visible"
+                         x-transition:enter="ease-in-out duration-100"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in-out duration-100"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50"
+                    >
 
                         {# Options menu #}
-                        <div x-data="{ open: false }"
-                             x-on:keydown.window.escape="open = false"
-                             x-on:click.away="open = false"
+                        <div x-on:keydown.window.escape="showOptions = false"
+                             x-on:click.away="showOptions = false"
                              class="absolute top-2 right-2 z-10"
                         >
-                            <button x-on:click.prevent="open = !open"
+                            <button x-on:click.prevent="showOptions = !showOptions"
                                     type="button"
                                     class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
                                     id="asset-options-menu-{{ asset.id }}"
                                     aria-haspopup="true"
-                                    x-bind:aria-expanded="open"
+                                    x-bind:aria-expanded="showOptions"
                             >
                                 <span class="sr-only">Open options menu</span>
                                 <span class="flex items-center justify-center h-full w-full rounded-full">
@@ -70,7 +82,7 @@
                                 </span>
                             </button>
 
-                            <div x-show="open"
+                            <div x-show="showOptions"
                                  x-cloak
                                  x-transition:enter="transition ease-out duration-100"
                                  x-transition:enter-start="transform opacity-0 scale-95"
@@ -94,6 +106,8 @@
                                 <div class="py-1">
                                     <button sprig
                                             s-val:selected-ids="{{ selectedIds|filter(v => v != asset.id)|join(',') }}"
+                                            s-swap="innerHTML settle:1s"
+                                            x-on:click="visible = false"
                                             type="button"
                                             class="w-full group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-red-700 hover:bg-red-100 hover:text-red-900"
                                             role="menuitem"
@@ -136,12 +150,12 @@
     <div class="htmx-indicator">SPIN</div>
 
     {# Asset browser #}
-    <div x-data="assetBrowser()">
+    <div x-data="{ open: false }">
 
         {# Action button to trigger it #}
         {% if field.limit > assets|length %}
             <button type="button"
-                    x-on:click.prevent="doOpen"
+                    x-on:click.prevent="open = true"
                     class="mt-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
                 {# Heroicon name: plus-circle #}
@@ -153,7 +167,7 @@
         {% endif %}
 
         {# The actual asset browser / index #}
-        <div x-show="isOpen()"
+        <div x-show="open"
              x-cloak
         >
             <div class="fixed inset-0 overflow-hidden z-40">
@@ -168,7 +182,7 @@
                          x-transition:leave-end="opacity-0"
                          class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
                          aria-hidden="true"
-                         x-show="isOpen()"
+                         x-show="open"
                     ></div>
 
                     {# Panel #}
@@ -181,8 +195,8 @@
                              x-transition:leave-start="translate-x-0"
                              x-transition:leave-end="translate-x-full"
                              x-on:keydown.window.escape="open = false"
-                             x-on:click.away="doClose"
-                             x-show="isOpen()"
+                             x-on:click.away="open = false"
+                             x-show="open"
                         >
                             {# Panel header #}
                             <div class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl">
@@ -352,9 +366,14 @@
                                                             </div>
                                                             <div class="mt-4">
                                                                 <div class="-mx-2 -my-1.5 flex">
-                                                                    <a href="{{ url('market/files') }}" class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600">
+                                                                    <button sprig
+                                                                            s-replace="#field-{{ field.id }}-asset-index"
+                                                                            s-val:query=""
+                                                                            type="button"
+                                                                            class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600"
+                                                                    >
                                                                         Reset search
-                                                                    </a>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -395,7 +414,7 @@
                                         <div class="flex-shrink-0 flex justify-end py-6 px-4 sm:px-6">
                                             {# TODO #}
                                             <div class="htmx-indicator">SPIN</div>
-                                            <button x-on:click.prevent="doClose"
+                                            <button x-on:click.prevent="open = false"
                                                     type="button"
                                                     class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                             >
@@ -405,7 +424,7 @@
                                                     s-val:selected-ids="{{ selectedIds|join(',') }}"
                                                     s-swap="innerHTML settle:1s"
                                                     s-indicator="#field-{{ field.id }}"
-                                                    x-on:click="doClose"
+                                                    x-on:click="open = false"
                                                     type="button"
                                                     class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                             >
@@ -422,23 +441,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-
-    function assetBrowser() {
-        return {
-            open: false,
-            doOpen() { this.open = true },
-            doClose() { this.open = false },
-            isOpen() { return this.open === true },
-        }
-    }
-
-    // htmx.on('htmx:afterSettle', function(event) {
-    //     console.log(assetBrowser);
-    //     console.log(event);
-    //     if (event.detail.elt.classList[0] === 'sprig-component') {
-    //         assetBrowser.doClose();
-    //     }
-    // });
-</script>
