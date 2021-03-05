@@ -8,8 +8,7 @@
 
 {% set assets = [] %}
 
-{# TODO: maintain original sort order #}
-{# TODO: add sortable on field to change sort-order #}
+{# TODO: fix bugs with trying to empty the field entirely #}
 
 {# Check if we have selected asset IDs incoming #}
 {% if selectedIds is defined and selectedIds is not empty %}
@@ -23,6 +22,13 @@
 
     {# Fetch the assets #}
     {% set assets = craft.assets.id(selectedIds).fixedOrder().all() %}
+
+{% elseif fields[field.handle] is defined and selectedIds is not defined %}
+
+    {# If we have submitted values then use them #}
+    {% set selectedIds = fields[field.handle] %}
+    {% set assets = craft.assets.id(selectedIds).fixedOrder().all() %}
+
 {% elseif value and selectedIds is not defined %}
     {# We have no incoming selected IDs, so fall back to the stored value #}
     {% set assets = value.all() %}
@@ -43,14 +49,13 @@
         {% endfor %}
 
         {# Then output the assets #}
-        <ul class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+        <ul id="field-{{ field.id }}-list"
+            class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"
+            sprig
+            s-trigger="end"
+        >
             {% for asset in assets %}
-                <li x-data="{
-                        visible: true,
-                        showOptions: false
-                    }"
-                    class="col-span-1 flex flex-col"
-                >
+                <li x-data="{ visible: true, showOptions: false }" class="col-span-1 flex flex-col">
                     <div x-show="visible"
                          x-transition:enter="ease-in-out duration-100"
                          x-transition:enter-start="opacity-0"
@@ -441,3 +446,14 @@
         </div>
     </div>
 </div>
+
+<script type="application/javascript">
+    htmx.onLoad(function(content) {
+        var el = content.querySelector("#field-{{ field.id }}-list");
+        if (el) {
+            new Sortable(el, {
+                ghostClass: 'opacity-10'
+            });
+        }
+    })
+</script>
