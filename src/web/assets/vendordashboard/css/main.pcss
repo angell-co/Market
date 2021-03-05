@@ -10,3 +10,14 @@
 .ck-content {
   @apply prose prose-blue text-gray-500 max-w-none;
 }
+
+.htmx-indicator {
+  opacity:0;
+  transition: opacity 50ms ease-in;
+}
+.htmx-request .htmx-indicator{
+  opacity:1
+}
+.htmx-request.htmx-indicator{
+  opacity:1
+}
