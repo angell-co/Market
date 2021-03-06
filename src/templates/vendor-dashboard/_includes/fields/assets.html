@@ -4,9 +4,16 @@
         {% if field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
+    {% set value = element.getFieldValue(field.handle) %}
+
     {{ sprig('_market/_components/assets/field', {
         fieldId: field.id,
-        elementId: element.id
+        fieldHandle: field.handle,
+        fieldLimit: field.limit,
+        elementId: element.id,
+        selectedIds: value.ids()|join(',')
+    }, {
+        id: 'field-'~field.id
     }) }}
 
     {% if field.instructions %}
