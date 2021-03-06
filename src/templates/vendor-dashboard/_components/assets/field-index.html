@@ -1,9 +1,16 @@
+{# This will likely come in as a comma separated string, so we need to split that into an array #}
 {% if selectedIds is not iterable %}
     {% set selectedIds = selectedIds|split(',') %}
 {% endif %}
 
-{% set selectedIds = selectedIds|unique %}
 
+{# Process the removed ID if there is one #}
+{% if removedId is defined %}
+    {% set selectedIds = selectedIds|filter((v, k) => v != removedId) %}
+{% endif %}
+
+
+{# Run the queries for the actual display of the index #}
 {% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
 {% set sort = sort ?? 'dateCreated desc' %}
@@ -226,9 +233,8 @@
 
 <script>
 
+    // Send the selected IDs to the parent component
     htmx.on('#field-{{ fieldId }}-asset-index-save', 'click', function(evt) {
-        console.log(evt);
-
         htmx.find('#field-{{ fieldId }}-selectedIds').value = "{{ selectedIds|join(',') }}";
         htmx.trigger('#field-{{ fieldId }}', 'refresh');
     });

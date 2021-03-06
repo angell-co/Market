@@ -42,11 +42,11 @@
     id: 'field-'~fieldId~'-selectedIds'
 }) }}
 
-{# TODO: fix bug when removing in that it doesn’t pass to the child component #}
-
 <div class="mt-1">
+    {# Output the selected assets #}
     {% if assets %}
-        {# Then output the assets #}
+
+        {# Sortable is wired up here, we have swap the DOM so we submit the new order #}
         <ul id="field-{{ fieldId }}-list"
             class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"
             sprig
@@ -110,6 +110,7 @@
                                     <button sprig
                                             s-val:removed-id="{{ asset.id }}"
                                             s-swap="innerHTML settle:1s"
+                                            s-target="#field-{{ fieldId }}"
                                             x-on:click="visible = false"
                                             type="button"
                                             class="w-full group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-red-700 hover:bg-red-100 hover:text-red-900"
