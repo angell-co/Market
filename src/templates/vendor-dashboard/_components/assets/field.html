@@ -202,9 +202,10 @@
                              x-on:click.away="open = false"
                              x-show="open"
                         >
-                            {# Panel header #}
-                            <div class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl">
-                                <div class="flex-shrink-0 flex justify-start">
+                            <div class="flex flex-col h-full bg-white shadow-xl overflow-hidden">
+
+                                {# Panel header #}
+                                <div class="flex-shrink-0 justify-start shadow-xl">
                                     <div class="py-6 px-4 bg-brand-700 sm:px-6 w-full">
                                         <div class="flex items-center justify-between">
                                             <h2 id="slide-over-heading" class="text-lg font-medium text-white">
@@ -223,25 +224,23 @@
                                                 </button>
                                             </div>
                                         </div>
-{#                                            <div class="mt-1">#}
-{#                                                <p class="text-sm text-brand-300">#}
-{#                                                    Choose a file, or upload a new one right here.#}
-{#                                                </p>#}
-{#                                            </div>#}
+                                        <div class="mt-1">
+                                            <p class="text-sm text-brand-300">
+                                                Choose a file, or upload a new one right here.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="flex-grow overflow-y-auto">
-                                    <div class="h-full divide-y divide-gray-200 flex flex-col">
-                                        {{ sprig('_market/_components/assets/field-index', {
-                                            fieldId: fieldId,
-                                            fieldLimit: fieldLimit,
-                                            selectedIds: selectedIds|join(','),
-                                        }, {
-                                            'id' : 'field-'~fieldId~'-asset-index'
-                                        }) }}
-                                    </div>
-                                </div>
+                                {# Middle and footer #}
+                                {{ sprig('_market/_components/assets/field-index', {
+                                    fieldId: fieldId,
+                                    fieldLimit: fieldLimit,
+                                    selectedIds: selectedIds|join(','),
+                                }, {
+                                    'id' : 'field-'~fieldId~'-asset-index',
+                                    'class' : 'flex flex-col h-full bg-red',
+                                }) }}
                             </div>
                         </div>
                     </section>
