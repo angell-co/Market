@@ -150,9 +150,6 @@
         </ul>
     {% endif %}
 
-    {# TODO #}
-    <div class="htmx-indicator">SPIN</div>
-
     {# Asset browser #}
     <div x-data="{ open: false }">
 
@@ -169,6 +166,9 @@
                 Add a file
             </button>
         {% endif %}
+
+        {# TODO #}
+        <div class="htmx-indicator">SPIN</div>
 
         {# The actual asset browser / index #}
         <div x-show="open"

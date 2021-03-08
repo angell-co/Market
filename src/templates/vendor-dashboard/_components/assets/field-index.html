@@ -199,38 +199,38 @@
               s-method="post"
               s-action="assets/upload"
               s-trigger="change"
-              s-indicator="#field-{{ fieldId }}-asset-index"
               hx-encoding="multipart/form-data"
               hx-ext="asset-uploader"
-              class="flex justify-start"
+              class="flex flex-grow justify-start"
         >
 
             {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
 
             <div>
-                <label for="field-{{ fieldId }}-uploader-input" class="block bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <label for="field-{{ fieldId }}-uploader-input"
+                       class="block bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm cursor-pointer text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    <span class="htmx-indicator h-3">
+                        <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                            <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                        </svg>
+                    </span>
                     <span>Upload a file</span>
                     <input id="field-{{ fieldId }}-uploader-input" type="file" name="assets-upload" class="sr-only">
                 </label>
             </div>
 
-            <div>
-                <div class="h-3 relative w-20 rounded-full overflow-hidden">
+            <div class="flex-1 ml-4 h-full items-center flex">
+                <div class="htmx-indicator h-3 relative w-full rounded-full overflow-hidden">
                     <div class="w-full h-full bg-gray-200 absolute"></div>
-                    <div id="field-{{ fieldId }}-uploader-progress" class="h-full bg-green-500 relative w-0"></div>
+                    <div id="field-{{ fieldId }}-uploader-progress" class="h-full bg-blue-500 relative w-0"></div>
                 </div>
             </div>
         </form>
 
         {# Right half #}
         <div>
-            {# TODO: finish this  #}
-            <div class="htmx-indicator inline-block">
-                <svg class="animate-spin h-5 w-5 text-brand-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </div>
             <button x-on:click.prevent="open = false"
                     type="button"
                     class="ml-4 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -240,12 +240,17 @@
             <button sprig
                     s-val:selected-ids="{{ selectedIds|join(',') }}"
                     s-swap="none"
-                    s-indicator="#field-{{ fieldId }}"
-                    x-on:click="open = false"
+                    x-on:htmx:after-request="open = false"
                     id="field-{{ fieldId }}-asset-index-save"
                     type="button"
-                    class="ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
+                <span class="htmx-indicator h-3">
+                    <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                        <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                    </svg>
+                </span>
                 Save
             </button>
         </div>
@@ -253,9 +258,8 @@
 </div>
 
 <script>
-
     // Send the selected IDs to the parent component
-    htmx.on('#field-{{ fieldId }}-asset-index-save', 'click', function(evt) {
+    htmx.on('#field-{{ fieldId }}-asset-index-save', 'htmx:afterRequest', function(evt) {
         htmx.find('#field-{{ fieldId }}-selectedIds').value = "{{ selectedIds|join(',') }}";
         htmx.trigger('#field-{{ fieldId }}', 'refresh');
     });
@@ -263,12 +267,12 @@
     // Add the asset uploader extension
     htmx.defineExtension('asset-uploader', {
         onEvent : function(name, evt) {
-            // Stop the processing at this point
+            // Stop the processing at this point because we can’t use the response at all
             if (name === 'htmx:beforeOnLoad') {
                 evt.preventDefault();
                 evt.stopPropagation();
 
-                // Trigger a refresh of only the asset index
+                // Manually trigger a refresh of only the asset index
                 htmx.trigger('#field-{{ fieldId }}-asset-index', 'refresh');
                 return false;
             }
