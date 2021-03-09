@@ -1,5 +1,8 @@
 @tailwind base;
 
+/**
+ * AlpineJS cloak style
+ */
 [x-cloak] {
   display: none;
 }
@@ -7,16 +10,29 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/**
+ * CKEditor styles
+ */
 .ck-content {
   @apply prose prose-blue text-gray-500 max-w-none;
 }
 
+
+/**
+ * HTMX loading indicator
+ */
 .htmx-indicator {
   display: none;
 }
-.htmx-request .htmx-indicator {
-  display: inline-block;
-}
+.htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
   display: inline-block;
+}
+
+/**
+ * Disable the spinner on assets index components when the parent field is updating
+ */
+.htmx-request.field-assets .field-assets-index .htmx-indicator{
+  display: none;
 }

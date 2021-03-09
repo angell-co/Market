@@ -10,6 +10,10 @@
 {% endif %}
 
 
+{# Filter out empties #}
+{% set selectedIds = selectedIds|filter %}
+
+
 {# Run the queries for the actual display of the index #}
 {% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
@@ -93,6 +97,7 @@
                                 <div class="h-5 flex items-center">
                                     <input sprig
                                            id="field-{{ fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
+                                           name="field_{{ fieldId }}_asset_index_{{ vendorAsset.id }}"
                                            type="checkbox"
                                            value="{{ vendorAsset.id }}"
                                            s-val:page="{{ page }}"
@@ -194,16 +199,14 @@
     <div class="flex justify-between py-6 px-4 sm:px-6">
 
         {# Left half #}
-        <form id="field-{{ fieldId }}-uploader"
-              sprig
-              s-method="post"
-              s-action="assets/upload"
-              s-trigger="change"
-              hx-encoding="multipart/form-data"
-              hx-ext="asset-uploader"
-              class="flex flex-grow justify-start"
+        <div id="field-{{ fieldId }}-uploader"
+             hx-post="{{ actionUrl('assets/upload') }}"
+             hx-trigger="change"
+             hx-encoding="multipart/form-data"
+             class="flex flex-grow justify-start"
         >
 
+            {{ csrfInput() }}
             {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
 
             <div>
@@ -227,7 +230,7 @@
                     <div id="field-{{ fieldId }}-uploader-progress" class="h-full bg-blue-500 relative w-0"></div>
                 </div>
             </div>
-        </form>
+        </div>
 
         {# Right half #}
         <div>
@@ -264,19 +267,14 @@
         htmx.trigger('#field-{{ fieldId }}', 'refresh');
     });
 
-    // Add the asset uploader extension
-    htmx.defineExtension('asset-uploader', {
-        onEvent : function(name, evt) {
-            // Stop the processing at this point because we can’t use the response at all
-            if (name === 'htmx:beforeOnLoad') {
-                evt.preventDefault();
-                evt.stopPropagation();
+    // After uploading an asset we want to cancle the response handling because we can’t actually use it
+    htmx.on('#field-{{ fieldId }}-uploader', 'htmx:beforeOnLoad', function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
 
-                // Manually trigger a refresh of only the asset index
-                htmx.trigger('#field-{{ fieldId }}-asset-index', 'refresh');
-                return false;
-            }
-        }
+        // Then manually trigger a refresh of only the asset index
+        htmx.trigger('#field-{{ fieldId }}-asset-index', 'refresh');
+        return false;
     });
 
     // Progress bar on upload

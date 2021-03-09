@@ -44,7 +44,7 @@
 
 <div class="mt-1">
     {# Output the selected assets #}
-    {% if assets %}
+{#    {% if assets %}#}
 
         {# Sortable is wired up here, we have swap the DOM so we submit the new order #}
         <ul id="field-{{ fieldId }}-list"
@@ -97,7 +97,7 @@
                                  role="menu" aria-orientation="vertical" aria-labelledby="asset-options-menu-{{ asset.id }}"
                             >
                                 <div class="py-1">
-                                    <a href="{{ url('market/files/'~asset.id) }}" class="group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                    <a href="{{ url('market/files/'~asset.id) }}" target="_blank" class="group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                                         {# Heroicon name: eye #}
                                         <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -148,27 +148,36 @@
                 </li>
             {% endfor %}
         </ul>
-    {% endif %}
+{#    {% endif %}#}
 
     {# Asset browser #}
     <div x-data="{ open: false }">
 
-        {# Action button to trigger it #}
-        {% if fieldLimit > assets|length %}
-            <button type="button"
-                    x-on:click.prevent="open = true"
-                    class="mt-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-                {# Heroicon name: plus-circle #}
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                </svg>
-                Add a file
-            </button>
-        {% endif %}
+        {# Button and spinner#}
+        <div class="flex items-center mt-4">
 
-        {# TODO #}
-        <div class="htmx-indicator">SPIN</div>
+            {# Button to trigger it if applicable #}
+            {% if fieldLimit > assets|length %}
+                <button type="button"
+                        x-on:click.prevent="open = true"
+                        class="mr-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    {# Heroicon name: plus-circle #}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                    </svg>
+                    Add a file
+                </button>
+            {% endif %}
+
+            <span class="htmx-indicator text-gray-500">
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                    <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                </svg>
+            </span>
+
+        </div>
 
         {# The actual asset browser / index #}
         <div x-show="open"
@@ -239,7 +248,7 @@
                                     selectedIds: selectedIds|join(','),
                                 }, {
                                     'id' : 'field-'~fieldId~'-asset-index',
-                                    'class' : 'flex flex-col h-full bg-red',
+                                    'class' : 'flex flex-col h-full field-assets-index',
                                 }) }}
                             </div>
                         </div>

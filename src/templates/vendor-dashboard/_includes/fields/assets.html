@@ -13,7 +13,8 @@
         elementId: element.id,
         selectedIds: value.ids()|join(',')
     }, {
-        id: 'field-'~field.id
+        id: 'field-'~field.id,
+        class: 'field-assets'
     }) }}
 
     {% if field.instructions %}
