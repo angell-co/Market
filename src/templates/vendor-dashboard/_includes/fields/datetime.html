@@ -1,18 +1,14 @@
-{% set value = '' %}
+{% set value = null %}
 {% if element %}{% set value = element[attribute] %}{% endif %}
 <div>
     <label for="{{ attribute }}" class="block text-sm font-medium text-gray-700">
         {{ label }}
     </label>
     <div id="{{ attribute }}">
-        <input type="date"
-               name="{{ attribute }}[date]"
-               id="{{ attribute }}-date"
-               value="{{ value.date|date('Y-m-d') }}"
-               class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-        >
+        {% include '_market/_includes/datepicker' with {
+            attribute: attribute~'[date]',
+            value: value ? value.date|date('Y-m-d') : null
+        } only %}
         {# TODO: time - dropdown #}
     </div>
 </div>
-
-{# TODO: use the alpine one here in an include: https://tailwindcomponents.com/component/datepicker-with-tailwindcss-and-alpinejs #}
