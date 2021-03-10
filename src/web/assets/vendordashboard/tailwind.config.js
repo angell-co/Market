@@ -23,7 +23,7 @@ module.exports = {
       },
       screens: {
         'smh': {'raw': '(min-height: 560px)'},
-      }
+      },
     },
   },
   variants: {
