@@ -1,4 +1,9 @@
-{% set error = field.setOptionsForVendor(element) %}
+{% if className(field) == 'angellco\\market\\fields\\ShippingProfile' %}
+    {% set error = field.setOptionsForVendor(element) %}
+{% else %}
+    {% set error = false %}
+{% endif %}
+
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
         {{ field.name }}

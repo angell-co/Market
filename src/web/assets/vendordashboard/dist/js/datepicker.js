@@ -17,12 +17,11 @@ function datepicker() {
                 let currDate = new Date(Date.parse(value));
                 this.month = currDate.getMonth();
                 this.year = currDate.getFullYear();
-                this.datepickerValue = currDate.toDateString();
+                this.datepickerValue = currDate.toLocaleDateString();
             } else {
                 let today = new Date();
                 this.month = today.getMonth();
                 this.year = today.getFullYear();
-                this.datepickerValue = new Date(this.year, this.month, today.getDate()).toDateString();
             }
         },
 
@@ -30,21 +29,27 @@ function datepicker() {
             const today = new Date();
             const d = new Date(this.year, this.month, date);
 
-            return today.toDateString() === d.toDateString() ? true : false;
+            return today.toLocaleDateString() === d.toLocaleDateString() ? true : false;
         },
 
         isSelectedDate(date) {
             const d = new Date(this.year, this.month, date);
 
-            return this.datepickerValue === d.toDateString() ? true : false;
+            return this.datepickerValue === d.toLocaleDateString() ? true : false;
         },
 
         getDateValue(date) {
             let selectedDate = new Date(this.year, this.month, date);
-            this.datepickerValue = selectedDate.toDateString();
+            this.datepickerValue = selectedDate.toLocaleDateString();
 
             this.$refs.date.value = selectedDate.getFullYear() +"-"+ ('0'+ selectedDate.getMonth()).slice(-2) +"-"+ ('0' + selectedDate.getDate()).slice(-2);
 
+            this.showDatepicker = false;
+        },
+
+        clearDateValue() {
+            this.datepickerValue = '';
+            this.$refs.date.value = '';
             this.showDatepicker = false;
         },
 
