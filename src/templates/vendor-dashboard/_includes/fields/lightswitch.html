@@ -1,9 +1,25 @@
-{% set value = field.default %}
-{% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
+{% if attribute is defined %}
+    {% set id = attribute %}
+    {% set name = attribute %}
+{% else %}
+    {% set id = 'field-'~field.id %}
+    {% set name = 'fields['~field.handle~']' %}
+{% endif %}
+
+{% if label is not defined and field is defined %}{% set label = field.name %}{% endif %}
+{% if value is not defined and field is defined %}{% set value = field.default %}{% endif %}
+
+{% if element %}
+    {% if attribute is defined %}
+        {% set value = element[attribute] %}
+    {% else %}
+        {% set value = element.getFieldValue(field.handle) %}
+    {% endif %}
+{% endif %}
 
 <div>
-    <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
-        {{ field.name }}
+    <label for="{{ id }}" class="block text-sm font-medium text-gray-700">
+        {{ label }}
     </label>
     <div class="mt-1">
         <button type="button"
@@ -11,12 +27,13 @@
                 x-data="{ on: {{ value ? 'true' : 'false' }} }"
                 aria-pressed="false"
                 :aria-pressed="on.toString()"
-                @click="on = !on"
-                x-state:on="Enabled"
-                x-state:off="Not Enabled"
+                x-on:click="on = !on"
                 :class="{ 'bg-blue-600': on, 'bg-gray-200': !(on) }"
         >
-            <input type="hidden" id="field-{{ field.id }}" name="fields[{{ field.handle }}]" x-model="on">
+            <input type="hidden"
+                   id="{{ id }}"
+                   name="{{ name }}"
+                   x-model="on">
             <span class="pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 translate-x-0" x-state:on="Enabled" x-state:off="Not Enabled" :class="{ 'translate-x-5': on, 'translate-x-0': !(on) }">
               <span class="absolute inset-0 h-full w-full flex items-center justify-center transition-opacity opacity-100 ease-in duration-200" aria-hidden="true" x-state:on="Enabled" x-state:off="Not Enabled" :class="{ 'opacity-0 ease-out duration-100': on, 'opacity-100 ease-in duration-200': !(on) }">
                 <svg class="bg-white h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
@@ -31,7 +48,7 @@
             </span>
         </button>
     </div>
-    {% if field.instructions %}
+    {% if field is defined and field.instructions %}
         <p class="mt-2 text-sm text-gray-500">{{ field.instructions }}</p>
     {% endif %}
 </div>

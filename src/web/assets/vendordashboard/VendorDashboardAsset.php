@@ -30,6 +30,7 @@ class VendorDashboardAsset extends AssetBundle
 
         $this->css[] = 'css/main.css';
 
+        $this->js[] = 'js/slug.js';
         $this->js[] = 'js/timepicker.js';
         $this->js[] = 'js/datepicker.js';
 

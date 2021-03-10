@@ -2,7 +2,10 @@
     {% set value = null %}
 {% endif %}
 
-<div x-data="datepicker()" x-init="[initDate('{{ value }}'), getNoOfDays()]" x-cloak class="">
+<div x-data="datepicker()"
+     x-init="[initDate('{{ value }}'), getNoOfDays()]"
+     x-cloak
+>
     <input type="hidden"
            name="{{ attribute }}"
            x-ref="date"

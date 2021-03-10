@@ -1,12 +1,17 @@
 {% set value = '' %}
 {% if element %}{% set value = element.slug %}{% endif %}
-<div>
+<div x-data="slug()"
+     x-init="initSlug('{{ value }}')"
+>
     <label for="slug" class="block text-sm font-medium text-gray-700">
         {{ 'Slug'|t('app') }} <span class="text-red-600">*</span>
     </label>
+
     <input type="text"
            name="slug"
            id="slug"
+           x-model="slug"
+           x-on:blur="formatValue(slug)"
            value="{{ value }}"
            required
            class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"

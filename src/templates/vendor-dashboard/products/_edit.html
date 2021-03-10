@@ -158,25 +158,14 @@
                             element: product is defined ? product : null
                         } %}
 
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
+                        {# Enabled switch #}
+                        {% include '_market/_includes/fields/lightswitch.html' with {
+                            label: 'Enabled'|t('app'),
+                            attribute: 'enabled',
+                            element: product is defined ? product : null
+                        } %}
 
                         {#
-                            Basics
-                            - Enabled switch
-
                             Custom fields
                             - shipping profile
                             - VAT included
