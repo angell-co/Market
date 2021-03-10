@@ -2,7 +2,9 @@
     {% set value = null %}
 {% endif %}
 
-<div x-data="app()" x-init="[initDate(), getNoOfDays()]" x-cloak class="antialiased">
+{# TODO: allow option to be empty! Should be empty by default #}
+
+<div x-data="datepicker()" x-init="[initDate('{{ value }}'), getNoOfDays()]" x-cloak class="antialiased">
     <div class="relative">
         <input type="hidden"
                name="{{ attribute }}"
@@ -29,7 +31,7 @@
 
             <header class="flex justify-between items-center mb-2 bg-gray-100 p-4">
                 <div>
-                    <span x-text="MONTH_NAMES[month]" class="text-lg font-bold text-gray-800"></span>
+                    <span x-text="DP_MONTH_NAMES[month]" class="text-lg font-bold text-gray-800"></span>
                     <span x-text="year" class="ml-1 text-lg text-gray-600 font-normal"></span>
                 </div>
                 <nav>
@@ -54,7 +56,7 @@
 
             <div class="p-3">
                 <div class="grid grid-cols-7 gap-1">
-                    <template x-for="(day, index) in DAYS" :key="index">
+                    <template x-for="(day, index) in DP_DAYS" :key="index">
                         <div x-text="day"
                              class="w-7 mx-0.5 mb-2 text-gray-800 font-medium text-center text-xs"
                         ></div>
@@ -82,94 +84,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-    function app() {
-        return {
-            showDatepicker: false,
-            datepickerValue: '',
-
-            month: '',
-            year: '',
-            no_of_days: [],
-            blankdays: [],
-            days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-
-            initDate() {
-                {% if value %}
-                    let currDate = new Date(Date.parse('{{ value }}'));
-                    this.month = currDate.getMonth();
-                    this.year = currDate.getFullYear();
-                    this.datepickerValue = currDate.toDateString();
-                {% else %}
-                    let today = new Date();
-                    this.month = today.getMonth();
-                    this.year = today.getFullYear();
-                    this.datepickerValue = new Date(this.year, this.month, today.getDate()).toDateString();
-                {% endif %}
-            },
-
-            isToday(date) {
-                const today = new Date();
-                const d = new Date(this.year, this.month, date);
-
-                return today.toDateString() === d.toDateString() ? true : false;
-            },
-
-            isSelectedDate(date) {
-                const d = new Date(this.year, this.month, date);
-
-                return this.datepickerValue === d.toDateString() ? true : false;
-            },
-
-            getDateValue(date) {
-                let selectedDate = new Date(this.year, this.month, date);
-                this.datepickerValue = selectedDate.toDateString();
-
-                this.$refs.date.value = selectedDate.getFullYear() +"-"+ ('0'+ selectedDate.getMonth()).slice(-2) +"-"+ ('0' + selectedDate.getDate()).slice(-2);
-
-                this.showDatepicker = false;
-            },
-
-            getNoOfDays() {
-                let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
-
-                // find where to start calendar day of week
-                let dayOfWeek = new Date(this.year, this.month).getDay();
-                let blankdaysArray = [];
-                for ( var i=1; i <= dayOfWeek; i++) {
-                    blankdaysArray.push(i);
-                }
-
-                let daysArray = [];
-                for ( var i=1; i <= daysInMonth; i++) {
-                    daysArray.push(i);
-                }
-
-                this.blankdays = blankdaysArray;
-                this.no_of_days = daysArray;
-            },
-
-            next() {
-                if (this.month == 11) {
-                    this.year++;
-                    this.month = 0;
-                } else {
-                    this.month++;
-                }
-            },
-
-            prev() {
-                if (this.month == 0) {
-                    this.year--;
-                    this.month = 11;
-                } else {
-                    this.month--;
-                }
-            }
-        }
-    }
-</script>
