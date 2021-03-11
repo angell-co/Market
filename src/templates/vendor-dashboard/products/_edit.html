@@ -7,6 +7,8 @@
 
 {% set title = 'Create new {productType} product'|t('market', {productType: productType.name}) %}
 
+{% set sidebarFields = craft.app.plugins.getPlugin('market').getSettings().productSidebarFieldHandles %}
+
 {# Sort out the product model #}
 {% if productId is defined and productId != null %}
     {% if product is not defined %}
@@ -128,9 +130,10 @@
                     >
                         <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                             {% for element in tab.elements %}
-                                {% include '_market/_includes/fields' with {
+                                {% include '_market/_includes/fld-element' with {
                                     uielement: element,
-                                    element: product is defined ? product : null
+                                    element: product is defined ? product : null,
+                                    excludedFieldHandles: sidebarFields
                                 } only %}
                             {% endfor %}
                         </div>
@@ -140,6 +143,8 @@
 
             <div class="lg:col-start-3 lg:col-span-1">
                 <div class="shadow rounded-md overflow-hidden">
+
+                    {# Core attributes #}
                     <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                         {% include '_market/_includes/fields/slug.html' with {
                             element: product is defined ? product : null
@@ -158,6 +163,13 @@
                             element: product is defined ? product : null
                         } %}
 
+                        {# Available for purchase #}
+                        {% include '_market/_includes/fields/lightswitch.html' with {
+                            label: 'Available for purchase'|t('commerce'),
+                            attribute: 'availableForPurchase',
+                            element: product is defined ? product : null
+                        } %}
+
                         {# Enabled switch #}
                         {% include '_market/_includes/fields/lightswitch.html' with {
                             label: 'Enabled'|t('app'),
@@ -165,29 +177,128 @@
                             element: product is defined ? product : null
                         } %}
 
+                        {# NOTE: no free shipping or promotable here yet #}
+                    </div>
+
+                    <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
+
+                        {# Hidden input #}
+                        {# name="variants[new1][isDefault]" #}
+                        {# OR #}
+                        {# name="variants[variant.id][isDefault]" #}
+
+                        {# Variant props need these names #}
+                        {# variants[new1][sku] #}
+                        {# OR #}
+                        {# variants[variant.id][sku] #}
+                        <div>
+                            <label for="sku" class="block text-sm font-medium text-gray-700">
+                                {{ 'SKU'|t('commerce') }}
+                                <span class="text-red-600">*</span>
+                            </label>
+                            <div class="mt-1 flex rounded-md shadow-sm">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                                    {{ currentVendor.code }}-
+                                </span>
+                                <input type="text"
+                                       name="sku"
+                                       id="sku"
+                                       class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300"
+                                       placeholder="JOY-CARD-BLUE">
+                            </div>
+                        </div>
+
+                        {% set currentCurrency = craft.commerce.getPaymentCurrencies().primaryPaymentCurrency %}
+                        <div>
+                            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">
+                                        {{ craft.app.locale.getCurrencySymbol(currentCurrency.iso) }}
+                                    </span>
+                                </div>
+                                <input type="number"
+                                       name="price"
+                                       id="price"
+                                       class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                                       placeholder="0.00"
+                                       aria-describedby="price-currency">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm" id="price-currency">
+                                        {{ currentCurrency.iso }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         {#
-                            Custom fields
-                            - shipping profile
-                            - VAT included
-                            - personalised
-                            - allow notes
-
-                            Product fields
-                            - Free Shipping
-                            - Promotable
-                            - Available for purchase
-
                             Variant fields
-                            - SKU
-                            - Price
                             - Stock - number / unlimited
                             - Min / max qty
+                        #}
+                    </div>
 
-                            Meta
-                            - Date Created
-                            - Date Updated
-                            - Qty sold
 
+                    {% if sidebarFields %}
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                            {% for handle in sidebarFields %}
+                                {% set field = craft.app.getFields().getFieldByHandle(handle) %}
+                                {% if field %}
+                                    {% include '_market/_includes/field' with {
+                                        element: product is defined ? product : null
+                                    } %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="px-4 sm:px-0 {{ sidebarFields ? 'bg-gray-50' : 'bg-white' }}">
+
+                        <dl class="sm:divide-y sm:divide-gray-200">
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    {{ 'Date Created'|t('app') }}
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 ">
+                                    {{ product.dateCreated|datetime('short')|replace(',','') }}
+                                </dd>
+                            </div>
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    {{ 'Date Updated'|t('app') }}
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                    {{ product.dateUpdated|datetime('short')|replace(',','') }}
+                                </dd>
+                            </div>
+                            {# NOTE: This is not very performant ... #}
+                            {% set variantIds = product.variants|map(v => v.id) %}
+
+                            {% set orders = craft.orders()
+                                .isCompleted()
+                                .hasPurchasables(variantIds)
+                                .all() %}
+
+                            {% set numberSold = 0 %}
+
+                            {% for order in orders %}
+                                {% for lineItem in order.lineItems %}
+                                    {% if lineItem.snapshot.purchasableId in variantIds %}
+                                        {% set numberSold = numberSold + lineItem.qty %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    {{ 'Quantity Sold'|t('market') }}
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                    {{ numberSold }}
+                                </dd>
+                            </div>
+                        </dl>
+
+                        {#
                             Underneath panels
                             - Delete action
                         #}

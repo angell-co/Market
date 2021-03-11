@@ -46,4 +46,9 @@ class Settings extends Model
      */
     public $googleAnalyticsUA;
 
+    /**
+     * @var array
+     */
+    public $productSidebarFieldHandles = [];
+
 }
