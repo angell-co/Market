@@ -267,7 +267,7 @@
         htmx.trigger('#field-{{ _fieldId }}', 'refresh');
     });
 
-    // After uploading an asset we want to cancle the response handling because we can’t actually use it
+    // After uploading an asset we want to cancel the response handling because we can’t actually use it
     htmx.on('#field-{{ _fieldId }}-uploader', 'htmx:beforeOnLoad', function(evt) {
         evt.preventDefault();
         evt.stopPropagation();

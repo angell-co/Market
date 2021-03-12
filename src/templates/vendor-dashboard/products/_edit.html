@@ -52,12 +52,23 @@
         <pre>{{ dump(product.getErrors()) }}</pre>
     {% endif %}
 
-{#    {% dd(product.getFieldValue('vendor')) %}#}
+    {# TODO: the cmd+s shortcut here stops html validation from triggering #}
 
-    <form method="POST" class="py-6">
+    <form x-data="{
+              saveAndReload: '{{ ('market/products/'~productType.handle~'/{id}-{slug}')|hash }}',
+          }"
+          x-on:keydown.window.cmd.s.prevent="$refs.redirectInput.value = saveAndReload; $el.submit();"
+          method="POST"
+          class="py-6"
+    >
         {{ csrfInput() }}
         {{ actionInput('commerce/products/save-product') }}
-        {{ redirectInput('market/products') }}
+
+        <input type="hidden"
+               name="redirect"
+               value="{{ 'market/products'|hash }}"
+               x-ref="redirectInput"
+        >
         {{ hiddenInput('typeId', productType.id) }}
         {% if product is defined and product.id %}{{ hiddenInput('productId', product.id) }}{% endif %}
 

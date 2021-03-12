@@ -9,14 +9,12 @@
     {% set value = element.getFieldValue(field.handle) %}
     {% set selectedIds = value ? value.ids()|join(',') : '' %}
 
-    {# TODO: this is correct, always #}
-{#    <pre>Pre sprig: {{ dump(selectedIds) }}</pre>#}
 
     {{ sprig('_market/_components/assets/field', {
         _fieldId: field.id,
         _fieldHandle: field.handle,
         _fieldLimit: field.limit,
-        selectedIds: value.ids()|join(',')
+        _originalIds: selectedIds
     }, {
         id: 'field-'~field.id,
         class: 'field-assets'

@@ -2,40 +2,57 @@
  # Selected IDs will be always present, initially it will be whatever is stored in the field
  # It may be a comma separated string, so we need to split that into an array
  #}
-{# TODO: why is this coming pre-populated with the 2nd fields values?? #}
-{#<pre>{{ dump(selectedIds) }}</pre>#}
 
-{% if selectedIds is not iterable %}
-    {% set selectedIds = selectedIds is not empty ? selectedIds|split(',') : [] %}
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
 {% endif %}
 
-{#<pre>{{ dump(_fieldHandle) }}</pre>#}
-{#<pre>{{ dump(selectedIds) }}</pre>#}
+{% if not sprig.isRequest %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): _originalIds
+    }) %}
+{% endif %}
+
+{% if selectedIds[_fieldHandle] is not iterable %}
+    {% if selectedIds[_fieldHandle] is not empty %}
+        {% set selectedIds = selectedIds|merge({
+            (_fieldHandle): selectedIds[_fieldHandle]|split(',')
+        }) %}
+    {% else %}
+        {% set selectedIds = selectedIds|merge({
+            (_fieldHandle): []
+        }) %}
+    {% endif %}
+{% endif %}
 
 {# If the field values are submitted, then we need to process them first #}
 {% if fields is defined and fields[_fieldHandle] %}
     {% set combinedIds = fields[_fieldHandle] %}
 
-    {% for id in selectedIds %}
+    {% for id in selectedIds[_fieldHandle] %}
         {% if id not in combinedIds %}
             {% set combinedIds = combinedIds|push(id) %}
         {% endif %}
     {% endfor %}
 
-    {% set selectedIds = combinedIds %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): combinedIds
+    }) %}
 {% endif %}
 
 
 {# Process the removed ID if there is one #}
 {% if removedId is defined %}
-    {% set selectedIds = selectedIds|filter((v, k) => v != removedId) %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): selectedIds[_fieldHandle]|filter((v, k) => v != removedId)
+    }) %}
 {% endif %}
 
 
 {# Now we can fetch the assets #}
 {% set assets = [] %}
-{% if selectedIds %}
-    {% set assets = craft.assets.id(selectedIds).fixedOrder().all() %}
+{% if selectedIds[_fieldHandle] %}
+    {% set assets = craft.assets.id(selectedIds[_fieldHandle]).fixedOrder().all() %}
 {% endif %}
 
 
@@ -43,7 +60,7 @@
  # At this point we need to store them in a field as a string so we can update
  # this from the asset index child component and trigger a refresh
  #}
-{{ hiddenInput('selectedIds', selectedIds|join(','), {
+{{ hiddenInput('selectedIds['~_fieldHandle~']', selectedIds[_fieldHandle]|join(','), {
     id: 'field-'~_fieldId~'-selectedIds'
 }) }}
 
@@ -249,7 +266,7 @@
                                 {{ sprig('_market/_components/assets/field-index', {
                                     _fieldId: _fieldId,
                                     _fieldLimit: _fieldLimit,
-                                    selectedIds: selectedIds|join(','),
+                                    selectedIds: selectedIds[_fieldHandle]|join(','),
                                 }, {
                                     'id' : 'field-'~_fieldId~'-asset-index',
                                     'class' : 'flex flex-col h-full field-assets-index',
