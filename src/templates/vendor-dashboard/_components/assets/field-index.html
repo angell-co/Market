@@ -81,7 +81,7 @@
             {% for vendorAsset in vendorAssets %}
 
                 <li class="col-span-1 flex flex-col">
-                    <label for="field-{{ fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
+                    <label for="field-{{ _fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
                            class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50">
 
                         {# Image #}
@@ -96,8 +96,8 @@
                             <div class="flex items-start">
                                 <div class="h-5 flex items-center">
                                     <input sprig
-                                           id="field-{{ fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
-                                           name="field_{{ fieldId }}_asset_index_{{ vendorAsset.id }}"
+                                           id="field-{{ _fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
+                                           name="field_{{ _fieldId }}_asset_index_{{ vendorAsset.id }}"
                                            type="checkbox"
                                            value="{{ vendorAsset.id }}"
                                            s-val:page="{{ page }}"
@@ -109,7 +109,7 @@
                                            {% else %}
                                                s-val:selected-ids="{{ selectedIds|push(vendorAsset.id)|join(',') }}"
                                            {% endif %}
-                                           {% if selectedIds|length == fieldLimit and vendorAsset.id not in selectedIds %}disabled{% endif %}
+                                           {% if selectedIds|length == _fieldLimit and vendorAsset.id not in selectedIds %}disabled{% endif %}
                                            class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
                                     >
                                 </div>
@@ -199,7 +199,7 @@
     <div class="flex justify-between py-6 px-4 sm:px-6">
 
         {# Left half #}
-        <div id="field-{{ fieldId }}-uploader"
+        <div id="field-{{ _fieldId }}-uploader"
              hx-post="{{ actionUrl('assets/upload') }}"
              hx-trigger="change"
              hx-encoding="multipart/form-data"
@@ -210,7 +210,7 @@
             {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
 
             <div>
-                <label for="field-{{ fieldId }}-uploader-input"
+                <label for="field-{{ _fieldId }}-uploader-input"
                        class="block bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm cursor-pointer text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                     <span class="htmx-indicator h-3">
@@ -220,14 +220,14 @@
                         </svg>
                     </span>
                     <span>Upload a file</span>
-                    <input id="field-{{ fieldId }}-uploader-input" type="file" name="assets-upload" class="sr-only">
+                    <input id="field-{{ _fieldId }}-uploader-input" type="file" name="assets-upload" class="sr-only">
                 </label>
             </div>
 
             <div class="flex-1 ml-4 h-full items-center flex">
                 <div class="htmx-indicator h-3 relative w-full rounded-full overflow-hidden">
                     <div class="w-full h-full bg-gray-200 absolute"></div>
-                    <div id="field-{{ fieldId }}-uploader-progress" class="h-full bg-blue-500 relative w-0"></div>
+                    <div id="field-{{ _fieldId }}-uploader-progress" class="h-full bg-blue-500 relative w-0"></div>
                 </div>
             </div>
         </div>
@@ -244,7 +244,7 @@
                     s-val:selected-ids="{{ selectedIds|join(',') }}"
                     s-swap="none"
                     x-on:htmx:after-request="open = false"
-                    id="field-{{ fieldId }}-asset-index-save"
+                    id="field-{{ _fieldId }}-asset-index-save"
                     type="button"
                     class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
@@ -262,24 +262,24 @@
 
 <script>
     // Send the selected IDs to the parent component
-    htmx.on('#field-{{ fieldId }}-asset-index-save', 'htmx:afterRequest', function(evt) {
-        htmx.find('#field-{{ fieldId }}-selectedIds').value = "{{ selectedIds|join(',') }}";
-        htmx.trigger('#field-{{ fieldId }}', 'refresh');
+    htmx.on('#field-{{ _fieldId }}-asset-index-save', 'htmx:afterRequest', function(evt) {
+        htmx.find('#field-{{ _fieldId }}-selectedIds').value = "{{ selectedIds|join(',') }}";
+        htmx.trigger('#field-{{ _fieldId }}', 'refresh');
     });
 
     // After uploading an asset we want to cancle the response handling because we can’t actually use it
-    htmx.on('#field-{{ fieldId }}-uploader', 'htmx:beforeOnLoad', function(evt) {
+    htmx.on('#field-{{ _fieldId }}-uploader', 'htmx:beforeOnLoad', function(evt) {
         evt.preventDefault();
         evt.stopPropagation();
 
         // Then manually trigger a refresh of only the asset index
-        htmx.trigger('#field-{{ fieldId }}-asset-index', 'refresh');
+        htmx.trigger('#field-{{ _fieldId }}-asset-index', 'refresh');
         return false;
     });
 
     // Progress bar on upload
-    htmx.on('#field-{{ fieldId }}-uploader', 'htmx:xhr:progress', function(evt) {
+    htmx.on('#field-{{ _fieldId }}-uploader', 'htmx:xhr:progress', function(evt) {
         var percent = evt.detail.loaded/evt.detail.total * 100;
-        htmx.find('#field-{{ fieldId }}-uploader-progress').style.width = percent+'%';
+        htmx.find('#field-{{ _fieldId }}-uploader-progress').style.width = percent+'%';
     });
 </script>

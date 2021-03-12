@@ -3,14 +3,14 @@
  # It may be a comma separated string, so we need to split that into an array
  #}
 {# TODO: why is this coming pre-populated with the 2nd fields values?? #}
-<pre>{{ dump(selectedIds) }}</pre>
+{#<pre>{{ dump(selectedIds) }}</pre>#}
 
 {% if selectedIds is not iterable %}
     {% set selectedIds = selectedIds is not empty ? selectedIds|split(',') : [] %}
 {% endif %}
 
-<pre>{{ dump(_fieldHandle) }}</pre>
-<pre>{{ dump(selectedIds) }}</pre>
+{#<pre>{{ dump(_fieldHandle) }}</pre>#}
+{#<pre>{{ dump(selectedIds) }}</pre>#}
 
 {# If the field values are submitted, then we need to process them first #}
 {% if fields is defined and fields[_fieldHandle] %}
