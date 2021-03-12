@@ -2,14 +2,19 @@
  # Selected IDs will be always present, initially it will be whatever is stored in the field
  # It may be a comma separated string, so we need to split that into an array
  #}
+{# TODO: why is this coming pre-populated with the 2nd fields values?? #}
+<pre>{{ dump(selectedIds) }}</pre>
+
 {% if selectedIds is not iterable %}
-    {% set selectedIds = selectedIds|split(',') %}
+    {% set selectedIds = selectedIds is not empty ? selectedIds|split(',') : [] %}
 {% endif %}
 
+<pre>{{ dump(_fieldHandle) }}</pre>
+<pre>{{ dump(selectedIds) }}</pre>
 
 {# If the field values are submitted, then we need to process them first #}
-{% if fields is defined and fields[fieldHandle] %}
-    {% set combinedIds = fields[fieldHandle] %}
+{% if fields is defined and fields[_fieldHandle] %}
+    {% set combinedIds = fields[_fieldHandle] %}
 
     {% for id in selectedIds %}
         {% if id not in combinedIds %}
@@ -39,116 +44,115 @@
  # this from the asset index child component and trigger a refresh
  #}
 {{ hiddenInput('selectedIds', selectedIds|join(','), {
-    id: 'field-'~fieldId~'-selectedIds'
+    id: 'field-'~_fieldId~'-selectedIds'
 }) }}
 
 <div class="mt-1">
-    {# Output the selected assets #}
-{#    {% if assets %}#}
+    {##
+     # Output the selected assets
+     # Sortable is wired up here, we have swap the DOM so we submit the new order
+     #}
+    <ul id="field-{{ _fieldId }}-list"
+        class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"
+        sprig
+        s-trigger="end"
+    >
+        {% for asset in assets %}
+            <li x-data="{ visible: true, showOptions: false }" class="col-span-1 flex flex-col">
+                <div x-show="visible"
+                     x-transition:enter="ease-in-out duration-100"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="ease-in-out duration-100"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50"
+                >
 
-        {# Sortable is wired up here, we have swap the DOM so we submit the new order #}
-        <ul id="field-{{ fieldId }}-list"
-            class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"
-            sprig
-            s-trigger="end"
-        >
-            {% for asset in assets %}
-                <li x-data="{ visible: true, showOptions: false }" class="col-span-1 flex flex-col">
-                    <div x-show="visible"
-                         x-transition:enter="ease-in-out duration-100"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         x-transition:leave="ease-in-out duration-100"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50"
+                    {# Options menu #}
+                    <div x-on:keydown.window.escape="showOptions = false"
+                         x-on:click.away="showOptions = false"
+                         class="absolute top-2 right-2 z-10"
                     >
-
-                        {# Options menu #}
-                        <div x-on:keydown.window.escape="showOptions = false"
-                             x-on:click.away="showOptions = false"
-                             class="absolute top-2 right-2 z-10"
+                        <button x-on:click.prevent="showOptions = !showOptions"
+                                type="button"
+                                class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                id="asset-options-menu-{{ asset.id }}"
+                                aria-haspopup="true"
+                                x-bind:aria-expanded="showOptions"
                         >
-                            <button x-on:click.prevent="showOptions = !showOptions"
-                                    type="button"
-                                    class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
-                                    id="asset-options-menu-{{ asset.id }}"
-                                    aria-haspopup="true"
-                                    x-bind:aria-expanded="showOptions"
-                            >
-                                <span class="sr-only">Open options menu</span>
-                                <span class="flex items-center justify-center h-full w-full rounded-full">
-                                    {# Heroicon name: dots-vertical #}
-                                    <svg class="w-5 h-5 text-brand-400 group-hover:text-brand-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                            <span class="sr-only">Open options menu</span>
+                            <span class="flex items-center justify-center h-full w-full rounded-full">
+                                {# Heroicon name: dots-vertical #}
+                                <svg class="w-5 h-5 text-brand-400 group-hover:text-brand-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                </svg>
+                            </span>
+                        </button>
+
+                        <div x-show="showOptions"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="origin-top-right absolute z-10 top-10 right-0 w-30 xl:w-24 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+                             role="menu" aria-orientation="vertical" aria-labelledby="asset-options-menu-{{ asset.id }}"
+                        >
+                            <div class="py-1">
+                                <a href="{{ url('market/files/'~asset.id) }}" target="_blank" class="group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                    {# Heroicon name: eye #}
+                                    <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
                                     </svg>
-                                </span>
-                            </button>
-
-                            <div x-show="showOptions"
-                                 x-cloak
-                                 x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="origin-top-right absolute z-10 top-10 right-0 w-30 xl:w-24 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
-                                 role="menu" aria-orientation="vertical" aria-labelledby="asset-options-menu-{{ asset.id }}"
-                            >
-                                <div class="py-1">
-                                    <a href="{{ url('market/files/'~asset.id) }}" target="_blank" class="group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                        {# Heroicon name: eye #}
-                                        <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                                        </svg>
-                                        View
-                                    </a>
-                                </div>
-                                <div class="py-1">
-                                    <button sprig
-                                            s-val:removed-id="{{ asset.id }}"
-                                            s-swap="innerHTML settle:1s"
-                                            s-target="#field-{{ fieldId }}"
-                                            x-on:click="visible = false"
-                                            type="button"
-                                            class="w-full group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-red-700 hover:bg-red-100 hover:text-red-900"
-                                            role="menuitem"
-                                    >
-                                        {# Heroicon name: minus-circle #}
-                                        <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-red-400 group-hover:text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                                        </svg>
-                                        Remove
-                                    </button>
-                                </div>
+                                    View
+                                </a>
                             </div>
-                        </div>
-
-                        {# Image #}
-                        <div class="flex-1 flex flex-col">
-                            <div class="aspect-w-1 aspect-h-1">
-                                <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="{{ asset.title }}" />
-                            </div>
-                        </div>
-
-                        {# Title #}
-                        <div class="flex-1 flex flex-col p-2">
-                            <div class="text-sm truncate">
-                                <span class="font-medium text-gray-700">{{ asset.title }}</span>
+                            <div class="py-1">
+                                <button sprig
+                                        s-val:removed-id="{{ asset.id }}"
+                                        s-swap="innerHTML settle:1s"
+                                        s-target="#field-{{ _fieldId }}"
+                                        x-on:click="visible = false"
+                                        type="button"
+                                        class="w-full group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-red-700 hover:bg-red-100 hover:text-red-900"
+                                        role="menuitem"
+                                >
+                                    {# Heroicon name: minus-circle #}
+                                    <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-red-400 group-hover:text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                    Remove
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <input type="hidden"
-                           name="fields[{{ fieldHandle }}][]"
-                           value="{{ asset.id }}"
-                    >
-                </li>
-            {% endfor %}
-        </ul>
-{#    {% endif %}#}
+                    {# Image #}
+                    <div class="flex-1 flex flex-col">
+                        <div class="aspect-w-1 aspect-h-1">
+                            <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="{{ asset.title }}" />
+                        </div>
+                    </div>
+
+                    {# Title #}
+                    <div class="flex-1 flex flex-col p-2">
+                        <div class="text-sm truncate">
+                            <span class="font-medium text-gray-700">{{ asset.title }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden"
+                       name="fields[{{ _fieldHandle }}][]"
+                       value="{{ asset.id }}"
+                >
+            </li>
+        {% endfor %}
+    </ul>
 
     {# Asset browser #}
     <div x-data="{ open: false }">
@@ -157,7 +161,7 @@
         <div class="flex items-center mt-4">
 
             {# Button to trigger it if applicable #}
-            {% if fieldLimit > assets|length %}
+            {% if _fieldLimit > assets|length %}
                 <button type="button"
                         x-on:click.prevent="open = true"
                         class="mr-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -243,11 +247,11 @@
 
                                 {# Middle and footer #}
                                 {{ sprig('_market/_components/assets/field-index', {
-                                    fieldId: fieldId,
-                                    fieldLimit: fieldLimit,
+                                    _fieldId: _fieldId,
+                                    _fieldLimit: _fieldLimit,
                                     selectedIds: selectedIds|join(','),
                                 }, {
-                                    'id' : 'field-'~fieldId~'-asset-index',
+                                    'id' : 'field-'~_fieldId~'-asset-index',
                                     'class' : 'flex flex-col h-full field-assets-index',
                                 }) }}
                             </div>
@@ -262,7 +266,7 @@
 <script>
     // Sortable
     htmx.onLoad(function(content) {
-        var el = content.querySelector("#field-{{ fieldId }}-list");
+        var el = content.querySelector("#field-{{ _fieldId }}-list");
         if (el) {
             new Sortable(el, {
                 ghostClass: 'opacity-10'

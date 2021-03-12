@@ -4,13 +4,17 @@
         {% if field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
+    {{ hiddenInput('fields['~field.handle~']', '') }}
+
     {% set value = element.getFieldValue(field.handle) %}
+    {% set selectedIds = value ? value.ids()|join(',') : '' %}
+
+    <pre>{{ dump(selectedIds) }}</pre>
 
     {{ sprig('_market/_components/assets/field', {
-        fieldId: field.id,
-        fieldHandle: field.handle,
-        fieldLimit: field.limit,
-        elementId: element.id,
+        _fieldId: field.id,
+        _fieldHandle: field.handle,
+        _fieldLimit: field.limit,
         selectedIds: value.ids()|join(',')
     }, {
         id: 'field-'~field.id,

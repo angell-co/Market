@@ -8,6 +8,9 @@
     </label>
 
     <pre>{{ dump(value) }}</pre>
+
+    {{ hiddenInput('fields['~field.handle~']', '') }}
+
     {% for id in value %}
         <input type="hidden" name="fields[{{ field.handle }}][]" value="{{ id }}">
     {% endfor %}
