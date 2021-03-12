@@ -11,29 +11,33 @@
 
 {% if element %}
     {% if attribute is defined %}
-        {% set value = element[attribute] %}
+        {% set value = element[attribute] ? true : false %}
     {% else %}
-        {% set value = element.getFieldValue(field.handle) %}
+        {% set value = element.getFieldValue(field.handle) ? true : false %}
     {% endif %}
 {% endif %}
 
-<div>
+<div x-data="lightswitch()"
+     x-init="[initValue({{ value ? 'true' : 'false' }})]"
+     x-cloak
+>
     <label for="{{ id }}" class="block text-sm font-medium text-gray-700">
         {{ label }}
     </label>
     <div class="mt-1">
         <button type="button"
                 class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-gray-200"
-                x-data="{ on: {{ value ? 'true' : 'false' }} }"
                 aria-pressed="false"
                 :aria-pressed="on.toString()"
-                x-on:click="on = !on"
+                x-on:click="updateValue(on = !on)"
                 :class="{ 'bg-blue-600': on, 'bg-gray-200': !(on) }"
         >
             <input type="hidden"
                    id="{{ id }}"
                    name="{{ name }}"
-                   x-model="on">
+                   value="{{ value ? '1' : '' }}"
+                   x-ref="input"
+            >
             <span class="pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 translate-x-0" x-state:on="Enabled" x-state:off="Not Enabled" :class="{ 'translate-x-5': on, 'translate-x-0': !(on) }">
               <span class="absolute inset-0 h-full w-full flex items-center justify-center transition-opacity opacity-100 ease-in duration-200" aria-hidden="true" x-state:on="Enabled" x-state:off="Not Enabled" :class="{ 'opacity-0 ease-out duration-100': on, 'opacity-100 ease-in duration-200': !(on) }">
                 <svg class="bg-white h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
