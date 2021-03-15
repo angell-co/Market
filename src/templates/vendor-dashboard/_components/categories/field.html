@@ -25,28 +25,35 @@
     {% endif %}
 {% endif %}
 
+
+{# TODO: sort this #}
 {# If the field values are submitted, then we need to process them first #}
-{% if fields is defined and fields[_fieldHandle] %}
-    {% set combinedIds = fields[_fieldHandle] %}
+{#{% if fields is defined and fields[_fieldHandle] %}#}
+{#    {% set combinedIds = fields[_fieldHandle] %}#}
 
-    {% for id in selectedIds[_fieldHandle] %}
-        {% if id not in combinedIds %}
-            {% set combinedIds = combinedIds|push(id) %}
-        {% endif %}
-    {% endfor %}
+{#    {% for id in selectedIds[_fieldHandle] %}#}
+{#        {% if id not in combinedIds %}#}
+{#            {% set combinedIds = combinedIds|push(id) %}#}
+{#        {% endif %}#}
+{#    {% endfor %}#}
 
-    {% set selectedIds = selectedIds|merge({
-        (_fieldHandle): combinedIds
-    }) %}
-{% endif %}
+{#    {% set selectedIds = selectedIds|merge({#}
+{#        (_fieldHandle): combinedIds#}
+{#    }) %}#}
+{#{% endif %}#}
 
 
 {# Process the removed ID if there is one #}
 {% if removedId is defined %}
     {% set selectedIds = selectedIds|merge({
         (_fieldHandle): selectedIds[_fieldHandle]|filter((v, k) => v != removedId)
-        }) %}
+    }) %}
 {% endif %}
+
+
+{# TODO: current removed-id doesn’t remove the child if you remove the parent #}
+
+<pre>{{ dump(selectedIds) }}</pre>
 
 
 {# Now we can fetch the categories #}
@@ -213,6 +220,7 @@
                                 {{ sprig('_market/_components/categories/field-index', {
                                     _fieldId: _fieldId,
                                     _branchLimit: _branchLimit,
+                                    _groupUid: _groupUid,
                                     selectedIds: selectedIds[_fieldHandle]|join(','),
                                 }, {
                                     'id' : 'field-'~_fieldId~'-categories-index',

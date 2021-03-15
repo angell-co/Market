@@ -16,6 +16,7 @@
         _fieldId: field.id,
         _fieldHandle: field.handle,
         _branchLimit: field.branchLimit ?? null,
+        _groupUid: field.source|split('group:')[1],
         _originalIds: selectedIds
     }, {
         id: 'field-'~field.id,
