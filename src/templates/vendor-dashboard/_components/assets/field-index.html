@@ -81,7 +81,7 @@
             {% for vendorAsset in vendorAssets %}
 
                 <li class="col-span-1 flex flex-col">
-                    <label for="field-{{ _fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
+                    <label for="field-{{ _fieldId }}-assets-index-{{ vendorAsset.id }}-checkbox"
                            class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50">
 
                         {# Image #}
@@ -96,7 +96,7 @@
                             <div class="flex items-start">
                                 <div class="h-5 flex items-center">
                                     <input sprig
-                                           id="field-{{ _fieldId }}-asset-index-{{ vendorAsset.id }}-checkbox"
+                                           id="field-{{ _fieldId }}-assets-index-{{ vendorAsset.id }}-checkbox"
                                            name="field_{{ _fieldId }}_asset_index_{{ vendorAsset.id }}"
                                            type="checkbox"
                                            value="{{ vendorAsset.id }}"
@@ -244,7 +244,7 @@
                     s-val:selected-ids="{{ selectedIds|join(',') }}"
                     s-swap="none"
                     x-on:htmx:after-request="open = false"
-                    id="field-{{ _fieldId }}-asset-index-save"
+                    id="field-{{ _fieldId }}-assets-index-save"
                     type="button"
                     class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
@@ -262,7 +262,7 @@
 
 <script>
     // Send the selected IDs to the parent component
-    htmx.on('#field-{{ _fieldId }}-asset-index-save', 'htmx:afterRequest', function(evt) {
+    htmx.on('#field-{{ _fieldId }}-assets-index-save', 'htmx:afterRequest', function(evt) {
         htmx.find('#field-{{ _fieldId }}-selectedIds').value = "{{ selectedIds|join(',') }}";
         htmx.trigger('#field-{{ _fieldId }}', 'refresh');
     });
@@ -273,7 +273,7 @@
         evt.stopPropagation();
 
         // Then manually trigger a refresh of only the asset index
-        htmx.trigger('#field-{{ _fieldId }}-asset-index', 'refresh');
+        htmx.trigger('#field-{{ _fieldId }}-assets-index', 'refresh');
         return false;
     });
 

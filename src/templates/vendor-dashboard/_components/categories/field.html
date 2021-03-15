@@ -1,0 +1,228 @@
+{##
+ # Selected IDs will be always present, initially it will be whatever is stored in the field
+ # It may be a comma separated string, so we need to split that into an array
+ #}
+
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+{% if not sprig.isRequest %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): _originalIds
+    }) %}
+{% endif %}
+
+{% if selectedIds[_fieldHandle] is not iterable %}
+    {% if selectedIds[_fieldHandle] is not empty %}
+        {% set selectedIds = selectedIds|merge({
+            (_fieldHandle): selectedIds[_fieldHandle]|split(',')
+        }) %}
+    {% else %}
+        {% set selectedIds = selectedIds|merge({
+            (_fieldHandle): []
+        }) %}
+    {% endif %}
+{% endif %}
+
+{# If the field values are submitted, then we need to process them first #}
+{% if fields is defined and fields[_fieldHandle] %}
+    {% set combinedIds = fields[_fieldHandle] %}
+
+    {% for id in selectedIds[_fieldHandle] %}
+        {% if id not in combinedIds %}
+            {% set combinedIds = combinedIds|push(id) %}
+        {% endif %}
+    {% endfor %}
+
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): combinedIds
+    }) %}
+{% endif %}
+
+
+{# Process the removed ID if there is one #}
+{% if removedId is defined %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): selectedIds[_fieldHandle]|filter((v, k) => v != removedId)
+        }) %}
+{% endif %}
+
+
+{# Now we can fetch the categories #}
+{% set categories = [] %}
+{% if selectedIds[_fieldHandle] %}
+    {# TODO: multi-site #}
+    {% set categories = craft.categories.id(selectedIds[_fieldHandle]).fixedOrder().all() %}
+
+    {# TODO: check this! #}
+
+    {# Fill in the gaps #}
+    {% do craft.app.getStructures().fillGapsInElements(categories) %}
+
+    {# Enforce the branch limit #}
+    {% do craft.app.getStructures().fillGapsInElements(categories) %}
+    {% if _branchLimit %}
+        {% do craft.app.getStructures().applyBranchLimitToElements(categories, _branchLimit) %}
+    {% endif %}
+{% endif %}
+
+
+{##
+ # At this point we need to store them in a field as a string so we can update
+ # this from the asset index child component and trigger a refresh
+ #}
+{{ hiddenInput('selectedIds['~_fieldHandle~']', selectedIds[_fieldHandle]|join(','), {
+    id: 'field-'~_fieldId~'-selectedIds'
+}) }}
+
+<div class="mt-1">
+    {# Output the selected categories #}
+    <ul id="field-{{ _fieldId }}-list"
+        class="mt-1"
+    >
+        {% nav category in categories %}
+            <li x-data="{ visible: true }"
+                class="mb-1"
+            >
+                <div x-show="visible"
+                     x-transition:enter="ease-in-out duration-100"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="ease-in-out duration-100"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                >
+                    <input type="hidden" name="fields[{{ _fieldHandle }}][]" value="{{ category.id }}">
+                    <span class="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white">
+                        {{ category.title }}
+                        <button sprig
+                                s-val:removed-id="{{ category.id }}"
+                                s-swap="innerHTML settle:1s"
+                                s-target="#field-{{ _fieldId }}"
+                                x-on:click="visible = false"
+                                type="button"
+                                class="flex-shrink-0 ml-0.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-500 focus:outline-none focus:bg-gray-500 focus:text-white"
+                        >
+                            <svg class="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+                              <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7" />
+                            </svg>
+                        </button>
+                    </span>
+
+                    <input type="hidden"
+                           name="fields[{{ _fieldHandle }}][]"
+                           value="{{ category.id }}"
+                    >
+                </div>
+
+                {% ifchildren %}
+                    <ul class="mt-1 mb-4 ml-{{ category.level * 5 }}">
+                        {% children %}
+                    </ul>
+                {% endifchildren %}
+            </li>
+        {% endnav %}
+    </ul>
+
+    {# Category browser #}
+    <div x-data="{ open: false }">
+
+        {# Button and spinner #}
+        <div class="flex items-center mt-4">
+
+            {# Button to trigger it #}
+            <button type="button"
+                    x-on:click.prevent="open = true"
+                    class="mr-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+                {# Heroicon name: plus-circle #}
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+                Add a category
+            </button>
+
+            <span class="htmx-indicator text-gray-500">
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                    <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                </svg>
+            </span>
+
+        </div>
+
+        {# The actual category browser / index #}
+        <div x-show="open"
+             x-cloak
+        >
+            <div class="fixed inset-0 overflow-hidden z-60">
+                <div class="absolute inset-0 overflow-hidden">
+
+                    {# Overlay #}
+                    <div x-transition:enter="ease-in-out duration-500"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in-out duration-500"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                         aria-hidden="true"
+                         x-show="open"
+                    ></div>
+
+                    {# Panel #}
+                    <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="slide-over-heading">
+                        <div class="w-screen max-w-2xl"
+                             x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+                             x-transition:enter-start="translate-x-full"
+                             x-transition:enter-end="translate-x-0"
+                             x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
+                             x-transition:leave-start="translate-x-0"
+                             x-transition:leave-end="translate-x-full"
+                             x-on:keydown.window.escape="open = false"
+                             x-on:click.away="open = false"
+                             x-show="open"
+                        >
+                            <div class="flex flex-col h-full bg-white shadow-xl overflow-hidden">
+
+                                {# Panel header #}
+                                <div class="flex-shrink-0 justify-start shadow-xl">
+                                    <div class="py-6 px-4 bg-brand-700 sm:px-6 w-full">
+                                        <div class="flex items-center justify-between">
+                                            <h2 id="slide-over-heading" class="text-lg font-medium text-white">
+                                                Add a category
+                                            </h2>
+                                            <div class="ml-3 h-7 flex items-center">
+                                                <button type="button"
+                                                        class="bg-brand-700 rounded-md text-brand-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                                        x-on:click.prevent="open = false"
+                                                >
+                                                    <span class="sr-only">Close panel</span>
+                                                    {# Heroicon name: outline/x #}
+                                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Middle and footer #}
+                                {{ sprig('_market/_components/categories/field-index', {
+                                    _fieldId: _fieldId,
+                                    _branchLimit: _branchLimit,
+                                    selectedIds: selectedIds[_fieldHandle]|join(','),
+                                }, {
+                                    'id' : 'field-'~_fieldId~'-categories-index',
+                                    'class' : 'flex flex-col h-full field-categories-index',
+                                }) }}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

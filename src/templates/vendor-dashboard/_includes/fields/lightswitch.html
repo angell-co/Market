@@ -53,6 +53,6 @@
         </button>
     </div>
     {% if field is defined and field.instructions %}
-        <p class="mt-2 text-sm text-gray-500">{{ field.instructions }}</p>
+        <p class="mt-2 text-sm text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
     {% endif %}
 </div>
