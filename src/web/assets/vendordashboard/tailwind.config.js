@@ -24,6 +24,13 @@ module.exports = {
       screens: {
         'smh': {'raw': '(min-height: 560px)'},
       },
+      spacing: {
+        '112': '28rem',
+      },
+      zIndex: {
+        '60': 60,
+        '70': 70,
+      }
     },
   },
   variants: {

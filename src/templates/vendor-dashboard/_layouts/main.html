@@ -265,8 +265,13 @@
             </div>
         </div>
     </div>
+
     <div class="flex flex-col w-0 flex-1 overflow-hidden">
-        <div class="relative z-30 flex-shrink-0 flex h-16 bg-white {{ extendHeader ? 'border-b' : 'shadow' }}">
+
+        {# Fixed header bar #}
+        <div class="relative z-50 flex-shrink-0 flex h-16 bg-white {{ extendHeader ? 'border-b' : 'shadow' }}">
+
+            {# Sidebar burger button #}
             <button class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 md:hidden">
                 <span class="sr-only">Open sidebar</span>
                 {# Heroicon name: menu-alt-2 #}
@@ -275,6 +280,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                 </svg>
             </button>
+
+            {# Breadcrumbs #}
             <div class="flex-1 px-4 flex justify-between">
 
                 {% if breadcrumbs is defined %}
@@ -320,6 +327,7 @@
                     <div class="flex-1 flex"></div>
                 {% endif %}
 
+                {# Right hand side of fixed header #}
                 <div class="ml-4 flex items-center md:ml-6">
                     {#                        <button class="relative bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">#}
                     {#                            <span class="sr-only">View notifications</span>#}
@@ -412,9 +420,12 @@
             </div>
         </div>
 
+        {# Main content area #}
         <main class="flex-1 relative overflow-y-auto focus:outline-none" tabindex="0">
+            {% include '_market/_layouts/_flashes.html' %}
+
             {% block content %}
-                <div class="py-6">
+                <div class="py-4 sm:py-6 md:py-8">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         {% block header %}
                             <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{{ title }}</h1>
@@ -428,5 +439,6 @@
         </main>
     </div>
 </div>
+
 
 {% include '_market/_layouts/_bottom.html' %}
