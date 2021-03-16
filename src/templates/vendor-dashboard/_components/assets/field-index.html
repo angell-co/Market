@@ -15,7 +15,7 @@
 
 
 {# Run the queries for the actual display of the index #}
-{% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
+{% set currentVendor = market.vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
 {% set sort = sort ?? 'dateCreated desc' %}
 {% set query = query ?? '' %}

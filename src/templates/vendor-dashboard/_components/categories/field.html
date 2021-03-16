@@ -59,15 +59,15 @@
 {% set categories = [] %}
 {% if selectedIds[_fieldHandle] %}
     {# TODO: multi-site #}
-    {% set categories = craft.categories.id(selectedIds[_fieldHandle]).fixedOrder().all() %}
+    {% set categories = craft.categories.id(selectedIds[_fieldHandle]).anyStatus().all() %}
 
-    {# Fill in the gaps #}
-    {% do craft.app.getStructures().fillGapsInElements(categories) %}
+    {# Enforce branch limit #}
+    {% set categories = market.prepStructuredElementsForField(categories, _branchLimit) %}
 
-    {# Enforce the branch limit #}
-    {% if _branchLimit %}
-        {% do craft.app.getStructures().applyBranchLimitToElements(categories, _branchLimit) %}
-    {% endif %}
+    {# Write over the selectedIds var with the prepared categories #}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): categories|map(c => c.id)
+    }) %}
 {% endif %}
 
 

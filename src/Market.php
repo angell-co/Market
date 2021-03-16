@@ -82,13 +82,17 @@ class Market extends Plugin
         $this->_installGlobalEventListeners();
 
         $request = Craft::$app->getRequest();
-        if ($request->getIsConsoleRequest()) {
-            //
-        } else if ($request->getIsCpRequest()) {
-            $this->_registerCpRoutes();
 
-        } else {
-            $this->_registerSiteRoutes();
+//        if ($request->getIsConsoleRequest()) {
+//
+//        }
+
+        if ($request->getIsCpRequest()) {
+            $this->_registerCpRoutes();
+        }
+
+        if ($request->getIsSiteRequest()) {
+            $this->_installSiteEventListeners();
         }
 
     }

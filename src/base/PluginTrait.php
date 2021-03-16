@@ -13,11 +13,13 @@ namespace angellco\market\base;
 use angellco\market\elements\Vendor;
 use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
+use angellco\market\Market;
 use angellco\market\services\ShippingDestinations;
 use angellco\market\services\ShippingProfiles;
 use angellco\market\services\StripeSettings;
 use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
+use angellco\market\web\twig\MarketExtension;
 use Craft;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -171,6 +173,12 @@ trait PluginTrait
                 $event->roots['_market'] = __DIR__ . '/../templates/vendor-dashboard';
             }
         );
+    }
+
+    private function _installSiteEventListeners(): void
+    {
+        Craft::$app->view->registerTwigExtension(new MarketExtension());
+        $this->_registerSiteRoutes();
     }
 
     private function _registerSiteRoutes(): void

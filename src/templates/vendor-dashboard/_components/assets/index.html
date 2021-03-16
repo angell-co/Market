@@ -1,4 +1,4 @@
-{% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
+{% set currentVendor = market.vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
 {% set sort = sort ?? 'dateCreated desc' %}
 {% set limit = limit ?? 36 %}

@@ -1,7 +1,8 @@
 {# @var craft \craft\web\twig\variables\CraftVariable #}
+{# @var market \angellco\market\web\twig\MarketVariable #}
 
 {# TODO: permissions #}
-{% set currentVendor = craft.app.plugins.getPlugin('market').vendors.getCurrentVendor() %}
+{% set currentVendor = market.vendors.getCurrentVendor() %}
 {% if not currentVendor %}
     {% redirect url('market/login') %}
 {% endif %}
