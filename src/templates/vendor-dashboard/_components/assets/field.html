@@ -25,18 +25,18 @@
     {% endif %}
 {% endif %}
 
-{# If the field values are submitted, then we need to process them first #}
+{# If the field values are submitted, then we need to use them to sort the selectedIds by #}
 {% if fields is defined and fields[_fieldHandle] %}
-    {% set combinedIds = fields[_fieldHandle] %}
+    {% set sortedIds = [] %}
 
-    {% for id in selectedIds[_fieldHandle] %}
-        {% if id not in combinedIds %}
-            {% set combinedIds = combinedIds|push(id) %}
+    {% for id in fields[_fieldHandle] %}
+        {% if id in selectedIds[_fieldHandle] %}
+            {% set sortedIds = sortedIds|push(id) %}
         {% endif %}
     {% endfor %}
 
     {% set selectedIds = selectedIds|merge({
-        (_fieldHandle): combinedIds
+        (_fieldHandle): sortedIds
     }) %}
 {% endif %}
 
@@ -266,7 +266,8 @@
                                 {{ sprig('_market/_components/assets/field-index', {
                                     _fieldId: _fieldId,
                                     _fieldLimit: _fieldLimit,
-                                    selectedIds: selectedIds[_fieldHandle]|join(','),
+                                    _fieldHandle: _fieldHandle,
+                                    _originalIds: selectedIds[_fieldHandle]|join(','),
                                 }, {
                                     'id' : 'field-'~_fieldId~'-assets-index',
                                     'class' : 'flex flex-col h-full field-assets-index',

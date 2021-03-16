@@ -26,7 +26,6 @@
 {% endif %}
 
 
-{# TODO: sort this #}
 {# If the field values are submitted, then we need to process them first #}
 {% if fields is defined and fields[_fieldHandle] %}
     {% set combinedIds = fields[_fieldHandle] %}
@@ -128,7 +127,7 @@
     </ul>
 
     {# Category browser #}
-    <div x-data="{ open: false }">
+    <div x-data="categoryField()">
 
         {# Button and spinner #}
         <div class="flex items-center mt-4">

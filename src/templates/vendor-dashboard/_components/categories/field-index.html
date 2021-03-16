@@ -1,66 +1,9 @@
-{% if selectedIds is not defined %}
-    {% set selectedIds = [] %}
-{% endif %}
-
-
-{# Handle original ids param which is from the initial page load #}
-{% if not sprig.isRequest %}
-    {% set selectedIds = _originalIds %}
-{% endif %}
-
-
-{# Grab the ids from parent context #}
-{% if selectedIds[_fieldHandle] is defined and selectedIds[_fieldHandle] is not empty %}
-    {% set selectedIds = selectedIds[_fieldHandle] %}
-{% endif %}
-
-
-{# Convert to array #}
-{% if selectedIds is not iterable %}
-    {% set selectedIds = selectedIds|split(',') %}
-{% endif %}
-
-
-{# Filter out duplicates and empties #}
-{% set selectedIds = selectedIds|filter|unique %}
-
-
-{# Process the removed ID if there is one #}
-{% if removedId is defined %}
-    {% set removedCat = craft.categories.id(removedId).one() %}
-    {% set childIds = removedCat.children.ids() %}
-    {% set filterIds = childIds|push(removedCat.id) %}
-    {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
-{% endif %}
-
-
-{# Enforce branch limit etc #}
-{# TODO: multi-site #}
-{% set selectedCats = craft.categories.id(selectedIds).anyStatus().all() %}
-{% set selectedCats = market.prepStructuredElementsForField(selectedCats, _branchLimit) %}
-{% set preppedSelectedIds = selectedCats|map(c => c.id) %}
-{% set error = null %}
-{% if selectedIds|length > preppedSelectedIds|length %}
-    {% set error = 'Limit reached, please deselect some categories first.' %}
-{% endif %}
-{% set selectedIds = preppedSelectedIds %}
-
-
-{# Run the queries for the actual display of the index #}
+{# Prep search params #}
 {% set query = query ?? '' %}
 
-{% set group = craft.app.getCategories().getGroupByUid(_groupUid) %}
-
-{% set categoriesQuery = craft.categories
-    .groupId(group.id)
-    .limit(null)
-    .search(query)
-%}
-
-{% set categories = categoriesQuery.all() %}
 
 {# Panel middle #}
-<div class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
+<div id="field-{{ _fieldId }}-categories-index-container" class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
 
     {# Search #}
     <div class="mb-4">
@@ -84,7 +27,67 @@
     </div>
 
     {# Results #}
-    <div id="field-{{ _fieldId }}-categories-index-results">
+    <div id="field-{{ _fieldId }}-categories-index-results" class="relative">
+        {% if selectedIds is not defined %}
+            {% set selectedIds = [] %}
+        {% endif %}
+
+
+        {# Handle original ids param which is from the initial page load #}
+        {% if not sprig.isRequest %}
+            {% set selectedIds = _originalIds %}
+        {% endif %}
+
+
+        {# Grab the ids from parent context #}
+        {% if selectedIds[_fieldHandle] is defined and selectedIds[_fieldHandle] is not empty %}
+            {% set selectedIds = selectedIds[_fieldHandle] %}
+        {% endif %}
+
+
+        {# Convert to array #}
+        {% if selectedIds is not iterable %}
+            {% set selectedIds = selectedIds|split(',') %}
+        {% endif %}
+
+
+        {# Filter out duplicates and empties #}
+        {% set selectedIds = selectedIds|filter|unique %}
+
+
+        {# Process the removed ID if there is one #}
+        {% if removedId is defined %}
+            {% set removedCat = craft.categories.id(removedId).one() %}
+            {% set childIds = removedCat.children.ids() %}
+            {% set filterIds = childIds|push(removedCat.id) %}
+            {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
+        {% endif %}
+
+        {# Enforce branch limit etc #}
+        {# TODO: multi-site #}
+        {% set selectedCats = craft.categories.id(selectedIds).anyStatus().all() %}
+        {% set selectedCats = market.prepStructuredElementsForField(selectedCats, _branchLimit) %}
+        {% set preppedSelectedIds = selectedCats|map(c => c.id) %}
+        {% set limitError = false %}
+        {% if selectedIds|length > preppedSelectedIds|length %}
+            {% set limitError = true %}
+        {% endif %}
+        {% set selectedIds = preppedSelectedIds %}
+
+
+        {# Run the queries for the actual display of the index #}
+        {% set group = craft.app.getCategories().getGroupByUid(_groupUid) %}
+
+        {% set categoriesQuery = craft.categories
+            .groupId(group.id)
+            .limit(null)
+            .search(query)
+        %}
+
+        {% set categories = categoriesQuery.all() %}
+
+
+        {# And display #}
         {% if categories %}
 
             {# Results list #}
@@ -92,6 +95,10 @@
                 {% nav category in categories %}
                     <li class="mb-1">
                         <button sprig
+                                {# TODO: track the scroll var here on window and then on refresh re-scroll #}
+                                {# TODO: do the same for assets #}
+                                {# TODO: also move it to the categoryFields js file and do same for assets #}
+                                x-on:htmx:before-request="console.log(document.getElementById('field-{{ _fieldId }}-categories-index-container').scrollTop)"
                                 {% if category.id in selectedIds %}
                                     {% set childIds = category.children.ids() %}
                                     {% set filterIds = childIds|push(category.id) %}
@@ -158,36 +165,78 @@
                 </div>
             </div>
         {% endif %}
+
+        {% if limitError %}
+            <div class="fixed z-30 top-16 right-0 w-96 flex flex-col space-y-4 sm:space-y-6 items-end justify-center p-4 sm:p-6 pointer-events-none">
+                <div x-data="{ show: true, pointerActive: false }"
+                     x-init="() => { setTimeout(() => show = false, 5000) }"
+                     x-show="show || pointerActive"
+                     x-cloak
+                     x-on:mouseenter="pointerActive = true"
+                     x-transition:enter="transform ease-out duration-300 transition"
+                     x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                     x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+                >
+                    <div class="p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                {# Heroicon name: outline/x-circle #}
+                                <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-3 w-0 flex-1 pt-0.5">
+                                <p class="text-sm font-medium text-gray-900">
+                                    Limit reached
+                                </p>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Please deselect some categories before adding more
+                                </p>
+                                <div class="mt-2">
+                                    <button sprig
+                                            s-replace="#field-{{ _fieldId }}-categories-index-results"
+                                            s-val:selected-ids=""
+                                            type="button"
+                                            class="bg-white rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        Clear selection
+                                    </button>
+                                    <button type="button"
+                                            x-on:click.prevent="show = false; pointerActive = false"
+                                            class="ml-6 bg-white rounded-md text-sm font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        Dismiss
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 flex">
+                                <button type="button"
+                                        x-on:click.prevent="show = false; pointerActive = false"
+                                        class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    <span class="sr-only">Close</span>
+                                    {# Heroicon name: solid/x #}
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
     </div>
 </div>
 
 {# Panel footer #}
-<div class="flex-none {{ error ? 'h-48 sm:h-44 md:h-40' : 'h-40' }} border-t">
-
-    <div class="flex justify-between items-center py-6 px-4 sm:px-6">
-
-        {# Left half #}
-        <div class="flex-1">
-            {% if error %}
-
-                <div class="rounded-md bg-red-50 p-2">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            {# Heroicon name: solid/x-circle #}
-                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-red-800">
-                                {{ error }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-
+<div class="flex-none h-40 border-t">
+    <div class="flex justify-end items-center py-6 px-4 sm:px-6">
         {# Right half #}
         <div>
             <button x-on:click.prevent="open = false"
@@ -199,7 +248,7 @@
             <button sprig
                     s-val:selected-ids="{{ selectedIds|join(',') }}"
                     s-swap="none"
-                    x-on:htmx:after-request="open = false"
+                    x-on:htmx:after-request="open = false; refreshParent('{{ _fieldId }}', '{{ selectedIds|join(',') }}')"
                     id="field-{{ _fieldId }}-categories-index-save"
                     type="button"
                     class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -210,6 +259,7 @@
                         <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
                     </svg>
                 </span>
+                {{ selectedIds|join(',') }}
                 Save
             </button>
         </div>
@@ -217,9 +267,7 @@
 </div>
 
 <script>
-    // Send the selected IDs to the parent component
-    htmx.on('#field-{{ _fieldId }}-categories-index-save', 'htmx:afterRequest', function(evt) {
-        htmx.find('#field-{{ _fieldId }}-selectedIds').value = "{{ selectedIds|join(',') }}";
-        htmx.trigger('#field-{{ _fieldId }}', 'refresh');
+    document.getElementById('field-{{ _fieldId }}-categories-index-results').addEventListener('scroll', function(){
+        console.log('scroll!');
     });
 </script>
