@@ -1,17 +1,49 @@
-{# This will likely come in as a comma separated string, so we need to split that into an array #}
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+
+{# Handle original ids param which is from the initial page load #}
+{% if not sprig.isRequest %}
+    {% set selectedIds = _originalIds %}
+{% endif %}
+
+
+{# Grab the ids from parent context #}
+{% if selectedIds[_fieldHandle] is defined and selectedIds[_fieldHandle] is not empty %}
+    {% set selectedIds = selectedIds[_fieldHandle] %}
+{% endif %}
+
+
+{# Convert to array #}
 {% if selectedIds is not iterable %}
     {% set selectedIds = selectedIds|split(',') %}
 {% endif %}
 
 
+{# Filter out duplicates and empties #}
+{% set selectedIds = selectedIds|filter|unique %}
+
+
 {# Process the removed ID if there is one #}
 {% if removedId is defined %}
-    {% set selectedIds = selectedIds|filter((v, k) => v != removedId) %}
+    {% set removedCat = craft.categories.id(removedId).one() %}
+    {% set childIds = removedCat.children.ids() %}
+    {% set filterIds = childIds|push(removedCat.id) %}
+    {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
 {% endif %}
 
 
-{# Filter out empties #}
-{% set selectedIds = selectedIds|filter %}
+{# Enforce branch limit etc #}
+{# TODO: multi-site #}
+{% set selectedCats = craft.categories.id(selectedIds).anyStatus().all() %}
+{% set selectedCats = market.prepStructuredElementsForField(selectedCats, _branchLimit) %}
+{% set preppedSelectedIds = selectedCats|map(c => c.id) %}
+{% set error = null %}
+{% if selectedIds|length > preppedSelectedIds|length %}
+    {% set error = 'Limit reached, please deselect some categories first.' %}
+{% endif %}
+{% set selectedIds = preppedSelectedIds %}
 
 
 {# Run the queries for the actual display of the index #}
@@ -70,14 +102,16 @@
                                     s-val:selected-ids="{{ selectedIds|push(addIds)|join(',') }}"
                                 {% endif %}
                                 type="button"
-                                {# TODO: focus ring #}
-                                class="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                class="group inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
                         >
                             {{ category.title }}
 
                             {% if category.id in selectedIds %}
-                                <svg class="flex-shrink-0 ml-0.5 h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <svg class="group-hover:hidden group-focus:hidden flex-shrink-0 ml-0.5 h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <svg class="hidden group-hover:block group-focus:block flex-shrink-0 ml-0.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
                             {% endif %}
                         </button>
@@ -128,9 +162,31 @@
 </div>
 
 {# Panel footer #}
-<div class="flex-none h-40 border-t">
+<div class="flex-none {{ error ? 'h-48 sm:h-44 md:h-40' : 'h-40' }} border-t">
 
-    <div class="flex justify-end py-6 px-4 sm:px-6">
+    <div class="flex justify-between items-center py-6 px-4 sm:px-6">
+
+        {# Left half #}
+        <div class="flex-1">
+            {% if error %}
+
+                <div class="rounded-md bg-red-50 p-2">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {# Heroicon name: solid/x-circle #}
+                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                {{ error }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
 
         {# Right half #}
         <div>

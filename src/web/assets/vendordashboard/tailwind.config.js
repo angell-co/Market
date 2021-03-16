@@ -2,9 +2,9 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  purge: {
-    content: ['../../../templates/vendor-dashboard/**/*.html'],
-  },
+  purge: [
+    '../../../templates/vendor-dashboard/**/*.html'
+  ],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
@@ -34,7 +34,9 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      display: ['group-hover', 'group-focus'],
+    },
   },
   plugins: [
     require('@tailwindcss/aspect-ratio'),

@@ -28,19 +28,19 @@
 
 {# TODO: sort this #}
 {# If the field values are submitted, then we need to process them first #}
-{#{% if fields is defined and fields[_fieldHandle] %}#}
-{#    {% set combinedIds = fields[_fieldHandle] %}#}
+{% if fields is defined and fields[_fieldHandle] %}
+    {% set combinedIds = fields[_fieldHandle] %}
 
-{#    {% for id in selectedIds[_fieldHandle] %}#}
-{#        {% if id not in combinedIds %}#}
-{#            {% set combinedIds = combinedIds|push(id) %}#}
-{#        {% endif %}#}
-{#    {% endfor %}#}
+    {% for id in selectedIds[_fieldHandle] %}
+        {% if id not in combinedIds %}
+            {% set combinedIds = combinedIds|push(id) %}
+        {% endif %}
+    {% endfor %}
 
-{#    {% set selectedIds = selectedIds|merge({#}
-{#        (_fieldHandle): combinedIds#}
-{#    }) %}#}
-{#{% endif %}#}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): combinedIds
+    }) %}
+{% endif %}
 
 
 {# Process the removed ID if there is one #}
@@ -214,9 +214,10 @@
                                 {# Middle and footer #}
                                 {{ sprig('_market/_components/categories/field-index', {
                                     _fieldId: _fieldId,
+                                    _fieldHandle: _fieldHandle,
                                     _branchLimit: _branchLimit,
                                     _groupUid: _groupUid,
-                                    selectedIds: selectedIds[_fieldHandle]|join(','),
+                                    _originalIds: selectedIds[_fieldHandle]|join(','),
                                 }, {
                                     'id' : 'field-'~_fieldId~'-categories-index',
                                     'class' : 'flex flex-col h-full field-categories-index',
