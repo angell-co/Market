@@ -1,6 +1,64 @@
-{# Prep search params #}
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+
+{# Handle original ids param which is from the initial page load #}
+{% if not sprig.isRequest %}
+    {% set selectedIds = _originalIds %}
+{% endif %}
+
+
+{# Grab the ids from parent context #}
+{% if selectedIds[_fieldHandle] is defined and selectedIds[_fieldHandle] is not empty %}
+    {% set selectedIds = selectedIds[_fieldHandle] %}
+{% endif %}
+
+
+{# Convert to array #}
+{% if selectedIds is not iterable %}
+    {% set selectedIds = selectedIds|split(',') %}
+{% endif %}
+
+
+{# Filter out duplicates and empties #}
+{% set selectedIds = selectedIds|filter|unique %}
+
+
+{# Process the removed ID if there is one #}
+{% if removedId is defined %}
+    {% set removedCat = craft.categories.id(removedId).one() %}
+    {% set childIds = removedCat.children.ids() %}
+    {% set filterIds = childIds|push(removedCat.id) %}
+    {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
+{% endif %}
+
+
+{# Enforce branch limit etc #}
+{# TODO: multi-site #}
+{% set selectedCats = craft.categories.id(selectedIds).anyStatus().all() %}
+{% set selectedCats = market.prepStructuredElementsForField(selectedCats, _branchLimit) %}
+{% set preppedSelectedIds = selectedCats|map(c => c.id) %}
+{% set limitError = false %}
+{% if selectedIds|length > preppedSelectedIds|length %}
+    {% set limitError = true %}
+{% endif %}
+{% set selectedIds = preppedSelectedIds %}
+
+
+{# Run the queries for the actual display of the index #}
+{% set group = craft.app.getCategories().getGroupByUid(_groupUid) %}
+
 {% set query = query ?? '' %}
 
+{# TODO: multi-site #}
+{% set categoriesQuery = craft.categories
+    .groupId(group.id)
+    .limit(null)
+    .search(query)
+%}
+
+{% set categories = categoriesQuery.all() %}
 
 {# Panel middle #}
 <div id="field-{{ _fieldId }}-categories-index-container" class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
@@ -18,6 +76,7 @@
             <input sprig
                    s-trigger="keyup changed delay:250ms"
                    s-replace="#field-{{ _fieldId }}-categories-index-results"
+                   s-val:selected-ids="{{ selectedIds|join(',') }}"
                    type="text" name="query" id="query"
                    class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
                    placeholder="Search categories"
@@ -28,63 +87,6 @@
 
     {# Results #}
     <div id="field-{{ _fieldId }}-categories-index-results" class="relative">
-        {% if selectedIds is not defined %}
-            {% set selectedIds = [] %}
-        {% endif %}
-
-
-        {# Handle original ids param which is from the initial page load #}
-        {% if not sprig.isRequest %}
-            {% set selectedIds = _originalIds %}
-        {% endif %}
-
-
-        {# Grab the ids from parent context #}
-        {% if selectedIds[_fieldHandle] is defined and selectedIds[_fieldHandle] is not empty %}
-            {% set selectedIds = selectedIds[_fieldHandle] %}
-        {% endif %}
-
-
-        {# Convert to array #}
-        {% if selectedIds is not iterable %}
-            {% set selectedIds = selectedIds|split(',') %}
-        {% endif %}
-
-
-        {# Filter out duplicates and empties #}
-        {% set selectedIds = selectedIds|filter|unique %}
-
-
-        {# Process the removed ID if there is one #}
-        {% if removedId is defined %}
-            {% set removedCat = craft.categories.id(removedId).one() %}
-            {% set childIds = removedCat.children.ids() %}
-            {% set filterIds = childIds|push(removedCat.id) %}
-            {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
-        {% endif %}
-
-        {# Enforce branch limit etc #}
-        {# TODO: multi-site #}
-        {% set selectedCats = craft.categories.id(selectedIds).anyStatus().all() %}
-        {% set selectedCats = market.prepStructuredElementsForField(selectedCats, _branchLimit) %}
-        {% set preppedSelectedIds = selectedCats|map(c => c.id) %}
-        {% set limitError = false %}
-        {% if selectedIds|length > preppedSelectedIds|length %}
-            {% set limitError = true %}
-        {% endif %}
-        {% set selectedIds = preppedSelectedIds %}
-
-
-        {# Run the queries for the actual display of the index #}
-        {% set group = craft.app.getCategories().getGroupByUid(_groupUid) %}
-
-        {% set categoriesQuery = craft.categories
-            .groupId(group.id)
-            .limit(null)
-            .search(query)
-        %}
-
-        {% set categories = categoriesQuery.all() %}
 
 
         {# And display #}
@@ -95,10 +97,7 @@
                 {% nav category in categories %}
                     <li class="mb-1">
                         <button sprig
-                                {# TODO: track the scroll var here on window and then on refresh re-scroll #}
-                                {# TODO: do the same for assets #}
-                                {# TODO: also move it to the categoryFields js file and do same for assets #}
-                                x-on:htmx:before-request="console.log(document.getElementById('field-{{ _fieldId }}-categories-index-container').scrollTop)"
+                                x-on:htmx:before-request="trackScroll"
                                 {% if category.id in selectedIds %}
                                     {% set childIds = category.children.ids() %}
                                     {% set filterIds = childIds|push(category.id) %}
@@ -109,7 +108,7 @@
                                     s-val:selected-ids="{{ selectedIds|push(addIds)|join(',') }}"
                                 {% endif %}
                                 type="button"
-                                class="group inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                class="category-toggle group inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
                         >
                             {{ category.title }}
 
@@ -154,6 +153,7 @@
                             <div class="-mx-2 -my-1.5 flex">
                                 <button sprig
                                         s-val:query=""
+                                        s-val:selected-ids="{{ selectedIds|join(',') }}"
                                         type="button"
                                         class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600"
                                 >
@@ -248,7 +248,7 @@
             <button sprig
                     s-val:selected-ids="{{ selectedIds|join(',') }}"
                     s-swap="none"
-                    x-on:htmx:after-request="open = false; refreshParent('{{ _fieldId }}', '{{ selectedIds|join(',') }}')"
+                    x-on:htmx:after-request="onSave('{{ selectedIds|join(',') }}')"
                     id="field-{{ _fieldId }}-categories-index-save"
                     type="button"
                     class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -259,15 +259,8 @@
                         <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
                     </svg>
                 </span>
-                {{ selectedIds|join(',') }}
                 Save
             </button>
         </div>
     </div>
 </div>
-
-<script>
-    document.getElementById('field-{{ _fieldId }}-categories-index-results').addEventListener('scroll', function(){
-        console.log('scroll!');
-    });
-</script>

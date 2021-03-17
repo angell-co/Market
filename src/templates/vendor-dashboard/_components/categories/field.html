@@ -127,7 +127,8 @@
     </ul>
 
     {# Category browser #}
-    <div x-data="categoryField()">
+    <div x-data="categoryField()"
+         x-init="initField('{{ _fieldId }}')">
 
         {# Button and spinner #}
         <div class="flex items-center mt-4">
@@ -220,6 +221,7 @@
                                 }, {
                                     'id' : 'field-'~_fieldId~'-categories-index',
                                     'class' : 'flex flex-col h-full field-categories-index',
+                                    'x-on:htmx:after-swap' : 'applyScroll'
                                 }) }}
                             </div>
                         </div>
