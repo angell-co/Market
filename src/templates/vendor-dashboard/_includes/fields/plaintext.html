@@ -1,5 +1,6 @@
 {% set value = '' %}
 {% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
+{% set errors = element.getErrors(field.handle) %}
 
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
@@ -7,8 +8,12 @@
         {% if field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
-    <div class="mt-1 relative" x-data="{
-        value: '{{ value }}',
+    {% if field.instructions %}
+        <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
+    {% endif %}
+
+    <div class="mt-2 relative rounded-md shadow-sm" x-data="{
+        value: '{{ value|e('js') }}',
         limit: {{ field.charLimit }},
         get remaining() {
             return this.limit - this.value.length
@@ -22,24 +27,42 @@
             <textarea id="field-{{ field.id }}"
                       name="fields[{{ field.handle }}]"
                       rows="{{ field.initialRows }}"
-                      class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md resize-none"
+                      class="mt-1 block w-full shadow-sm sm:text-sm rounded-md resize-none {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
                       placeholder="{{ field.placeholder }}"
                       x-model="value"
                       x-init="resize($event)"
                       x-on:input="resize($event)"
             ></textarea>
+
+            {% if errors %}
+                <div class="absolute top-0 right-0 pt-3 pr-3 flex items-center pointer-events-none">
+                    {# Heroicon name: solid/exclamation-circle #}
+                    <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            {% endif %}
         {% else %}
             <input type="text"
                    id="field-{{ field.id }}"
                    name="fields[{{ field.handle }}]"
                    x-model="value"
                    {% if field.required %}required{% endif %}
-                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                   class="mt-1 block w-full shadow-sm sm:text-sm rounded-md {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
             >
+
+            {% if errors %}
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    {# Heroicon name: solid/exclamation-circle #}
+                    <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            {% endif %}
         {% endif %}
 
         {% if field.charLimit %}
-            <span class="absolute bottom-1 right-1 block text-sm"
+            <span class="absolute bottom-1 right-1.5 block text-sm"
                   :class="{
                       'text-red-600': remaining < 0,
                       'text-gray-500': remaining >= 0
@@ -49,7 +72,7 @@
         {% endif %}
     </div>
 
-    {% if field.instructions %}
-        <p class="mt-2 text-sm text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
-    {% endif %}
+    {% for error in errors %}
+        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
 </div>

@@ -30,6 +30,10 @@ module.exports = {
       zIndex: {
         '60': 60,
         '70': 70,
+      },
+      ringOffsetWidth: {
+        '12': '12px',
+        '16': '16px',
       }
     },
   },

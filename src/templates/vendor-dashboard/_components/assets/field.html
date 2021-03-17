@@ -25,6 +25,7 @@
     {% endif %}
 {% endif %}
 
+
 {# If the field values are submitted, then we need to use them to sort the selectedIds by #}
 {% if fields is defined and fields[_fieldHandle] %}
     {% set sortedIds = [] %}
@@ -36,7 +37,7 @@
     {% endfor %}
 
     {% set selectedIds = selectedIds|merge({
-        (_fieldHandle): sortedIds
+        (_fieldHandle): sortedIds|merge(selectedIds[_fieldHandle])|filter|unique
     }) %}
 {% endif %}
 
@@ -64,7 +65,7 @@
     id: 'field-'~_fieldId~'-selectedIds'
 }) }}
 
-<div class="mt-1">
+<div class="mt-2">
     {##
      # Output the selected assets
      # Sortable is wired up here, we have swap the DOM so we submit the new order

@@ -47,11 +47,6 @@
 
 {% block content %}
 
-    {# TODO: ERRORROORRROORS #}
-    {% if product.getErrors() %}
-        <pre>{{ dump(product.getErrors()) }}</pre>
-    {% endif %}
-
     {# TODO: the cmd+s shortcut here stops html validation from triggering #}
 
     <form x-data="{
