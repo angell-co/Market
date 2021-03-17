@@ -26,13 +26,13 @@
         {% if field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
-    <div class="mt-1">
+    {% if field.instructions %}
+        <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
+    {% endif %}
+
+    <div class="mt-2">
         <textarea id="field-{{ field.id }}" name="fields[{{ field.handle }}]">
             {{ value|e }}
         </textarea>
     </div>
-
-    {% if field.instructions %}
-        <p class="mt-2 text-sm text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
-    {% endif %}
 </div>

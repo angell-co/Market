@@ -93,6 +93,32 @@
         {# Main #}
         {% set fl = productType.getFieldLayout() %}
         {% set tabs = fl.getTabs() %}
+        {% set tabErrors = [] %}
+
+        {% set tabContent %}
+            {% for tab in tabs %}
+                <div x-show="tab === '{{ tab.name|kebab }}'"
+                     x-cloak
+                     id="{{ tab.name|kebab }}"
+                     class="shadow rounded-md overflow-hidden"
+                >
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {% for element in tab.elements %}
+                            {% if product is defined and product.getErrors(element.attribute) %}
+                                {% set tabErrors = tabErrors|merge([tab.id]) %}
+                            {% endif %}
+
+                            {% include '_market/_includes/fld-element' with {
+                                uielement: element,
+                                element: product is defined ? product : null,
+                                excludedFieldHandles: sidebarFields
+                            } only %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endset %}
+
         <div x-data="{tab: window.location.hash ? window.location.hash.substring(1) : '{{ (tabs|first).name|kebab }}'}"
              class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-4 grid grid-cols-1 gap-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
         >
@@ -107,7 +133,10 @@
                         {% for tab in tabs  %}
                             <option value="{{ tab.name|kebab }}"
                                     :selected="tab === '{{ tab.name|kebab }}'"
-                            >{{ tab.name }}</option>
+                            >
+                                {{ tab.name }}
+                                {% if tab.id in tabErrors %}⚠{% endif %}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -116,16 +145,18 @@
                 <div class="hidden sm:block">
                     <nav class="flex space-x-4" aria-label="Tabs">
                         {% for tab in tabs %}
-                            {# TODO: focus ring #}
                             <a href="#{{ tab.name|kebab }}"
                                x-on:click.prevent="tab = '{{ tab.name|kebab }}'; window.location.hash = '{{ tab.name|kebab }}'"
-                               class="px-3 py-2 font-medium text-sm rounded-md"
+                               class="px-3 py-2 font-medium text-sm rounded-md relative"
                                :class="{
-                                       'text-gray-500 hover:text-gray-700': tab !== '{{ tab.name|kebab }}',
-                                       'bg-brand-600 text-white': tab === '{{ tab.name|kebab }}'
-                                   }"
+                                   'bg-gray-100 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-600': tab !== '{{ tab.name|kebab }}',
+                                   'bg-brand-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-600': tab === '{{ tab.name|kebab }}'
+                               }"
                             >
                                 {{ tab.name }}
+                                {% if tab.id in tabErrors %}
+                                    <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                {% endif %}
                             </a>
                         {% endfor %}
                     </nav>
@@ -135,23 +166,7 @@
 
             <div class="lg:col-start-1 lg:col-span-2">
                 {# Tab content #}
-                {% for tab in tabs  %}
-                    <div x-show="tab === '{{ tab.name|kebab }}'"
-                         x-cloak
-                         id="{{ tab.name|kebab }}"
-                         class="shadow rounded-md overflow-hidden"
-                    >
-                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
-                            {% for element in tab.elements %}
-                                {% include '_market/_includes/fld-element' with {
-                                    uielement: element,
-                                    element: product is defined ? product : null,
-                                    excludedFieldHandles: sidebarFields
-                                } only %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
+                {{ tabContent }}
             </div>
 
             <div class="lg:col-start-3 lg:col-span-1">

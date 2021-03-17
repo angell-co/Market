@@ -7,6 +7,10 @@
         {% if field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
+    {% if field.instructions %}
+        <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
+    {% endif %}
+
     {{ hiddenInput('fields['~field.handle~']', '') }}
 
     {% set value = element.getFieldValue(field.handle) %}
@@ -22,8 +26,4 @@
         id: 'field-'~field.id,
         class: 'field-categories'
     }) }}
-
-    {% if field.instructions %}
-        <p class="mt-2 text-sm text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
-    {% endif %}
 </div>
