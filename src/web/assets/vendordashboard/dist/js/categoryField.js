@@ -1,6 +1,7 @@
 if (typeof Market === 'undefined') {
     var Market = {
-        categoryFields: {}
+        categoryFields: {},
+        assetFields: {}
     };
 }
 

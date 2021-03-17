@@ -34,6 +34,7 @@ class VendorDashboardAsset extends AssetBundle
         $this->js[] = 'js/lightswitch.js';
         $this->js[] = 'js/timepicker.js';
         $this->js[] = 'js/datepicker.js';
+        $this->js[] = 'js/assetField.js';
         $this->js[] = 'js/categoryField.js';
 
         parent::init();

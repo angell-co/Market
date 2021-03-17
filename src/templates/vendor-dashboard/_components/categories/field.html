@@ -128,7 +128,8 @@
 
     {# Category browser #}
     <div x-data="categoryField()"
-         x-init="initField('{{ _fieldId }}')">
+         x-init="initField('{{ _fieldId }}')"
+    >
 
         {# Button and spinner #}
         <div class="flex items-center mt-4">
@@ -174,7 +175,7 @@
                     ></div>
 
                     {# Panel #}
-                    <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="slide-over-heading">
+                    <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="field-{{ _fieldId }}-slide-over-heading">
                         <div class="w-screen max-w-2xl"
                              x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
                              x-transition:enter-start="translate-x-full"
@@ -192,7 +193,7 @@
                                 <div class="flex-shrink-0 justify-start shadow-xl">
                                     <div class="py-6 px-4 bg-brand-700 sm:px-6 w-full">
                                         <div class="flex items-center justify-between">
-                                            <h2 id="slide-over-heading" class="text-lg font-medium text-white">
+                                            <h2 id="field-{{ _fieldId }}-slide-over-heading" class="text-lg font-medium text-white">
                                                 Add a category
                                             </h2>
                                             <div class="ml-3 h-7 flex items-center">

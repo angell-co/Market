@@ -150,13 +150,22 @@
 
                     {# Image #}
                     <div class="flex-1 flex flex-col">
-                        <div class="aspect-w-1 aspect-h-1">
-                            <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="{{ asset.title }}" />
+                        <div class="aspect-w-1 aspect-h-1 relative">
+                            {% if asset.kind == 'image' %}
+                                <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="{{ asset.title }}" />
+                            {% else %}
+                                <div class="object-cover">
+                                    <svg class="text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    <div class="absolute top-1/2 right-1/2 h-7 w-12 -mt-3.5 -mr-6 text-gray-400 text-lg font-bold text-center">{{ asset.extension|upper }}</div>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
 
                     {# Title #}
-                    <div class="flex-1 flex flex-col p-2">
+                    <div class="flex-1 flex flex-col p-2 border-t">
                         <div class="text-sm truncate">
                             <span class="font-medium text-gray-700">{{ asset.title }}</span>
                         </div>
@@ -172,7 +181,9 @@
     </ul>
 
     {# Asset browser #}
-    <div x-data="{ open: false }">
+    <div x-data="assetField()"
+         x-init="initField('{{ _fieldId }}')"
+    >
 
         {# Button and spinner#}
         <div class="flex items-center mt-4">
@@ -220,7 +231,7 @@
                     ></div>
 
                     {# Panel #}
-                    <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="slide-over-heading">
+                    <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="field-{{ _fieldId }}-slide-over-heading">
                         <div class="w-screen max-w-2xl"
                              x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
                              x-transition:enter-start="translate-x-full"
@@ -238,7 +249,7 @@
                                 <div class="flex-shrink-0 justify-start shadow-xl">
                                     <div class="py-6 px-4 bg-brand-700 sm:px-6 w-full">
                                         <div class="flex items-center justify-between">
-                                            <h2 id="slide-over-heading" class="text-lg font-medium text-white">
+                                            <h2 id="field-{{ _fieldId }}-slide-over-heading" class="text-lg font-medium text-white">
                                                 Add a file
                                             </h2>
                                             <div class="ml-3 h-7 flex items-center">
@@ -256,7 +267,7 @@
                                         </div>
                                         <div class="mt-1">
                                             <p class="text-sm text-brand-300">
-                                                Choose a file, or upload a new one right here.
+                                                Choose a file from your library or upload a new one.
                                             </p>
                                         </div>
                                     </div>
@@ -271,6 +282,7 @@
                                 }, {
                                     'id' : 'field-'~_fieldId~'-assets-index',
                                     'class' : 'flex flex-col h-full field-assets-index',
+                                    'x-on:htmx:after-swap' : 'applyScroll'
                                 }) }}
                             </div>
                         </div>
