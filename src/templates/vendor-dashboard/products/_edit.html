@@ -47,8 +47,6 @@
 
 {% block content %}
 
-    {# TODO: the cmd+s shortcut here stops html validation from triggering #}
-
     <form x-data="{
               saveAndReload: '{{ ('market/products/'~productType.handle~'/{id}-{slug}')|hash }}',
           }"
@@ -219,28 +217,12 @@
                         <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
 
                             {# SKU #}
-                            <div>
-                                {{ hiddenInput('variants['~variantKey~'][isDefault]', 1) }}
-
-                                <label for="sku" class="block text-sm font-medium text-gray-700">
-                                    {{ 'SKU'|t('commerce') }}
-                                    <span class="text-red-600">*</span>
-                                </label>
-                                <div class="mt-1 flex rounded-md shadow-sm">
-                                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                                        {{ currentVendor.code }}-
-                                    </span>
-                                    {# TODO: hook up with alpine to submit via hidden field with prefix enforced #}
-                                    <input type="text"
-                                           id="sku"
-                                           name="variants[{{ variantKey }}][sku]"
-                                           value="{{ variant ? variant.sku : '' }}"
-                                           class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300"
-                                           placeholder="JOY-CARD-BLUE"
-                                           required
-                                    >
-                                </div>
-                            </div>
+                            {% include '_market/_includes/fields/sku.html' with {
+                                variantKey: variantKey,
+                                prefix: currentVendor.code~'-',
+                                value: variant ? variant.sku : '',
+                                errors: variant.getErrors('sku')
+                            } %}
 
                             {# Price #}
                             {% include '_market/_includes/fields/price.html' with {
