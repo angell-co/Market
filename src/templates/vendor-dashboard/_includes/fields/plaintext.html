@@ -14,7 +14,7 @@
 
     <div class="mt-2 relative rounded-md shadow-sm"
          x-data="textField()"
-         {% if field.multiline %}x-init="initField('{{ field.id }}', '{{ value|e('js') }}', '{{ field.charLimit }}', '{{ field.multiline }}')"{% endif %}
+         {% if field.multiline %}x-init="initField('{{ field.id }}', '{{ value|e('js') }}', '{{ field.charLimit }}', {{ field.multiline ? 'true' : 'false' }})"{% endif %}
     >
         {% if field.multiline %}
             <textarea id="field-{{ field.id }}"
