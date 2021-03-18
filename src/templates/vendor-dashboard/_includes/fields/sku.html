@@ -9,8 +9,6 @@
         <span class="text-red-600">*</span>
     </label>
 
-    {# Doesn’t validate if sub-field is empty ... #}
-
     <div x-data="skuField()"
          x-init="initField('{{ prefix }}', '{{ value|replace(prefix, '') }}')"
          class="mt-1 flex relative rounded-md shadow-sm"
@@ -18,12 +16,13 @@
         <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
             {{ prefix }}
         </span>
-        {# TODO: hook up with alpine to submit via hidden field with prefix enforced #}
+
         <input type="hidden"
                name="variants[{{ variantKey }}][sku]"
                value="{{ value }}"
                x-ref="input"
         >
+
         <input type="text"
                id="sku"
                value="{{ value|replace(prefix, '') }}"
@@ -32,6 +31,7 @@
                class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md sm:text-sm {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
                placeholder="JOY-CARD-BLUE"
         >
+
         {% if errors %}
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 {# Heroicon name: solid/exclamation-circle #}
