@@ -5,7 +5,7 @@
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
         {{ field.name }}
-        {% if field.required %} <span class="text-red-600">*</span>{% endif %}
+        {% if field.required %}<span class="text-red-600">*</span>{% endif %}
     </label>
 
     {% if field.instructions %}
@@ -41,7 +41,6 @@
                    id="field-{{ field.id }}"
                    name="fields[{{ field.handle }}]"
                    x-model="value"
-                   {% if field.required %}required{% endif %}
                    class="mt-1 block w-full shadow-sm sm:text-sm rounded-md {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
             >
 
