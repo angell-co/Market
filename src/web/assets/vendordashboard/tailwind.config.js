@@ -10,7 +10,19 @@ module.exports = {
     extend: {
       colors: {
         brand: colors.teal,
-        blue: colors.indigo,
+        action: colors.fuchsia,
+        // brand: {
+        //   50: '#f1d4da',
+        //   100: '#f3cad2',
+        //   200: '#f5bcc7',
+        //   300: '#f3a2b3',
+        //   400: '#f194a8',
+        //   500: '#F0869D',
+        //   600: '#ef7590',
+        //   700: '#ef6584',
+        //   800: '#ef597b',
+        //   900: '#f14d72',
+        // },
         red: colors.rose,
         green: colors.emerald,
         orange: colors.orange,

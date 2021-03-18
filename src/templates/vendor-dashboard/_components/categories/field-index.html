@@ -215,7 +215,7 @@
                             <div class="ml-4 flex-shrink-0 flex">
                                 <button type="button"
                                         x-on:click.prevent="show = false; pointerActive = false"
-                                        class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                                 >
                                     <span class="sr-only">Close</span>
                                     {# Heroicon name: solid/x #}
@@ -240,7 +240,7 @@
         <div>
             <button x-on:click.prevent="open = false"
                     type="button"
-                    class="ml-4 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    class="ml-4 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
             >
                 Cancel
             </button>
@@ -250,7 +250,7 @@
                     x-on:htmx:after-request="onSave('{{ selectedIds|join(',') }}')"
                     id="field-{{ _fieldId }}-categories-index-save"
                     type="button"
-                    class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
             >
                 <span class="htmx-indicator h-3">
                     <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">

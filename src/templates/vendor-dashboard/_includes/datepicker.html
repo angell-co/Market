@@ -27,12 +27,12 @@
                x-on:click="showDatepicker = !showDatepicker"
                x-on:keydown.escape="showDatepicker = false"
                placeholder="Select date"
-               class="focus:ring-blue-500 focus:border-blue-500 block w-full px-10 sm:text-sm border-gray-300 rounded-md"
+               class="focus:ring-action-500 focus:border-action-500 block w-full px-10 sm:text-sm border-gray-300 rounded-md"
         >
         <div class="absolute inset-y-0 right-0 flex items-center">
             <button x-on:click="clearDateValue()"
                     type="button"
-                    class="focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 focus:border-blue-500 h-full w-9 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
+                    class="focus:outline-none focus:ring-2 focus:ring-inset focus:ring-action-500 focus:border-action-500 h-full w-9 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
             >
                 {# Heroicon name: x #}
                 <svg class="mx-auto h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -87,9 +87,9 @@
                         <button type="button"
                                 x-on:click="getDateValue(date)"
                                 x-text="date"
-                                class="w-full h-full cursor-pointer text-center text-sm border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:bg-blue-500 focus:text-white"
+                                class="w-full h-full cursor-pointer text-center text-sm border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 focus:bg-action-500 focus:text-white"
                                 :class="{
-                                    'bg-blue-500 text-white': isSelectedDate(date) == true,
+                                    'bg-action-500 text-white': isSelectedDate(date) == true,
                                     'text-gray-700 hover:bg-gray-200 ring-2 ring-offset-2 ring-gray-200': isToday(date) == true && isSelectedDate(date) == false,
                                     'text-gray-700 hover:bg-gray-200': isToday(date) == false && isSelectedDate(date) == false
                                 }"

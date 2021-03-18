@@ -6,7 +6,7 @@
 
 {% set statusMap = {
     green: 'bg-green-100 text-green-800',
-    blue: 'bg-blue-100 text-blue-800',
+    action: 'bg-action-100 text-action-800',
     pink: 'bg-pink-100 text-pink-800',
     default: 'bg-gray-100 text-gray-800',
 } %}
@@ -165,7 +165,7 @@
 
                     {# If stripe is not connected, help them #}
                     {% if not currentVendor.stripeUserId %}
-                        <a href="{{ url('market/settings/payments') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <a href="{{ url('market/settings/payments') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500">
                             {{ 'Setup Payments'|t('market') }}
                         </a>
                     {% else %}
@@ -178,7 +178,7 @@
                         >
                             <div>
                                 <button x-on:click="open = !open"
-                                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                                         id="new-product-menu" aria-haspopup="true" x-bind:aria-expanded="true"
                                 >
                                     {# Heroicon name: plus #}
@@ -245,7 +245,7 @@
                         </div>
                         <div class="bg-gray-50 px-5 py-3">
                             <div class="text-sm">
-                                <a href="{{ url('market/orders', {status: 'new'}) }}" class="font-medium text-blue-700 hover:text-blue-900">
+                                <a href="{{ url('market/orders', {status: 'new'}) }}" class="font-medium text-action-700 hover:text-action-900">
                                     {{ 'View all'|t('market') }}
                                 </a>
                             </div>
@@ -294,7 +294,7 @@
                         </div>
                         <div class="bg-gray-50 px-5 py-3">
                             <div class="flex items-center">
-                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-blue-700 hover:text-blue-900">
+                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-action-700 hover:text-action-900">
                                     {{ 'View all'|t('market') }}
                                 </a>
                                 <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
@@ -344,7 +344,7 @@
                         </div>
                         <div class="bg-gray-50 px-5 py-3">
                             <div class="flex items-center">
-                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-blue-700 hover:text-blue-900">
+                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-action-700 hover:text-action-900">
                                     {{ 'View all'|t('market') }}
                                 </a>
                                 <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
@@ -391,7 +391,7 @@
                     </ul>
                     <div class="bg-gray-50 px-5 py-3 border-t">
                         <div class="text-sm">
-                            <a href="{{ url('market/orders') }}" class="font-medium text-blue-700 hover:text-blue-900">
+                            <a href="{{ url('market/orders') }}" class="font-medium text-action-700 hover:text-action-900">
                                 {{ 'View all'|t('market') }}
                             </a>
                         </div>
@@ -428,7 +428,7 @@
                                         {% set billingAddress = order.billingAddress %}
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="{{ url('market/orders/'~order.id) }}" class="text-blue-600 hover:text-blue-900">{{ order.reference }}</a>
+                                                <a href="{{ url('market/orders/'~order.id) }}" class="text-action-600 hover:text-action-900">{{ order.reference }}</a>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900">
@@ -455,7 +455,7 @@
                                 </table>
                                 <div class="bg-gray-50 px-5 py-3 border-t">
                                     <div class="text-sm">
-                                        <a href="{{ url('market/orders') }}" class="font-medium text-blue-700 hover:text-blue-900">
+                                        <a href="{{ url('market/orders') }}" class="font-medium text-action-700 hover:text-action-900">
                                             {{ 'View all'|t('market') }}
                                         </a>
                                     </div>

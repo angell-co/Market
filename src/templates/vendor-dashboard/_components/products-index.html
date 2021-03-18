@@ -49,7 +49,7 @@
             >
                 <div>
                     <button x-on:click="open = !open"
-                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
+                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
                             id="new-product-menu" aria-haspopup="true" x-bind:aria-expanded="true"
                     >
                         {# Heroicon name: plus #}
@@ -235,7 +235,7 @@
                                 {% for product in products %}
                                     <tr>
                                         <td class="px-6 py-4 max-w-xs text-sm font-medium">
-                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-blue-600 hover:text-blue-900">{{ product.title }}</a>
+                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-action-600 hover:text-action-900">{{ product.title }}</a>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[product.status] }}">

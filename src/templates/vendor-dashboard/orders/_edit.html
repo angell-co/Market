@@ -23,14 +23,14 @@
 
 {% set statusMap = {
     green: 'bg-green-200 text-green-800',
-    blue: 'bg-blue-200 text-blue-800',
+    action: 'bg-action-200 text-action-800',
     pink: 'bg-pink-200 text-pink-800',
     default: 'bg-gray-200 text-gray-800',
 } %}
 
 {% set statusOptionMap = {
     green: 'text-green-700 hover:bg-green-100 hover:text-green-900',
-    blue: 'text-blue-700 hover:bg-blue-100 hover:text-blue-900',
+    action: 'text-action-700 hover:bg-action-100 hover:text-action-900',
     pink: 'text-pink-700 hover:bg-pink-100 hover:text-pink-900',
     default: 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
 } %}
@@ -186,7 +186,7 @@
                                 {{ 'Customer'|t('market') }}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 truncate">
-                                <a href="mailto:{{ order.email }}" class="text-blue-600 hover:text-blue-900">{{ order.email }}</a>
+                                <a href="mailto:{{ order.email }}" class="text-action-600 hover:text-action-900">{{ order.email }}</a>
                             </dd>
                         </div>
                     </dl>
@@ -252,7 +252,7 @@
                                     <td class="px-6 py-4 max-w-xs text-sm font-medium text-gray-900">
                                         {% if item.purchasable.product is defined  %}
                                             {% set product = item.purchasable.product %}
-                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-blue-600 hover:text-blue-900">{{ product.title }}</a>
+                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-action-600 hover:text-action-900">{{ product.title }}</a>
                                         {% else %}
                                             {{ item.description }}
                                         {% endif %}

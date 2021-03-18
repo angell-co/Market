@@ -77,7 +77,7 @@
                 {# Actions #}
                 <div class="mt-5 flex lg:mt-0 lg:ml-4">
                     {# Save #}
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500">
                         {# Heroicon name: save #}
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
@@ -176,7 +176,9 @@
                         {% include '_market/_includes/fields/slug.html' with {
                             element: product is defined ? product : null
                         } %}
-                        {# TODO: link to page on site #}
+                        {% if product is defined and product.enabled %}
+                            {{ product.getUrl() }}
+                        {% endif %}
 
                         {% include '_market/_includes/fields/datetime.html' with {
                             label: 'Post Date'|t('app'),
@@ -253,7 +255,7 @@
                                            id="minQty"
                                            name="variants[{{ variantKey }}][minQty]"
                                            value="{{ variant ? variant.minQty : '' }}"
-                                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                     >
                                 </div>
 
@@ -268,7 +270,7 @@
                                            id="maxQty"
                                            name="variants[{{ variantKey }}][maxQty]"
                                            value="{{ variant ? variant.maxQty : '' }}"
-                                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                     >
                                 </div>
 
@@ -336,7 +338,7 @@
                             </div>
                         </dl>
 
-                        {#
+                        {# TODO
                             Underneath panels
                             - Delete action
                         #}

@@ -22,7 +22,7 @@
             {# New shipping profile #}
             <div class="relative inline-block text-left">
                 <div>
-                    <a href="{{ url('market/shipping/new') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
+                    <a href="{{ url('market/shipping/new') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500">
                         {# Heroicon name: plus #}
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -59,7 +59,7 @@
                             {% for profile in profiles %}
                                 <tr>
                                     <td class="px-6 py-4 max-w-xs text-sm font-medium">
-                                        <a href="{{ url('market/shipping/'~profile.id) }}" class="text-blue-600 hover:text-blue-900">{{ profile.name }}</a>
+                                        <a href="{{ url('market/shipping/'~profile.id) }}" class="text-action-600 hover:text-action-900">{{ profile.name }}</a>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ profile.getProcessingTimeLabel() }}
