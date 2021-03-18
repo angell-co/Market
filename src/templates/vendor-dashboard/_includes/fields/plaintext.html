@@ -12,26 +12,9 @@
         <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
     {% endif %}
 
-    {# TODO: when tabs load with this field hidden the height is mucked up #}
-
     <div class="mt-2 relative rounded-md shadow-sm"
-         x-data="{
-             value: '{{ value|e('js') }}',
-             limit: {{ field.charLimit }},
-             get remaining() {
-                 return this.limit - this.value.length
-             },
-             resize: ($event) => {
-                 $event.target.style.height = 'auto';
-                 $event.target.style.height = ($event.target.scrollHeight + 2) + 'px';
-             },
-             initInput: () => {
-                 var el = document.getElementById('field-{{ field.id }}');
-                 el.style.height = 'auto';
-                 el.style.height = (el.scrollHeight + 2) + 'px';
-             }
-         }"
-         x-init="initInput"
+         x-data="textField()"
+         {% if field.multiline %}x-init="initField('{{ field.id }}', '{{ value|e('js') }}', '{{ field.charLimit }}', '{{ field.multiline }}')"{% endif %}
     >
         {% if field.multiline %}
             <textarea id="field-{{ field.id }}"
@@ -40,8 +23,9 @@
                       class="mt-1 block w-full shadow-sm sm:text-sm rounded-md resize-none {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
                       placeholder="{{ field.placeholder }}"
                       x-model="value"
-                      x-on:input="resize"
-                      x-on:focus="resize"
+                      x-on:input="resize($event.target)"
+                      x-on:focus="resize($event.target)"
+                      x-on:update-size="resize($event.target);"
             ></textarea>
 
             {% if errors %}
