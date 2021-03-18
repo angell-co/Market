@@ -91,6 +91,8 @@ class Vendors extends Component
      * Fetches the Vendor that is currently logged in. Returns false if there is
      * anything wrong (not logged in or user isn’t attached to a vendor)
      *
+     * TODO: cache this on the class
+     *
      * @return array|bool|ElementInterface|null
      */
     public function getCurrentVendor()

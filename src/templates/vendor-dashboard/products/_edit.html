@@ -106,10 +106,19 @@
                                 {% set tabErrors = tabErrors|merge([tab.id]) %}
                             {% endif %}
 
+                            {% if element.attribute == 'variants' %}
+                                {% for v in product.variants %}
+                                    {% if v.getErrors() %}
+                                        {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
                             {% include '_market/_includes/fld-element' with {
                                 uielement: element,
                                 element: product is defined ? product : null,
-                                excludedFieldHandles: sidebarFields
+                                excludedFieldHandles: sidebarFields,
+                                currentVendor: currentVendor
                             } only %}
                         {% endfor %}
                     </div>
@@ -169,7 +178,7 @@
             </div>
 
             <div class="lg:col-start-3 lg:col-span-1">
-                <div class="shadow rounded-md overflow-hidden">
+                <div class="shadow rounded-md overflow-hidden divide-y">
 
                     {# Core attributes #}
                     <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
@@ -210,14 +219,10 @@
 
                     {# Single variant product, so we have the required fields in the sidebar #}
                     {% if not productType.hasVariants %}
-                        {% set variant = product.id ? product.defaultVariant : false %}
-                        {% if not variant and product.variants is defined %}
-                            {% set variant = product.variants[0] %}
-                        {% endif %}
+                        {% set variant = product.id ? product.variants[0] : false %}
                         {% set variantKey = variant and variant.id ? variant.id : 'new1' %}
 
                         <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
-
                             {# SKU #}
                             {% include '_market/_includes/fields/sku.html' with {
                                 variantKey: variantKey,
@@ -242,45 +247,17 @@
                             } %}
 
                             {# QTY #}
-                            <div class="grid gap-2 grid-cols-2">
-
-                                <div>
-                                    <label for="minQty" class="block text-sm font-medium text-gray-700">
-                                        {{ 'Min Qty'|t('commerce') }}
-                                    </label>
-
-                                    <input type="number"
-                                           step="1"
-                                           min="0"
-                                           id="minQty"
-                                           name="variants[{{ variantKey }}][minQty]"
-                                           value="{{ variant ? variant.minQty : '' }}"
-                                           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="minQty" class="block text-sm font-medium text-gray-700">
-                                        {{ 'Max Qty'|t('commerce') }}
-                                    </label>
-
-                                    <input type="number"
-                                           step="1"
-                                           min="0"
-                                           id="maxQty"
-                                           name="variants[{{ variantKey }}][maxQty]"
-                                           value="{{ variant ? variant.maxQty : '' }}"
-                                           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                    >
-                                </div>
-
-                            </div>
+                            {% include '_market/_includes/fields/qty.html' with {
+                                variantKey: variantKey,
+                                minValue: variant ? variant.minQty : '',
+                                maxValue: variant ? variant.maxQty : ''
+                            } %}
                         </div>
                     {% endif %}
 
 
                     {% if sidebarFields %}
-                        <div class="px-4 py-5 {{ productType.hasVariants ? 'bg-gray-50' : 'bg-white' }} space-y-6 sm:p-6">
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                             {% for handle in sidebarFields %}
                                 {% set field = craft.app.getFields().getFieldByHandle(handle) %}
                                 {% if field %}
@@ -292,7 +269,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="px-4 sm:px-0 {{ sidebarFields ? 'bg-gray-50' : 'bg-white' }}">
+                    <div class="px-4 sm:px-0 bg-gray-50">
 
                         <dl class="sm:divide-y sm:divide-gray-200">
                             <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">

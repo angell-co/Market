@@ -2,6 +2,9 @@
     {% case 'craft\\commerce\\fieldlayoutelements\\ProductTitleField' %}
         {% include '_market/_includes/fields/title.html' %}
 
+    {% case 'craft\\commerce\\fieldlayoutelements\\VariantsField' %}
+        {% include '_market/_includes/fields/variants.html' %}
+
     {% case 'craft\\fieldlayoutelements\\CustomField' %}
         {% set field = uielement.getField() %}
         {% if field.handle not in excludedFieldHandles %}
