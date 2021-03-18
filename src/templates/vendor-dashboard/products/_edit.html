@@ -1,51 +1,51 @@
 {% extends "_market/_layouts/main" %}
 
-{% if productTypeHandle is not defined %}{% exit 403 %}{% endif %}
-{% set productType = craft.commerce.productTypes.getProductTypeByHandle(productTypeHandle) %}
-{% if not productType %}{% exit 404 %}{% endif %}
-{% set site = craft.app.getSites().currentSite %}
-
-{% set title = 'Create new {productType} product'|t('market', {productType: productType.name}) %}
-
-{% set sidebarFields = craft.app.plugins.getPlugin('market').getSettings().productSidebarFieldHandles %}
-
-{# Sort out the product model #}
-{% if productId is defined and productId != null %}
-    {% if product is not defined %}
-        {% set product = craft.commerce.products.getProductById(productId) %}
-    {% endif %}
-    {% if not product %}{% exit 404 %}{% endif %}
-    {% set title = product.title %}
-{% elseif product is not defined %}
-    {% set product = create({
-        class: 'craft\\commerce\\elements\\Product',
-        typeId: productType.id,
-        taxCategoryId: productType.getTaxCategories()|keys|first,
-        shippingCategoryId: productType.getShippingCategories()|keys|first,
-        enabled: true,
-        siteId: site.id,
-        promotable: true,
-        availableForPurchase: true,
-        freeShipping: false
-    }) %}
-
-    {% do product.setFieldValue('vendor', [currentVendor.id]) %}
-{% endif %}
-
-{# TODO: permissions check #}
-
-{% set breadcrumbs = [
-    {
-        url: url('market/products'),
-        label: 'Products'|t('market')
-    },
-    {
-        url: craft.app.request.getUrl,
-        label: title
-    }
-] %}
-
 {% block content %}
+
+    {% if productTypeHandle is not defined %}{% exit 403 %}{% endif %}
+    {% set productType = craft.commerce.productTypes.getProductTypeByHandle(productTypeHandle) %}
+    {% if not productType %}{% exit 404 %}{% endif %}
+    {% set site = craft.app.getSites().currentSite %}
+
+    {% set title = 'Create new {productType} product'|t('market', {productType: productType.name}) %}
+
+    {% set sidebarFields = market.plugin.getSettings().productSidebarFieldHandles %}
+
+    {# Sort out the product model #}
+    {% if productId is defined and productId != null %}
+        {% if product is not defined %}
+            {% set product = craft.commerce.products.getProductById(productId) %}
+        {% endif %}
+        {% if not product %}{% exit 404 %}{% endif %}
+        {% set title = product.title %}
+    {% elseif product is not defined %}
+        {% set product = create({
+            class: 'craft\\commerce\\elements\\Product',
+            typeId: productType.id,
+            taxCategoryId: productType.getTaxCategories()|keys|first,
+            shippingCategoryId: productType.getShippingCategories()|keys|first,
+            enabled: true,
+            siteId: site.id,
+            promotable: true,
+            availableForPurchase: true,
+            freeShipping: false
+        }) %}
+
+        {% do product.setFieldValue('vendor', [currentVendor.id]) %}
+    {% endif %}
+
+    {# TODO: permissions check #}
+
+    {% set breadcrumbs = [
+        {
+            url: url('market/products'),
+            label: 'Products'|t('market')
+        },
+        {
+            url: craft.app.request.getUrl,
+            label: title
+        }
+    ] %}
 
     <form x-data="{
               saveAndReload: '{{ ('market/products/'~productType.handle~'/{id}-{slug}')|hash }}',
@@ -211,7 +211,10 @@
                     {# Single variant product, so we have the required fields in the sidebar #}
                     {% if not productType.hasVariants %}
                         {% set variant = product.id ? product.defaultVariant : false %}
-                        {% set variantKey = variant ? variant.id : 'new1' %}
+                        {% if not variant and product.variants is defined %}
+                            {% set variant = product.variants[0] %}
+                        {% endif %}
+                        {% set variantKey = variant and variant.id ? variant.id : 'new1' %}
 
                         <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
 
@@ -220,14 +223,14 @@
                                 variantKey: variantKey,
                                 prefix: currentVendor.code~'-',
                                 value: variant ? variant.sku : '',
-                                errors: variant.getErrors('sku')
+                                errors: variant ? variant.getErrors('sku') : []
                             } %}
 
                             {# Price #}
                             {% include '_market/_includes/fields/price.html' with {
                                 variantKey: variantKey,
                                 value: variant ? variant.price : '',
-                                errors: variant.getErrors('price')
+                                errors: variant ? variant.getErrors('price') : []
                             } %}
 
                             {# Stock #}
@@ -235,7 +238,7 @@
                                 variantKey: variantKey,
                                 value: variant ? variant.stock : '',
                                 hasUnlimitedStock: variant and variant.hasUnlimitedStock,
-                                errors: variant.getErrors('stock')
+                                errors: variant ? variant.getErrors('stock') : []
                             } %}
 
                             {# QTY #}
