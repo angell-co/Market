@@ -4,7 +4,7 @@
 <div>
     {{ hiddenInput('variants['~variantKey~'][isDefault]', 1) }}
 
-    <label for="sku" class="block text-sm font-medium text-gray-700">
+    <label for="{{ variantKey }}-sku" class="block text-sm font-medium text-gray-700">
         {{ 'SKU'|t('commerce') }}
         <span class="text-red-600">*</span>
     </label>
@@ -24,7 +24,7 @@
         >
 
         <input type="text"
-               id="sku"
+               id="{{ variantKey }}-sku"
                value="{{ value|replace(prefix, '') }}"
                x-model="skuValue"
                x-on:input="onUpdate"

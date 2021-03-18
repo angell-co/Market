@@ -1,6 +1,5 @@
 function skuField() {
     return {
-
         prefix: '',
         skuValue: '',
 

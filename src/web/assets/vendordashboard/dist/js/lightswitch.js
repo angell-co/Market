@@ -1,5 +1,4 @@
-function lightswitch()
-{
+function lightswitch() {
     return {
         on: false,
 

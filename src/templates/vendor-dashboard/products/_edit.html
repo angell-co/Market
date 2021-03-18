@@ -232,37 +232,12 @@
                             } %}
 
                             {# Stock #}
-                            <div>
-                                {{ hiddenInput('variants['~variantKey~'][hasUnlimitedStock]', '') }}
-
-                                <label for="stock" class="block text-sm font-medium text-gray-700">
-                                    {{ 'Stock'|t('commerce') }}
-                                    <span class="text-red-600">*</span>
-                                </label>
-
-                                <input type="number"
-                                       step="1"
-                                       min="0"
-                                       id="stock"
-                                       name="variants[{{ variantKey }}][stock]"
-                                       value="{{ variant ? variant.stock : '' }}"
-                                       class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                >
-
-                                <div class="mt-2 relative flex items-start">
-                                    <div class="flex items-center h-5">
-                                        <input id="hasUnlimitedStock"
-                                               name="variants[{{ variantKey }}][hasUnlimitedStock]"
-                                               type="checkbox"
-                                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                                               {% if variant and variant.hasUnlimitedStock %}checked{% endif %}
-                                        >
-                                    </div>
-                                    <div class="ml-3 text-sm">
-                                        <label for="hasUnlimitedStock" class="font-medium text-gray-700">{{ 'Unlimited'|t('commerce') }}</label>
-                                    </div>
-                                </div>
-                            </div>
+                            {% include '_market/_includes/fields/stock.html' with {
+                                variantKey: variantKey,
+                                value: variant ? variant.stock : '',
+                                hasUnlimitedStock: variant and variant.hasUnlimitedStock,
+                                errors: variant.getErrors('stock')
+                            } %}
 
                             {# QTY #}
                             <div class="grid gap-2 grid-cols-2">

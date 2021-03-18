@@ -1,0 +1,54 @@
+<div x-data="stockField()"
+     x-init="initField({{ hasUnlimitedStock ? 'true' : 'false' }})"
+     x-cloak
+>
+    {{ hiddenInput('variants['~variantKey~'][hasUnlimitedStock]', '') }}
+
+    <label for="{{ variantKey }}-stock" class="block text-sm font-medium text-gray-700">
+        {{ 'Stock'|t('commerce') }}
+        <span class="text-red-600">*</span>
+    </label>
+
+    <div class="mt-1 relative rounded-md shadow-sm">
+        <input type="number"
+               step="1"
+               min="0"
+               id="{{ variantKey }}-stock"
+               name="variants[{{ variantKey }}][stock]"
+               value="{{ value }}"
+               class="mt-1 block w-full sm:text-sm rounded-md {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
+               :class="{
+                   'opacity-20': hasUnlimitedStock
+               }"
+               :disabled="hasUnlimitedStock"
+        >
+        {% if errors %}
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                {# Heroicon name: solid/exclamation-circle #}
+                <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-2 relative flex items-start">
+        <div class="flex items-center h-5">
+            <input id="{{ variantKey }}-hasUnlimitedStock"
+                   name="variants[{{ variantKey }}][hasUnlimitedStock]"
+                   type="checkbox"
+                   class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                   value="1"
+                   x-model="hasUnlimitedStock"
+                   :checked="hasUnlimitedStock"
+            >
+        </div>
+        <div class="ml-3 text-sm">
+            <label for="{{ variantKey }}-hasUnlimitedStock" class="font-medium text-gray-700">{{ 'Unlimited'|t('commerce') }}</label>
+        </div>
+    </div>
+
+    {% for error in errors %}
+        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+    {% endfor %}
+</div>

@@ -1,7 +1,5 @@
-function tabs()
-{
+function tabs() {
     return {
-
         tab: null,
 
         initTabs: function(defaultTab) {

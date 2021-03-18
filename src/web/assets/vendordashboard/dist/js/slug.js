@@ -1,5 +1,4 @@
-function slug()
-{
+function slug() {
     return {
         slug: '',
 

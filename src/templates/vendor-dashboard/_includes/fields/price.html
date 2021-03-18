@@ -1,6 +1,6 @@
 {% set currentCurrency = craft.commerce.getPaymentCurrencies().primaryPaymentCurrency %}
 <div>
-    <label for="price" class="block text-sm font-medium text-gray-700">
+    <label for="{{ variantKey }}-price" class="block text-sm font-medium text-gray-700">
         {{ 'Price'|t('commerce') }}
         <span class="text-red-600">*</span>
     </label>
@@ -13,7 +13,7 @@
         <input type="number"
                step=".01"
                min="0"
-               id="price"
+               id="{{ variantKey }}-price"
                name="variants[{{ variantKey }}][price]"
                value="{{ value }}"
                class="block w-full pl-7 sm:text-sm rounded-md {{ errors ? 'pr-20 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'pr-12 border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
