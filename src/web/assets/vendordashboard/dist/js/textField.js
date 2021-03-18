@@ -12,7 +12,9 @@ function textField() {
             // Initial resize size
             if (isMultiline) {
                 const inputEl = document.getElementById('field-' + this.fieldId);
-                this.resize(inputEl);
+                setTimeout(() => {
+                    this.resize(inputEl);
+                }, 100);
             }
         },
 
