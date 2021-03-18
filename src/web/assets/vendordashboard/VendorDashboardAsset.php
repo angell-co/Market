@@ -32,6 +32,7 @@ class VendorDashboardAsset extends AssetBundle
 
         $this->js[] = 'js/tabs.js';
         $this->js[] = 'js/textField.js';
+        $this->js[] = 'js/skuField.js';
         $this->js[] = 'js/slug.js';
         $this->js[] = 'js/lightswitch.js';
         $this->js[] = 'js/timepicker.js';
