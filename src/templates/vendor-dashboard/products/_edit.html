@@ -176,9 +176,6 @@
                         {% include '_market/_includes/fields/slug.html' with {
                             element: product is defined ? product : null
                         } %}
-                        {% if product is defined and product.enabled %}
-                            {{ product.getUrl() }}
-                        {% endif %}
 
                         {% include '_market/_includes/fields/datetime.html' with {
                             label: 'Post Date'|t('app'),
