@@ -1,0 +1,29 @@
+{# SKU #}
+{% include '_market/_includes/fields/sku.html' with {
+    variantKey: variantKey,
+    prefix: currentVendor.code~'-',
+    value: variant ? variant.sku : '',
+    errors: variant ? variant.getErrors('sku') : []
+} %}
+
+{# Price #}
+{% include '_market/_includes/fields/price.html' with {
+    variantKey: variantKey,
+    value: variant ? variant.price : '',
+    errors: variant ? variant.getErrors('price') : []
+} %}
+
+{# Stock #}
+{% include '_market/_includes/fields/stock.html' with {
+    variantKey: variantKey,
+    value: variant ? variant.stock : '',
+    hasUnlimitedStock: variant and variant.hasUnlimitedStock,
+    errors: variant ? variant.getErrors('stock') : []
+} %}
+
+{# QTY #}
+{% include '_market/_includes/fields/qty.html' with {
+    variantKey: variantKey,
+    minValue: variant ? variant.minQty : '',
+    maxValue: variant ? variant.maxQty : ''
+} %}

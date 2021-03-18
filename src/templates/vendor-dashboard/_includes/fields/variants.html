@@ -4,15 +4,22 @@
         <span class="text-red-600">*</span>
     </label>
 
+
+    {#
+        - Loop POSTed or current variants as normal
+        - Wire in delete and sortable on the DOM
+        - Delete should simply remove the DOM element in full
+        - Add new should use sprig to fetch a URL that renders a blank block,
+            count is a param here for the variant key
+    #}
     <div class="mt-2 space-y-6">
-        {% set count = 1 %}
+        {% set count = 0 %}
         {% for variant in element.variants %}
-            {% set variantKey = variant.id ? variant.id : 'new'~count %}
             {% if variant.id %}
                 {% set variantKey = variant.id %}
             {% else %}
-                {% set variantKey = 'new'~count %}
                 {% set count = count + 1 %}
+                {% set variantKey = 'new'~count %}
             {% endif %}
 
             {# TODO: add new, mark as default, disable / enable, remove #}
@@ -20,14 +27,13 @@
             {# variants[new1][isDefault] #}
 
             {# Sprig get to get html for new block and append to list using s-swap #}
-
-
             <div class="bg-white overflow-hidden shadow rounded-md">
                 <div class="bg-gray-200 px-2 py-2.5 sm:px-3 flex justify-end">
+                    <div>{{ variantKey }}</div>
                     {% if variant.isDefault %}
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-gray-400 text-white uppercase">
-                            Default
-                        </span>
+                        Default
+                    </span>
                     {% endif %}
 
                     <svg class="ml-4 w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -41,50 +47,19 @@
                 <div class="bg-gray-50 px-2 py-2.5 sm:p-3 space-y-3">
                     {# Title #}
                     {% include '_market/_includes/fields/title.html' with {
-                        element: variant
+                        value: variant ? variant.title : '',
+                        errors: variant ? variant.getErrors('sku') : [],
+                        name: 'variants['~variantKey~'][title]',
+                        id: 'variants-'~variantKey~'-title'
                     } %}
 
-                    {# SKU #}
-                    {% include '_market/_includes/fields/sku.html' with {
-                        variantKey: variantKey,
-                        prefix: currentVendor.code~'-',
-                        value: variant ? variant.sku : '',
-                        errors: variant ? variant.getErrors('sku') : []
-                    } %}
-
-                    {# Price #}
-                    {% include '_market/_includes/fields/price.html' with {
-                        variantKey: variantKey,
-                        value: variant ? variant.price : '',
-                        errors: variant ? variant.getErrors('price') : []
-                    } %}
-
-                    {# Stock #}
-                    {% include '_market/_includes/fields/stock.html' with {
-                        variantKey: variantKey,
-                        value: variant ? variant.stock : '',
-                        hasUnlimitedStock: variant and variant.hasUnlimitedStock,
-                        errors: variant ? variant.getErrors('stock') : []
-                    } %}
-
-                    {# QTY #}
-                    {% include '_market/_includes/fields/qty.html' with {
-                        variantKey: variantKey,
-                        minValue: variant ? variant.minQty : '',
-                        maxValue: variant ? variant.maxQty : ''
-                    } %}
+                    {% include '_market/_includes/variant-fields' %}
                 </div>
             </div>
         {% endfor %}
 
-        <button type="button"
-                class="mr-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-action-700 bg-action-100 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
-        >
-            {# Heroicon name: plus-circle #}
-            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-action-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-            </svg>
-            Add a variant
-        </button>
+        {{ sprig('_market/_components/add-variant', {
+            count: element.variants|length
+        }) }}
     </div>
 </div>
