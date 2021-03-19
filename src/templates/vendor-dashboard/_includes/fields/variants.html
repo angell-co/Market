@@ -27,9 +27,7 @@
 
     <input type="hidden" name="variants" value="">
 
-    {# TODO
-        - Copy markup into add-variant component
-    #}
+    {# TODO deal with needing a minimum of one variant to submit successfully #}
     <div id="variants-list" class="mt-2 space-y-6">
         {% set count = 0 %}
         {% for variant in element.variants %}
