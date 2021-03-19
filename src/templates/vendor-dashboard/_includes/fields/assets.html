@@ -1,5 +1,5 @@
 {% set errors = element.getErrors(field.handle) %}
-<div{% if errors %} class="ring-2 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
+<div{% if errors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
 
     <div class="flex">
         <div class="flex-grow">
@@ -12,7 +12,15 @@
                 <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
             {% endif %}
         </div>
+
         {% if errors %}
+
+            <div class="ml-3 leading-1 space-y-1.5">
+                {% for error in errors %}
+                    <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+
             <div class="flex-shrink-0 ml-3">
                 {# Heroicon name: solid/exclamation-circle #}
                 <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -36,8 +44,4 @@
         id: 'field-'~field.id,
         class: 'field-assets'
     }) }}
-
-    {% for error in errors %}
-        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}
 </div>

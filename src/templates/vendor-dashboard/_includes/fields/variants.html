@@ -1,16 +1,36 @@
-<div>
-    <label for="variants" class="block text-sm font-medium text-gray-700">
-        {{ 'Variants'|t('commerce') }}
-        <span class="text-red-600">*</span>
-    </label>
+{% set generalVariantErrors = element.getErrors('variants') %}
+<div{% if generalVariantErrors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
+    <div class="flex">
+        <div class="flex-grow">
+            <label for="variants" class="block text-sm font-medium text-gray-700">
+                {{ 'Variants'|t('commerce') }}
+                <span class="text-red-600">*</span>
+            </label>
+        </div>
 
+        {% if generalVariantErrors %}
 
-    {#
-        - Loop POSTed or current variants as normal
+            <div class="ml-3 leading-1 space-y-1.5">
+                {% for error in generalVariantErrors %}
+                    <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="flex-shrink-0 ml-3">
+                {# Heroicon name: solid/exclamation-circle #}
+                <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        {% endif %}
+    </div>
+
+    <input type="hidden" name="variants" value="">
+
+    {# TODO
         - Wire in delete and sortable on the DOM
         - Delete should simply remove the DOM element in full
-        - Add new should use sprig to fetch a URL that renders a blank block,
-            count is a param here for the variant key
+        - Copy markup into add-variant component
     #}
     <div class="mt-2 space-y-6">
         {% set count = 0 %}
@@ -22,18 +42,26 @@
                 {% set variantKey = 'new'~count %}
             {% endif %}
 
-            {# TODO: add new, mark as default, disable / enable, remove #}
+            {# TODO: mark as default, disable / enable, remove #}
             {# variants[new1][enabled] #}
-            {# variants[new1][isDefault] #}
+            {# TODO: NOT WORKING: variants[new1][isDefault] #}
 
-            {# Sprig get to get html for new block and append to list using s-swap #}
-            <div class="bg-white overflow-hidden shadow rounded-md">
-                <div class="bg-gray-200 px-2 py-2.5 sm:px-3 flex justify-end">
-                    <div>{{ variantKey }}</div>
+            {% set variantErrors = variant.getErrors() %}
+
+            <div class="bg-white shadow rounded-md relative{% if variantErrors %} border border-red-500{% endif %}">
+
+                {% if variantErrors %}
+                    <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                {% endif %}
+
+                <div class="bg-gray-200 px-2 py-2.5 sm:px-3 flex justify-end rounded-t-md">
+                    <input type="hidden"
+                           name="variants[{{ variantKey }}][isDefault]"
+                           {% if variant.isDefault %}value="1"{% endif %}
+                    >
+
                     {% if variant.isDefault %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-gray-400 text-white uppercase">
-                        Default
-                    </span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-gray-400 text-white uppercase">Default</span>
                     {% endif %}
 
                     <svg class="ml-4 w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -44,14 +72,14 @@
                         <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <div class="bg-gray-50 px-2 py-2.5 sm:p-3 space-y-3">
+                <div class="bg-gray-50 px-2 py-2.5 sm:p-3 rounded-b-md grid gap-3 grid-cols-2">
                     {# Title #}
                     {% include '_market/_includes/fields/title.html' with {
                         value: variant ? variant.title : '',
-                        errors: variant ? variant.getErrors('sku') : [],
+                        errors: variant ? variant.getErrors('title') : [],
                         name: 'variants['~variantKey~'][title]',
                         id: 'variants-'~variantKey~'-title'
-                    } %}
+                    } only %}
 
                     {% include '_market/_includes/variant-fields' %}
                 </div>
@@ -59,7 +87,7 @@
         {% endfor %}
 
         {{ sprig('_market/_components/add-variant', {
-            count: element.variants|length
+            startingCount: element.variants|length
         }) }}
     </div>
 </div>
