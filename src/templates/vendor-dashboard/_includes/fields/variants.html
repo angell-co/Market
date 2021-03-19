@@ -28,11 +28,7 @@
     <input type="hidden" name="variants" value="">
 
     {# TODO
-        - Collapse - to make sorting easier?
         - Copy markup into add-variant component
-        - Enabled / disabled
-
-        variants[new1][enabled]
     #}
     <div id="variants-list" class="mt-2 space-y-6">
         {% set count = 0 %}
@@ -143,7 +139,6 @@
                             </svg>
                         </div>
                     </div>
-
                 </div>
                 <div x-show="isExpanded"
                      class="bg-gray-50 px-2 py-2.5 sm:p-3 rounded-b-md grid gap-3 grid-cols-2"
