@@ -223,6 +223,7 @@
                         {% set variantKey = variant and variant.id ? variant.id : 'new1' %}
 
                         <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
+                            {{ hiddenInput('variants['~variantKey~'][isDefault]', 1) }}
                             {% include '_market/_includes/variant-fields.html' with {
                                 singleVariant: true
                             } %}

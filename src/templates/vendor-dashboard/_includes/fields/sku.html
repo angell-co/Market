@@ -2,8 +2,6 @@
     {% set value = '' %}
 {% endif %}
 <div>
-    {{ hiddenInput('variants['~variantKey~'][isDefault]', 1) }}
-
     <label for="{{ variantKey }}-sku" class="block text-sm font-medium text-gray-700">
         {{ 'SKU'|t('commerce') }}
         <span class="text-red-600">*</span>

@@ -36,6 +36,7 @@ class VendorDashboardAsset extends AssetBundle
         $this->js[] = 'js/stockField.js';
         $this->js[] = 'js/assetField.js';
         $this->js[] = 'js/categoryField.js';
+        $this->js[] = 'js/variantBlock.js';
         // TODO: append Field to these
         $this->js[] = 'js/slug.js';
         $this->js[] = 'js/lightswitch.js';

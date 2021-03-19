@@ -4,10 +4,6 @@ function stockField() {
 
         initField: function(hasUnlimitedStock) {
             this.hasUnlimitedStock = hasUnlimitedStock;
-            },
-
-        toggleUnlimitedStock: function($event) {
-
         }
     }
 }
