@@ -3,11 +3,12 @@
 {% set start = startingCount + 1 %}
 {% set end = end ?? start %}
 
+{# TODO: when adding a new one which hasn’t already been dragged out, we get the old ones overwritten #}
+{# So, after swap move it in the DOM to just in front of the component #}
+
 {% if end > start %}
     {% for n in start..(end-1) %}
         {% set variantKey = 'new'~n %}
-
-        {# TODO: copy markup in from main loop #}
 
         <div x-data="variantBlock()"
              x-init="initBlock(false, true)"
