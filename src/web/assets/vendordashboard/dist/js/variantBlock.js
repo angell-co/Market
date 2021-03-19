@@ -25,8 +25,7 @@ function variantBlock() {
 
         removeBlock: function($event) {
             this.visible = false;
-            setTimeout(function() {
-                // TODO remove from DOM
+            setTimeout(() => {
                 this.$el.parentNode.removeChild(this.$el);
             }, 250)
         }
