@@ -11,9 +11,11 @@
                    x-ref="enabledInput"
             >
             <button x-on:click="toggleEnabled(isEnabled = !isEnabled)"
+                    :disabled="isDefault"
                     :aria-pressed="isEnabled.toString()"
                     type="button"
                     class="flex-shrink-0 group relative rounded-full inline-flex items-center justify-center h-5 w-10 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 focus:ring-offset-gray-200"
+                    :class="{'opacity-20' : isDefault}"
             >
                 <span class="sr-only">Enable or disable this variant</span>
                 <span aria-hidden="true"
@@ -47,7 +49,7 @@
             >Default</button>
         </div>
 
-        <div x-show="!isExpanded" class="overflow-hidden mx-4">
+        <div x-show="!isExpanded && titleText !== ''" class="flex-grow overflow-hidden mx-4">
             <p x-text="titleText" class="truncate text-sm text-gray-400"></p>
         </div>
 

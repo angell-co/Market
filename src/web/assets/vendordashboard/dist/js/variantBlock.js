@@ -11,7 +11,6 @@ function variantBlock() {
             this.isEnabled = isEnabled;
             this.isExpanded = this.isEnabled;
             this.titleText = titleText;
-            console.log(titleText);
 
             if (fadeIn) {
                 this.visible = false;
@@ -31,9 +30,11 @@ function variantBlock() {
                 btn.classList.add('opacity-30');
             }
 
-            setTimeout(() => {
-                this.visible = true;
-            }, 200)
+            if (fadeIn) {
+                setTimeout(() => {
+                    this.visible = true;
+                }, 200)
+            }
         },
 
         updateTitle: function($event) {
@@ -49,6 +50,9 @@ function variantBlock() {
             }
             this.isDefault = true;
             this.$refs.defaultInput.value = '1';
+
+            // Make sure the block is enabled
+            this.toggleEnabled(true);
         },
 
         setNotDefault: function($event) {
@@ -72,6 +76,7 @@ function variantBlock() {
             // Check we have more than one block
             if (blocks.length > 1) {
                 this.visible = false;
+
                 setTimeout(() => {
                     this.$el.parentNode.removeChild(this.$el);
 
@@ -81,6 +86,13 @@ function variantBlock() {
                         const btn = blocks[0].querySelector('.variant-block-delete-btn');
                         btn.setAttribute('disabled', 'disabled');
                         btn.classList.add('opacity-30');
+                    }
+
+                    // Check if it was default and if so mark the first one remaining as default
+                    if (this.isDefault) {
+                        blocks[0].dispatchEvent(new CustomEvent('make-default', {
+                            bubbles: true
+                        }));
                     }
 
                 }, 250)

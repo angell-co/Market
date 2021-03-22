@@ -44,6 +44,7 @@
                  class="variant-block bg-white shadow rounded-md relative{% if variantErrors %} border border-red-500{% endif %}"
                  x-show="visible"
                  x-on:update-from-title="updateTitle"
+                 x-on:make-default="isDefault = true"
                  x-transition:enter="ease-in-out duration-500"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
