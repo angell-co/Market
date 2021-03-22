@@ -215,8 +215,6 @@
                         {# NOTE: no free shipping or promotable here yet #}
                     </div>
 
-                    {# TODO: this will need abstracting for reuse on multi-variant products #}
-
                     {# Single variant product, so we have the required fields in the sidebar #}
                     {% if not productType.hasVariants %}
                         {% set variant = product.id ? product.variants[0] : false %}

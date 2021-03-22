@@ -4,11 +4,18 @@ function variantBlock() {
         isDefault: false,
         isEnabled: true,
         isExpanded: true,
+        titleText: '',
 
-        initBlock: function(isDefault, isEnabled) {
+        initBlock: function(isDefault, isEnabled, fadeIn, titleText) {
             this.isDefault = isDefault;
             this.isEnabled = isEnabled;
             this.isExpanded = this.isEnabled;
+            this.titleText = titleText;
+            console.log(titleText);
+
+            if (fadeIn) {
+                this.visible = false;
+            }
 
             // Enable all delete buttons or disable if there is only block
             const blocks = document.querySelectorAll('.variant-block');
@@ -23,6 +30,14 @@ function variantBlock() {
                 btn.setAttribute('disabled', 'disabled');
                 btn.classList.add('opacity-30');
             }
+
+            setTimeout(() => {
+                this.visible = true;
+            }, 200)
+        },
+
+        updateTitle: function($event) {
+            this.titleText = $event.detail.titleValue;
         },
 
         setAsDefault: function($event) {
