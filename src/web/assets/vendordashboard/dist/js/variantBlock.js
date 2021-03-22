@@ -9,6 +9,20 @@ function variantBlock() {
             this.isDefault = isDefault;
             this.isEnabled = isEnabled;
             this.isExpanded = this.isEnabled;
+
+            // Enable all delete buttons or disable if there is only block
+            const blocks = document.querySelectorAll('.variant-block');
+            if (blocks.length > 1) {
+                for (let i = 0; i < blocks.length; i++) {
+                    let btn = blocks[i].querySelector('.variant-block-delete-btn');
+                    btn.removeAttribute('disabled');
+                    btn.classList.remove('opacity-30');
+                }
+            } else {
+                let btn = blocks[0].querySelector('.variant-block-delete-btn');
+                btn.setAttribute('disabled', 'disabled');
+                btn.classList.add('opacity-30');
+            }
         },
 
         setAsDefault: function($event) {
@@ -38,10 +52,24 @@ function variantBlock() {
         },
 
         removeBlock: function($event) {
-            this.visible = false;
-            setTimeout(() => {
-                this.$el.parentNode.removeChild(this.$el);
-            }, 250)
+            let blocks = document.querySelectorAll('.variant-block');
+
+            // Check we have more than one block
+            if (blocks.length > 1) {
+                this.visible = false;
+                setTimeout(() => {
+                    this.$el.parentNode.removeChild(this.$el);
+
+                    // If there is now only one block, set disable its delete button
+                    let blocks = document.querySelectorAll('.variant-block');
+                    if (blocks.length === 1) {
+                        const btn = blocks[0].querySelector('.variant-block-delete-btn');
+                        btn.setAttribute('disabled', 'disabled');
+                        btn.classList.add('opacity-30');
+                    }
+
+                }, 250)
+            }
         }
     }
 }
