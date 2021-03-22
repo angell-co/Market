@@ -139,9 +139,20 @@
                 <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table x-data="{ allchecked: false }"
+                                   class="min-w-full divide-y divide-gray-200"
+                            >
                                 <thead class="bg-gray-50">
                                     <tr>
+                                        <th scope="col" class="relative pl-3 py-0 text-left text-xs">
+                                            <span class="sr-only">Select</span>
+                                            <input id="products-checkbox-all"
+                                                   name="products[]"
+                                                   type="checkbox"
+                                                   x-on:click="allchecked = !allchecked"
+                                                   class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                            >
+                                        </th>
                                         <th scope="col" class="p-0">
                                             <button sprig
                                                     s-val:sort="title"
@@ -235,6 +246,15 @@
                                 {% for product in products %}
                                     {% set productUrl = url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) %}
                                     <tr>
+                                        <td class="pl-3 py-0 text-xs">
+                                            <input id="product-checkbox-{{ product.id }}"
+                                                   name="products[]"
+                                                   type="checkbox"
+                                                   value="{{ product.id }}"
+                                                   x-bind:checked="allchecked"
+                                                   class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                            >
+                                        </td>
                                         <td class="px-6 py-4 text-sm font-medium">
                                             <a href="{{ productUrl }}" class="flex text-action-600 hover:text-action-900">
                                                 <div class="mr-4 flex-shrink-0 rounded border border-gray-300 text-gray-300 overflow-hidden">
