@@ -1,6 +1,6 @@
 {% set value = '' %}
 {% if element %}{% set value = element.slug %}{% endif %}
-<div x-data="slug()"
+<div x-data="slugField()"
      x-init="initSlug('{{ value }}')"
 >
     <div class="flex justify-between">
@@ -23,6 +23,7 @@
            id="slug"
            x-model="slug"
            x-on:blur="formatValue(slug)"
+           x-on:update-from-title="formatValue($event.target.value)"
            value="{{ value }}"
            class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
     >

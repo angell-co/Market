@@ -1,9 +1,13 @@
-function slug() {
+function slugField() {
     return {
         slug: '',
 
         initSlug: function(val) {
             this.slug = val;
+        },
+
+        updateFromTitle: function() {
+            this.formatValue(this.slug);
         },
 
         formatValue: function (val) {

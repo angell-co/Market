@@ -31,6 +31,8 @@ class VendorDashboardAsset extends AssetBundle
         $this->css[] = 'css/main.css';
 
         $this->js[] = 'js/tabs.js';
+        $this->js[] = 'js/titleField.js';
+        $this->js[] = 'js/slugField.js';
         $this->js[] = 'js/textField.js';
         $this->js[] = 'js/skuField.js';
         $this->js[] = 'js/stockField.js';
@@ -38,7 +40,6 @@ class VendorDashboardAsset extends AssetBundle
         $this->js[] = 'js/categoryField.js';
         $this->js[] = 'js/variantBlock.js';
         // TODO: append Field to these
-        $this->js[] = 'js/slug.js';
         $this->js[] = 'js/lightswitch.js';
         $this->js[] = 'js/timepicker.js';
         $this->js[] = 'js/datepicker.js';

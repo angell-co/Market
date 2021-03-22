@@ -4,7 +4,9 @@
 {% if name is not defined %}{% set name = 'title' %}{% endif %}
 {% if id is not defined %}{% set id = 'title' %}{% endif %}
 
-<div>
+{% set autoSlug = element is defined and not element.slug %}
+
+<div x-data="titleField()">
     <label for="{{ id }}" class="block text-sm font-medium text-gray-700">
         {{ 'Title'|t('app') }}
         <span class="text-red-600">*</span>
@@ -15,6 +17,7 @@
                name="{{ name }}"
                id="{{ id }}"
                value="{{ value }}"
+               {% if autoSlug %}x-on:blur="updateSlug"{% endif %}
                class="mt-1 block w-full sm:text-sm rounded-md {{ errors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
         >
         {% if errors %}
