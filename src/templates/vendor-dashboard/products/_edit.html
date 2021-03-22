@@ -287,13 +287,17 @@
                                 </dd>
                             </div>
                         </dl>
-
-                        {# TODO
-                            Underneath panels
-                            - Delete action
-                        #}
                     </div>
                 </div>
+
+                {# Delete action #}
+                {% if product.id %}
+                    <div class="mt-6 text-right">
+                        {{ sprig('_market/_components/delete-product', {
+                            _productId: product.id
+                        }) }}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </form>
