@@ -15,6 +15,12 @@
 
 {% set pageInfo = sprig.paginate(assetsQuery, page) %}
 {% set assets = pageInfo.pageResults %}
+
+{% if successfulNotice is defined %}
+    {% do craft.app.session.setNotice(successfulNotice) %}
+    {% do sprig.redirect('/market/files') %}
+{% endif %}
+
 {# Header #}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
     <div class="lg:flex lg:items-center lg:justify-between mb-4">
@@ -133,7 +139,10 @@
                                      role="menu" aria-orientation="vertical" aria-labelledby="asset-options-menu-{{ asset.id }}"
                                 >
                                     <div class="py-1">
-                                        <a href="{{ url('market/files/'~asset.id) }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                        <a href="{{ url('market/files/'~asset.id) }}"
+                                           class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:rounded-md focus:bg-gray-100 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                                           role="menuitem"
+                                        >
                                             {# Heroicon name: eye #}
                                             <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -143,21 +152,40 @@
                                         </a>
                                     </div>
                                     <div class="py-1">
-                                        <a href="#" class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900" role="menuitem">
+                                        <button sprig
+                                                s-action="assets/delete-asset"
+                                                s-method="post"
+                                                s-val:asset-id="{{ asset.id }}"
+                                                s-val:selected-ids=""
+                                                s-confirm="Are you sure you want to delete this file?"
+                                                s-val:successful-notice="File deleted."
+                                                type="button"
+                                                class="w-full group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900 focus:rounded-md focus:bg-red-100 focus:text-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                role="menuitem"
+                                        >
                                             {# Heroicon name: trash #}
                                             <svg class="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                             </svg>
                                             Delete
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             {# Image #}
                             <div class="flex-1 flex flex-col">
-                                <div class="aspect-w-1 aspect-h-1">
-                                    <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="">
+                                <div class="aspect-w-1 aspect-h-1 relative">
+                                    {% if asset.kind == 'image' %}
+                                        <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="{{ asset.title }}">
+                                    {% else %}
+                                        <div class="object-cover">
+                                            <svg class="text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                            <div class="absolute top-1/2 right-1/2 h-7 w-12 -mt-3.5 -mr-6 text-gray-400 text-lg font-bold text-center">{{ asset.extension|upper }}</div>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
 
