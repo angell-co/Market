@@ -95,15 +95,37 @@
                             </p>
                         </div>
                         <div class="py-1" role="none">
-                            <button type="button"
-                                    class="w-full group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            <button sprig
+                                    s-action="market/products/set-status"
+                                    s-method="post"
+                                    s-val:status="enabled"
+                                    s-val:product-ids="{{ selectedIds|join(',') }}"
+                                    s-val:selected-ids=""
+                                    {% if selectedIds|length == 1 %}
+                                        s-val:successful-notice="Products enabled."
+                                    {% else %}
+                                        s-val:successful-notice="{{ selectedIds|length }} products enabled."
+                                    {% endif %}
+                                    type="button"
+                                    class="w-full group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:rounded-md focus:bg-gray-100 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                                     role="menuitem"
                             >
                                 <span class="block ml-1 mr-4 h-3 w-3 rounded-full ring-2 ring-green-300 bg-green-100"></span>
                                 Enable
                             </button>
-                            <button type="button"
-                                    class="w-full group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            <button sprig
+                                    s-action="market/products/set-status"
+                                    s-method="post"
+                                    s-val:status="disabled"
+                                    s-val:product-ids="{{ selectedIds|join(',') }}"
+                                    s-val:selected-ids=""
+                                    {% if selectedIds|length == 1 %}
+                                    s-val:successful-notice="Products disabled."
+                                    {% else %}
+                                    s-val:successful-notice="{{ selectedIds|length }} products disabled."
+                                    {% endif %}
+                                    type="button"
+                                    class="w-full group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:rounded-md focus:bg-gray-100 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                                     role="menuitem"
                             >
                                 <span class="block ml-1 mr-4 h-3 w-3 rounded-full ring-2 ring-gray-300 bg-gray-100"></span>
@@ -124,7 +146,7 @@
                                         s-val:successful-notice="{{ selectedIds|length }} products deleted."
                                     {% endif %}
                                     type="button"
-                                    class="w-full group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900"
+                                    class="w-full group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900 focus:rounded-md focus:bg-red-100 focus:text-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                     role="menuitem"
                             >
                                 {# Heroicon name: trash #}

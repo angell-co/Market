@@ -52,6 +52,7 @@ module.exports = {
   variants: {
     extend: {
       display: ['group-hover', 'group-focus'],
+      borderRadius: ['focus'],
     },
   },
   plugins: [
