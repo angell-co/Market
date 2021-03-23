@@ -11,6 +11,8 @@
 
 {% block content %}
     <div class="py-4 sm:py-6 md:py-8">
-        {{ sprig('_market/_components/assets/index') }}
+        {{ sprig('_market/_components/assets/index', {}, {
+            id: 'files-index'
+        }) }}
     </div>
 {% endblock %}

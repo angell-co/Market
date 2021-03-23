@@ -31,6 +31,9 @@ class VendorDashboardAsset extends AssetBundle
         $this->css[] = 'css/main.css';
 
         $this->js[] = 'js/tabs.js';
+
+        $this->js[] = 'js/assetIndex.js';
+
         $this->js[] = 'js/titleField.js';
         $this->js[] = 'js/slugField.js';
         $this->js[] = 'js/textField.js';

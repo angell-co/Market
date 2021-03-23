@@ -52,9 +52,7 @@ class ProductsController extends Controller
             if (!$product->getIsDeletable()) {
                 continue;
             }
-            if (!isset($deletedProductIds[$product->id])) {
-                $elementsService->deleteElement($product);
-            }
+            $elementsService->deleteElement($product);
         }
 
         return true;
@@ -88,7 +86,6 @@ class ProductsController extends Controller
             ->anyStatus()
             ->limit(null)
             ->id($productIds);
-
 
         foreach ($query->all() as $product) {
 

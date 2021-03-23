@@ -40,7 +40,6 @@ function assetField() {
 
         // Fired after uploading an asset
         uploaderOnLoad(evt) {
-            console.log(evt);
             // We want to cancel the response handling because we can’t actually use it
             evt.preventDefault();
             evt.stopPropagation();

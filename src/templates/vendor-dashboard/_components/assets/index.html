@@ -16,31 +16,113 @@
 {% set pageInfo = sprig.paginate(assetsQuery, page) %}
 {% set assets = pageInfo.pageResults %}
 
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+{% if selectedIds is defined and selectedIds is not iterable %}
+    {% set selectedIds = selectedIds|split(',') %}
+{% endif %}
+
+{% set selectedIds = selectedIds|filter|unique %}
+
 {% if successfulNotice is defined %}
     {% do craft.app.session.setNotice(successfulNotice) %}
     {% do sprig.redirect('/market/files') %}
 {% endif %}
 
 {# Header #}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+<div x-data="assetIndex()" id="files-index-header" class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
     <div class="lg:flex lg:items-center lg:justify-between mb-4">
-        <div class="flex-1 min-w-0">
+        <div class="min-w-0">
             <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
                 {{ 'Files'|t('market') }}
             </h1>
         </div>
 
+        {# Upload bar #}
+        <div x-show="uploading" class="mt-5 flex-1 w-full lg:mt-0 lg:mx-8 h-full items-center flex">
+            <div class="h-3 relative w-full rounded-full overflow-hidden">
+                <div class="w-full h-full bg-gray-200 absolute"></div>
+                <div id="file-uploader-progress" class="h-full bg-action-500 relative w-0"></div>
+            </div>
+        </div>
+
         {# Actions #}
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
 
+            {# Delete selected files #}
+            {% if selectedIds %}
+                <button sprig
+                        s-action="market/files/delete-files"
+                        s-method="post"
+                        s-val:file-ids="{{ selectedIds|join(',') }}"
+                        s-val:selected-ids=""
+                        {% if selectedIds|length == 1 %}
+                            s-confirm="Are you sure you want to delete this file?"
+                            s-val:successful-notice="File deleted."
+                        {% else %}
+                            s-confirm="Are you sure you want to delete {{ selectedIds|length }} files?"
+                            s-val:successful-notice="{{ selectedIds|length }} files deleted."
+                        {% endif %}
+                        x-on:htmx:before-request="deleting = true"
+                        x-on:htmx:after-request="deleting = false"
+                        :disabled="deleting"
+                        type="button"
+                        class="mr-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-red-500"
+                >
+                    <span x-show="deleting" class="h-3">
+                        <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                            <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                        </svg>
+                    </span>
+
+                    {# Heroicon name: trash #}
+                    <svg x-show="!deleting" class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    {{ 'Delete'|t('market') }}
+                </button>
+            {% endif %}
+
             {# Upload #}
-            <button class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500">
-                {# Heroicon name: plus #}
-                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                </svg>
-                {{ 'Upload'|t('market') }}
-            </button>
+            <div id="file-uploader"
+                 hx-post="{{ actionUrl('assets/upload') }}"
+                 hx-trigger="change"
+                 hx-encoding="multipart/form-data"
+                 hx-indicator="#files-index-header"
+                 x-on:htmx:before-request="uploading = true"
+                 x-on:htmx:before-on-load="uploaderOnLoad"
+                 x-on:htmx:xhr:progress="uploaderOnProgress"
+            >
+
+                {{ csrfInput() }}
+                {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
+
+                <label for="file-uploader-input"
+                       class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
+                >
+                    <span x-show="uploading" class="h-3">
+                        <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                            <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                        </svg>
+                    </span>
+
+                    {# Heroicon name: plus #}
+                    <svg x-show="!uploading" class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ 'Upload'|t('market') }}</span>
+                    <input id="file-uploader-input"
+                           type="file"
+                           name="assets-upload"
+                           class="sr-only"
+                           :disabled="uploading"
+                    >
+                </label>
+            </div>
         </div>
     </div>
 </div>
@@ -193,10 +275,12 @@
                             <div class="flex-1 flex flex-col p-2">
                                 <div class="flex items-start">
                                     <div class="h-5 flex items-center">
-                                        <input id="asset-checkbox-{{ asset.id }}"
-                                               name="assets[]"
+                                        <input sprig
+                                               id="asset-checkbox-{{ asset.id }}"
+                                               name="selectedIds[]"
                                                type="checkbox"
                                                value="{{ asset.id }}"
+                                               {% if asset.id in selectedIds %}checked{% endif %}
                                                class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
                                         >
                                     </div>
