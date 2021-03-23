@@ -9,6 +9,7 @@ function assetField() {
     return {
         open: false,
         fieldId: null,
+        uploading: false,
 
         initField(fieldId) {
             this.fieldId = fieldId;
@@ -46,6 +47,8 @@ function assetField() {
 
             // Then manually trigger a refresh of only the asset index
             htmx.trigger('#field-'+this.fieldId+'-assets-index', 'refresh');
+
+            this.uploading = false;
             return false;
         },
 

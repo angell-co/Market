@@ -227,6 +227,7 @@
              hx-trigger="change"
              hx-encoding="multipart/form-data"
              class="flex flex-grow justify-start"
+             x-on:htmx:before-request="uploading = true"
              x-on:htmx:before-on-load="uploaderOnLoad"
              x-on:htmx:xhr:progress="uploaderOnProgress"
         >
@@ -236,15 +237,20 @@
 
             <div>
                 <label for="field-{{ _fieldId }}-uploader-input"
-                       class="block bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm cursor-pointer text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                       class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
                 >
-                    <span class="htmx-indicator h-3">
+                    <span x-show="uploading" class="h-3">
                         <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
                             <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
                         </svg>
                     </span>
-                    <span>Upload a file</span>
+
+                    {# Heroicon name: plus #}
+                    <svg x-show="!uploading" class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ 'Upload'|t('market') }}</span>
                     <input id="field-{{ _fieldId }}-uploader-input" type="file" name="assets-upload" class="sr-only">
                 </label>
             </div>
