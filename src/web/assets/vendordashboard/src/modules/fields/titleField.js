@@ -1,4 +1,4 @@
-function titleField() {
+const titleField = function() {
     return {
         titleValue: null,
         allowSlugUpdate: true,
@@ -29,4 +29,6 @@ function titleField() {
             }));
         }
     }
-}
+};
+
+export default titleField;

@@ -1,4 +1,4 @@
-function variantBlock() {
+const variantBlock = function() {
     return {
         visible: true,
         isDefault: false,
@@ -99,4 +99,6 @@ function variantBlock() {
             }
         }
     }
-}
+};
+
+export default variantBlock;

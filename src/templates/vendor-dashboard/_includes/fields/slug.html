@@ -1,6 +1,6 @@
 {% set value = '' %}
 {% if element %}{% set value = element.slug %}{% endif %}
-<div x-data="slugField()"
+<div x-data="Market.slugField()"
      x-init="initSlug('{{ value }}')"
 >
     <div class="flex justify-between">

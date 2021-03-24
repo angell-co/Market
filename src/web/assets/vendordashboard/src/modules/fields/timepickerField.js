@@ -1,4 +1,4 @@
-function timepicker() {
+const timepickerField = function() {
     return {
         timepickerValue: '',
 
@@ -8,4 +8,6 @@ function timepicker() {
             }
         }
     }
-}
+};
+
+export default timepickerField;

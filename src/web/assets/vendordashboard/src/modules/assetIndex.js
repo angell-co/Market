@@ -1,4 +1,4 @@
-function assetIndex() {
+const assetIndex = function() {
     return {
         deleting: false,
         uploading: false,
@@ -24,4 +24,6 @@ function assetIndex() {
             htmx.find('#file-uploader-progress').style.width = percent+'%';
         }
     }
-}
+};
+
+export default assetIndex;

@@ -1,4 +1,4 @@
-function stockField() {
+const stockField = function() {
     return {
         hasUnlimitedStock: false,
 
@@ -6,4 +6,6 @@ function stockField() {
             this.hasUnlimitedStock = hasUnlimitedStock;
         }
     }
-}
+};
+
+export default stockField;

@@ -29,23 +29,7 @@ class VendorDashboardAsset extends AssetBundle
         $this->sourcePath = __DIR__ . '/dist';
 
         $this->css[] = 'css/main.css';
-
-        $this->js[] = 'js/tabs.js';
-
-        $this->js[] = 'js/assetIndex.js';
-
-        $this->js[] = 'js/titleField.js';
-        $this->js[] = 'js/slugField.js';
-        $this->js[] = 'js/textField.js';
-        $this->js[] = 'js/skuField.js';
-        $this->js[] = 'js/stockField.js';
-        $this->js[] = 'js/assetField.js';
-        $this->js[] = 'js/categoryField.js';
-        $this->js[] = 'js/variantBlock.js';
-        // TODO: append Field to these
-        $this->js[] = 'js/lightswitch.js';
-        $this->js[] = 'js/timepicker.js';
-        $this->js[] = 'js/datepicker.js';
+        $this->js[] = 'js/main.js';
 
         parent::init();
     }

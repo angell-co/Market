@@ -1,7 +1,7 @@
 const DP_MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DP_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function datepicker() {
+const datepickerField = function() {
     return {
         showDatepicker: false,
         datepickerValue: '',
@@ -90,4 +90,6 @@ function datepicker() {
             }
         }
     }
-}
+};
+
+export { DP_MONTH_NAMES, DP_DAYS, datepickerField };

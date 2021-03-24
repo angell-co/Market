@@ -1,4 +1,4 @@
-function lightswitch() {
+const lightswitchField = function() {
     return {
         on: false,
 
@@ -11,4 +11,6 @@ function lightswitch() {
             this.$refs.input.value = this.on ? '1' : '';
         }
     }
-}
+};
+
+export default lightswitchField;

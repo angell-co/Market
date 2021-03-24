@@ -39,7 +39,7 @@
 
             {% set variantErrors = variant.getErrors() %}
 
-            <div x-data="variantBlock()"
+            <div x-data="Market.variantBlock()"
                  x-init="initBlock({{ variant.isDefault ? 'true' : 'false' }}, {{ variant.enabled ? 'true' : 'false' }}, false, '{{ variant.title }}')"
                  class="variant-block bg-white shadow rounded-md relative{% if variantErrors %} border border-red-500{% endif %}"
                  x-show="visible"
@@ -88,15 +88,17 @@
     }) }}
 </div>
 
-<script>
-    // Sortable
-    var el = document.querySelector("#variants-list");
-    if (el) {
-        new Sortable(el, {
-            ghostClass: 'opacity-10',
-            handle: '.variant-drag-handle',
-            draggable: '.variant-block',
-            group: 'variants'
-        });
-    }
+<script type="text/javascript">
+    // Sortable - wait for main js bundles to be executed
+    window.onload = (event) => {
+        var el = document.querySelector("#variants-list");
+        if (el) {
+            new Market.Sortable(el, {
+                ghostClass: 'opacity-10',
+                handle: '.variant-drag-handle',
+                draggable: '.variant-block',
+                group: 'variants'
+            });
+        }
+    };
 </script>

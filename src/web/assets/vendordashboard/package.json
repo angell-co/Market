@@ -5,18 +5,23 @@
   "main": "css/main.css",
   "dependencies": {},
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^11.2.0",
     "@tailwindcss/aspect-ratio": "^0.2.0",
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/typography": "^0.4.0",
+    "alpinejs": "^2.8.2",
     "autoprefixer": "^10.2.5",
     "postcss": "^8.2.8",
     "postcss-cli": "^8.3.1",
+    "rollup": "^2.42.3",
+    "sortablejs": "^1.13.0",
     "tailwindcss": "^2.0.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx postcss css/main.pcss -o dist/css/main.css",
-    "build": "npx postcss css/main.pcss -o dist/css/main.css --env production"
+    "css_dev": "npx postcss src/css/main.pcss -o dist/css/main.css",
+    "css_prod": "npx postcss src/css/main.pcss -o dist/css/main.css --env production",
+    "js_dev": "rollup --config"
   },
   "author": "",
   "license": "ISC"

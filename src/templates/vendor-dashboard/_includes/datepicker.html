@@ -2,7 +2,7 @@
     {% set value = null %}
 {% endif %}
 
-<div x-data="datepicker()"
+<div x-data="Market.datepickerField()"
      x-init="[initDate('{{ value }}'), getNoOfDays()]"
      x-cloak
 >
@@ -48,7 +48,7 @@
 
         <header class="flex justify-between items-center mb-2 bg-gray-100 p-4">
             <div>
-                <span x-text="DP_MONTH_NAMES[month]" class="text-lg font-bold text-gray-800"></span>
+                <span x-text="Market.DP_MONTH_NAMES[month]" class="text-lg font-bold text-gray-800"></span>
                 <span x-text="year" class="ml-1 text-lg text-gray-600 font-normal"></span>
             </div>
             <nav>
@@ -73,7 +73,7 @@
 
         <div class="p-3">
             <div class="grid grid-cols-7 gap-1">
-                <template x-for="(day, index) in DP_DAYS" :key="index">
+                <template x-for="(day, index) in Market.DP_DAYS" :key="index">
                     <div x-text="day"
                          class="w-7 mx-0.5 mb-2 text-gray-800 font-medium text-center text-xs"
                     ></div>

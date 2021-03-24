@@ -1,4 +1,4 @@
-function skuField() {
+const skuField = function() {
     return {
         prefix: '',
         skuValue: '',
@@ -16,4 +16,6 @@ function skuField() {
             }
         }
     }
-}
+};
+
+export default skuField;

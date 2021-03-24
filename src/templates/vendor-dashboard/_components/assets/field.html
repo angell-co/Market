@@ -186,7 +186,7 @@
     </ul>
 
     {# Asset browser #}
-    <div x-data="assetField()"
+    <div x-data="Market.assetField()"
          x-init="initField('{{ _fieldId }}')"
     >
 
@@ -299,11 +299,11 @@
 </div>
 
 <script>
-    // Sortable
+    // Sortable - wait for htmx
     htmx.onLoad(function(content) {
         var el = content.querySelector("#field-{{ _fieldId }}-list");
         if (el) {
-            new Sortable(el, {
+            new Market.Sortable(el, {
                 ghostClass: 'opacity-10'
             });
         }

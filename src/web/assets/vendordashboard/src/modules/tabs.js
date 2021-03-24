@@ -1,4 +1,4 @@
-function tabs() {
+const tabs = function() {
     return {
         tab: null,
 
@@ -27,4 +27,6 @@ function tabs() {
         }
 
     };
-}
+};
+
+export default tabs;

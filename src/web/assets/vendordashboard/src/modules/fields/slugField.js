@@ -1,4 +1,4 @@
-function slugField() {
+const slugField = function() {
     return {
         slug: '',
 
@@ -32,4 +32,6 @@ function slugField() {
             this.slug = val;
         }
     }
-}
+};
+
+export default slugField;

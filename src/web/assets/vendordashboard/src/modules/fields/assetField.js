@@ -1,11 +1,4 @@
-if (typeof Market === 'undefined') {
-    var Market = {
-        categoryFields: {},
-        assetFields: {}
-    };
-}
-
-function assetField() {
+const assetField = function() {
     return {
         open: false,
         fieldId: null,
@@ -58,4 +51,6 @@ function assetField() {
             htmx.find('#field-'+this.fieldId+'-uploader-progress').style.width = percent+'%';
         }
     }
-}
+};
+
+export default assetField;

@@ -1,4 +1,4 @@
-function textField() {
+const textField = function() {
     return {
         fieldId: null,
         value: null,
@@ -27,4 +27,6 @@ function textField() {
             return this.limit - this.value.length
         },
     }
-}
+};
+
+export default textField;

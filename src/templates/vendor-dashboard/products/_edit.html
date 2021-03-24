@@ -126,7 +126,7 @@
             {% endfor %}
         {% endset %}
 
-        <div x-data="tabs()"
+        <div x-data="Market.tabs()"
              x-init="initTabs('{{ (tabs|first).name|kebab }}')"
              class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-4 grid grid-cols-1 gap-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
         >

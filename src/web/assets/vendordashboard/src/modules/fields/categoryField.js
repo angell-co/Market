@@ -1,11 +1,4 @@
-if (typeof Market === 'undefined') {
-    var Market = {
-        categoryFields: {},
-        assetFields: {}
-    };
-}
-
-function categoryField() {
+const categoryField = function() {
     return {
         open: false,
         fieldId: null,
@@ -38,4 +31,6 @@ function categoryField() {
             }
         }
     }
-}
+};
+
+export default categoryField;
