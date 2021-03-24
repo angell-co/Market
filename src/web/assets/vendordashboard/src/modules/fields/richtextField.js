@@ -50,30 +50,29 @@ const richtextField = function (content) {
                 content: this.content,
                 editorProps: {
                     attributes: {
-                        class: "prose prose-action text-gray-500 max-w-none"
+                        class: "prose prose-action text-gray-500 max-w-none max-h-96 overflow-x-auto p-3 rounded-b-md focus:outline-none focus:ring-2 focus:ring-action-500 focus:border-action-500"
                     }
                 }
-            })
+            });
 
             editor.on("update", () => {
-                this.content = this.editor.getHTML()
-            })
+                this.content = this.editor.getHTML();
+            });
 
             editor.on("focus", () => {
-                this.inFocus = true
-            })
+                this.inFocus = true;
+            });
 
             editor.on("selection", () => {
-                this.updatedAt = Date.now()
-            })
+                this.updatedAt = Date.now();
+            });
 
-            this.editor = editor
+            this.editor = editor;
         },
 
         setLink() {
-            const url = window.prompt('URL')
-
-            this.editor.chain().focus().setLink({ href: url }).run()
+            const url = window.prompt('URL');
+            this.editor.chain().focus().setLink({ href: url }).run();
         },
     }
 };
