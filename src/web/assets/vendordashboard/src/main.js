@@ -9,6 +9,7 @@ import assetField from './modules/fields/assetField.js';
 import categoryField from './modules/fields/categoryField.js';
 import { DP_MONTH_NAMES, DP_DAYS, datepickerField } from './modules/fields/datepickerField.js';
 import lightswitchField from './modules/fields/lightswitchField.js';
+import richtextField from './modules/fields/richtextField.js';
 import skuField from './modules/fields/skuField.js';
 import slugField from './modules/fields/slugField.js';
 import stockField from './modules/fields/stockField.js';
@@ -33,6 +34,7 @@ export default {
     datepickerField,
     lightswitchField,
 
+    richtextField,
     skuField,
     slugField,
     stockField,

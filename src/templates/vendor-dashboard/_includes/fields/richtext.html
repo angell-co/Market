@@ -1,24 +1,9 @@
 {% set value = '' %}
 {% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
-{% js "https://cdn.ckeditor.com/ckeditor5/25.0.0/classic/ckeditor.js" %}
 
-{% js %}
-    ClassicEditor
-        .create(document.querySelector('#field-{{ field.id }}'), {
-            toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ],
-        })
-        .then(editor => {
-            // https://stackoverflow.com/a/45145797/1688568
-            editor.model.document.on('change:data', () => {
-                editor.updateSourceElement();
-            });
-        })
-        .catch(error => {
-            console.error(error);
-        });
-{% endjs %}
 
 {# TODO - sort buttons / options and format the internal text #}
+{# TODO: errors #}
 
 <div>
     <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
@@ -30,9 +15,35 @@
         <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
     {% endif %}
 
-    <div class="mt-2">
-        <textarea id="field-{{ field.id }}" name="fields[{{ field.handle }}]">
-            {{ value|e }}
-        </textarea>
+    <div x-data="Market.richtextField('{{ value|e }}')"
+         x-init="() => init($refs.editor)"
+         x-on:click.away="inFocus = false"
+         class="mt-2 bg-white shadow rounded-md relative"
+    >
+        <template x-if="editor">
+            <nav class="bg-gray-200 px-2 py-2.5 sm:px-3 select-none rounded-t-md">
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('bold') }"
+                        @click="editor.chain().focus().toggleBold().run()"
+                >
+                    Bold
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('italic') }"
+                        @click="editor.chain().focus().toggleItalic().run()"
+                >
+                    Italic
+                </button>
+            </nav>
+        </template>
+
+        <div x-ref="editor" class="bg-gray-50 px-2 py-2.5 sm:p-3 rounded-b-md"></div>
+
+        <input type="hidden"
+               id="field-{{ field.id }}"
+               name="fields[{{ field.handle }}]"
+               :value="content">
     </div>
 </div>
