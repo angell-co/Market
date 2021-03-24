@@ -23,6 +23,7 @@ const richtextField = function (content) {
         // rerender on selection change
         updatedAt: Date.now(),
         editor: null,
+        showLinkPanel: false,
 
         init(el) {
             let editor = new TipTap({
@@ -70,9 +71,11 @@ const richtextField = function (content) {
             this.editor = editor;
         },
 
+        // TODO:
         setLink() {
-            const url = window.prompt('URL');
-            this.editor.chain().focus().setLink({ href: url }).run();
+            this.showLinkPanel = true;
+            // const url = window.prompt('URL');
+            // this.editor.chain().focus().setLink({ href: url }).run();
         },
     }
 };

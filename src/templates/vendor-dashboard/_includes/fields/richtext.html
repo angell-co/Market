@@ -18,7 +18,7 @@
     <div x-data="Market.richtextField('{{ value|e }}')"
          x-init="() => init($refs.editor)"
          x-on:click.away="inFocus = false"
-         class="mt-2 border shadow-sm sm:text-sm border-gray-300 rounded-md"
+         class="mt-2 border shadow-sm sm:text-sm border-gray-300 rounded-md relative"
     >
         <template x-if="editor">
             <div class="bg-gray-50 border-b p-3 overflow-y-auto rounded-t-md">
@@ -169,6 +169,42 @@
         </template>
 
         <div x-ref="editor"></div>
+
+        <div x-show="showLinkPanel" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+            <div class="absolute inset-0 overflow-hidden">
+
+                <div class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                <div class="absolute inset-y-0 right-0 pl-10 max-w-full flex">
+
+                    <div class="w-screen max-w-md">
+                        <div class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
+                            <div class="px-4 sm:px-6">
+                                <div class="flex items-start justify-between">
+                                    <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">
+                                        Panel title
+                                    </h2>
+                                    <div class="ml-3 h-7 flex items-center">
+                                        <button class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            <span class="sr-only">Close panel</span>
+                                            <!-- Heroicon name: outline/x -->
+                                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6 relative flex-1 px-4 sm:px-6">
+                                <div class="absolute inset-0 px-4 sm:px-6">
+                                    <div class="h-full border-2 border-dashed border-gray-200" aria-hidden="true"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <input type="hidden"
                id="field-{{ field.id }}"
