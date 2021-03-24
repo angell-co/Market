@@ -1,0 +1,29 @@
+{% extends "_market/_layouts/main" %}
+
+{% if profileId != null and profile is not defined %}
+    {% set profile = market.plugin.shippingProfiles.getShippingProfileById(profileId) %}
+{% endif %}
+
+{% if not profile %}
+    {% exit 404 %}
+{% endif %}
+
+{% set title = '{name}'|t('market', {name: profile.name}) %}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/shipping'),
+        label: 'Shipping'|t('market')
+    },
+    {
+        url: craft.app.request.getUrl,
+        label: title
+    }
+] %}
+
+{% block main %}
+    <div class="py-6">
+        FOO
+    </div>
+{% endblock %}
+
