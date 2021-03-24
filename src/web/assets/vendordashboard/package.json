@@ -13,7 +13,19 @@
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/typography": "^0.4.0",
     "@tiptap/core": "^2.0.0-beta.5",
-    "@tiptap/starter-kit": "^2.0.0-beta.4",
+    "@tiptap/extension-blockquote": "^2.0.0-beta.1",
+    "@tiptap/extension-bold": "^2.0.0-beta.1",
+    "@tiptap/extension-bullet-list": "^2.0.0-beta.1",
+    "@tiptap/extension-document": "^2.0.0-beta.1",
+    "@tiptap/extension-hard-break": "^2.0.0-beta.1",
+    "@tiptap/extension-heading": "^2.0.0-beta.1",
+    "@tiptap/extension-italic": "^2.0.0-beta.1",
+    "@tiptap/extension-link": "^2.0.0-beta.1",
+    "@tiptap/extension-list-item": "^2.0.0-beta.1",
+    "@tiptap/extension-ordered-list": "^2.0.0-beta.1",
+    "@tiptap/extension-paragraph": "^2.0.0-beta.1",
+    "@tiptap/extension-text": "^2.0.0-beta.1",
+    "@tiptap/extension-typography": "^2.0.0-beta.1",
     "alpinejs": "^2.8.2",
     "autoprefixer": "^10.2.5",
     "postcss": "^8.2.8",
@@ -27,8 +39,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "css_dev": "npx postcss src/css/main.pcss -o dist/css/main.css",
     "css_prod": "npx postcss src/css/main.pcss -o dist/css/main.css --env production",
-    "js_dev": "rollup --config"
+    "js": "rollup --config",
+    "dev": "npm run js && npm run css_dev",
+    "build": "npm run js && npm run css_prod"
   },
-  "author": "",
+  "author": "Josh Angell",
   "license": "ISC"
 }

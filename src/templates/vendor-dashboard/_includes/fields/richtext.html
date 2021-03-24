@@ -24,17 +24,59 @@
             <nav class="bg-gray-200 px-2 py-2.5 sm:px-3 select-none rounded-t-md">
                 <button type="button"
                         class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('heading', { level: 2 }) }"
+                >
+                    H2
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('heading', { level: 3 }) }"
+                >
+                    H3
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().setParagraph().run()"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('paragraph') }"
+                >
+                    P
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleBold().run()"
                         x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('bold') }"
-                        @click="editor.chain().focus().toggleBold().run()"
                 >
                     Bold
                 </button>
                 <button type="button"
                         class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleItalic().run()"
                         x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('italic') }"
-                        @click="editor.chain().focus().toggleItalic().run()"
                 >
                     Italic
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleBulletList().run()"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('bulletList') }"
+                >
+                    Bullet list
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleOrderedList().run()"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('orderedList') }"
+                >
+                    Ordered list
+                </button>
+                <button type="button"
+                        class="bg-gray-200 rounded px-2 py-1"
+                        x-on:click="editor.chain().focus().toggleBlockquote().run()"
+                        x-bind:class="{ 'bg-gray-600 text-white': editor.isActive('blockquote') }"
+                >
+                    Quote
                 </button>
             </nav>
         </template>
