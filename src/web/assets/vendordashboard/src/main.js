@@ -18,17 +18,21 @@ import titleField from './modules/fields/titleField.js';
 
 export default {
     Sortable,
-    categoryFields: {},
-    assetFields: {},
+
     tabs,
     assetIndex,
     variantBlock,
-    assetField, // CHECK Market.var stuff
-    categoryField, // CHECK Market.var stuff
+
+    categoryFields: {},
+    assetFields: {},
+    assetField,
+    categoryField,
+
     DP_MONTH_NAMES,
     DP_DAYS,
     datepickerField,
     lightswitchField,
+
     skuField,
     slugField,
     stockField,
