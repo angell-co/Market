@@ -16,8 +16,9 @@ import Blockquote from '@tiptap/extension-blockquote';
 
 import Link from '@tiptap/extension-link';
 
-const richtextField = function (content) {
+const richtextField = function (content, fieldId) {
     return {
+        fieldId: fieldId,
         content: content,
         inFocus: false,
         // updatedAt is to force Alpine to
@@ -76,6 +77,15 @@ const richtextField = function (content) {
 
         openLinkPanel() {
             this.showLinkPanel = true;
+
+            // Preset the form with the current link data if its there
+            const attrs = this.editor.getMarkAttributes('link');
+            if (attrs.href) {
+                this.linkUrl = attrs.href;
+            }
+            if (attrs.target && attrs.target === '_blank') {
+                this.linkTarget = true;
+            }
         },
 
         closeLinkPanel() {
@@ -85,10 +95,6 @@ const richtextField = function (content) {
         },
 
         setLink() {
-            console.log(this.linkTarget);
-            // const url = window.prompt('URL');
-            // url: element.url + '#' + refHandle + ':' + element.id + '@' + element.siteId,
-            // produces: https://cheerfully-given-v3.test/shop/test#product:157349@1
             this.editor.chain().focus().setLink({
                 href: this.linkUrl,
                 target: this.linkTarget ? '_blank' : null
@@ -97,6 +103,34 @@ const richtextField = function (content) {
             // After we’ve committed it, close the window and clear the models
             this.closeLinkPanel();
         },
+
+        fixScroll(evt) {
+            // Product queries
+            if (evt.target.id === 'field-'+this.fieldId+'-link-panel-link-product-results') {
+
+                // Hide file results
+                const fileResults = document.getElementById('field-'+this.fieldId+'-link-panel-link-file-results-inner');
+                if (fileResults) {
+                    fileResults.remove();
+                }
+
+                // Sort the scroll
+                htmx.find('#field-'+this.fieldId+'-link-panel-container').scrollTop = 240;
+            }
+
+            // File queries
+            if (evt.target.id === 'field-'+this.fieldId+'-link-panel-link-file-results') {
+
+                // Hide file results
+                const productResults = document.getElementById('field-'+this.fieldId+'-link-panel-link-product-results-inner');
+                if (productResults) {
+                    productResults.remove();
+                }
+
+                // Sort the scroll
+                htmx.find('#field-'+this.fieldId+'-link-panel-container').scrollTop = 150;
+            }
+        }
     }
 };
 

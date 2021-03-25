@@ -1,8 +1,6 @@
 {% set value = '' %}
 {% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
 
-
-{# TODO - sort buttons / options and format the internal text #}
 {# TODO: errors #}
 
 <div>
@@ -15,7 +13,7 @@
         <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
     {% endif %}
 
-    <div x-data="Market.richtextField('{{ value|e }}')"
+    <div x-data="Market.richtextField('{{ value|e }}', '{{ field.id }}')"
          x-init="() => init($refs.editor)"
          x-on:click.away="inFocus = false"
          x-on:keydown.cmd.k="openLinkPanel"
@@ -206,8 +204,8 @@
                 <div class="w-screen max-w-md">
                     <div class="h-full flex flex-col py-6 bg-white shadow-xl overflow-hidden">
                         {# Panel header #}
-                        <div class="flex-shrink-0 px-4 sm:px-6">
-                            <div class="flex items-start justify-between">
+                        <div class="flex-shrink-0 px-6 border-b">
+                            <div class="flex items-start justify-between mb-6">
                                 <h2 class="text-lg font-medium text-gray-900" id="field-{{ field.id }}-link-panel-title">
                                     Add a link
                                 </h2>
@@ -226,13 +224,13 @@
                             </div>
                         </div>
 
-                        <div class="mt-6 flex flex-col h-full border-t pt-6">
+                        <div class="flex flex-col h-full">
 
                             {# Panel middle #}
-                            <div class="relative flex-1 overflow-y-auto px-4 sm:px-6">
-                                <div class="absolute inset-0 px-4 sm:px-6">
+                            <div id="field-{{ field.id }}-link-panel-container" class="relative flex-1 overflow-y-auto px-6">
+                                <div class="absolute inset-0 px-6">
 
-                                    <div class="space-y-4">
+                                    <div class="space-y-4 py-6">
                                         <div>
                                             <label for="field-{{ field.id }}-link-panel-link-url" class="block text-sm font-medium text-gray-700">
                                                 URL
@@ -259,26 +257,12 @@
                                             </div>
                                         </div>
 
-                                        {# TODO #}
-                                        <div>
-                                            <label for="field-{{ field.id }}-link-panel-link-file" class="block text-sm font-medium text-gray-700">
-                                                Link to a file
-                                            </label>
-
-                                        </div>
-
-                                        {# TODO - pull up a list of products, in a small panel with only search? #}
-                                        <div>
-                                            <label for="field-{{ field.id }}-link-panel-link-product" class="block text-sm font-medium text-gray-700">
-                                                Link to a product
-                                            </label>
-
-                                            {{ sprig('_market/_components/richtext/link-to-products', {
-                                                _fieldId: field.id
-                                            }) }}
-                                        </div>
-
-
+                                        {{ sprig('_market/_components/richtext-links', {
+                                            _fieldId: field.id
+                                        }, {
+                                            class: 'space-y-4',
+                                            'x-on:htmx:after-swap' : 'fixScroll'
+                                        }) }}
                                     </div>
                                 </div>
                             </div>
