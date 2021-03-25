@@ -13,6 +13,7 @@ import BulletList from '@tiptap/extension-bullet-list';
 import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
 import Blockquote from '@tiptap/extension-blockquote';
+
 import Link from '@tiptap/extension-link';
 
 const richtextField = function (content) {
@@ -24,6 +25,8 @@ const richtextField = function (content) {
         updatedAt: Date.now(),
         editor: null,
         showLinkPanel: false,
+        linkUrl: '',
+        linkTarget: '',
 
         init(el) {
             let editor = new TipTap({
@@ -51,7 +54,7 @@ const richtextField = function (content) {
                 content: this.content,
                 editorProps: {
                     attributes: {
-                        class: "prose prose-action text-gray-500 max-w-none max-h-96 overflow-x-auto p-3 rounded-b-md focus:outline-none focus:ring-2 focus:ring-action-500 focus:border-action-500"
+                        class: "prose prose-action text-gray-500 max-w-none h-96 overflow-x-auto p-3 rounded-b-md focus:outline-none focus:ring-2 focus:ring-action-500 focus:border-action-500"
                     }
                 }
             });
@@ -71,11 +74,28 @@ const richtextField = function (content) {
             this.editor = editor;
         },
 
-        // TODO:
-        setLink() {
+        openLinkPanel() {
             this.showLinkPanel = true;
+        },
+
+        closeLinkPanel() {
+            this.showLinkPanel = false;
+            this.linkUrl = '';
+            this.linkTarget = '';
+        },
+
+        setLink() {
+            console.log(this.linkTarget);
             // const url = window.prompt('URL');
-            // this.editor.chain().focus().setLink({ href: url }).run();
+            // url: element.url + '#' + refHandle + ':' + element.id + '@' + element.siteId,
+            // produces: https://cheerfully-given-v3.test/shop/test#product:157349@1
+            this.editor.chain().focus().setLink({
+                href: this.linkUrl,
+                target: this.linkTarget ? '_blank' : null
+            }).run();
+
+            // After we’ve committed it, close the window and clear the models
+            this.closeLinkPanel();
         },
     }
 };

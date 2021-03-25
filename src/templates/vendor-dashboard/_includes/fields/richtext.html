@@ -18,6 +18,7 @@
     <div x-data="Market.richtextField('{{ value|e }}')"
          x-init="() => init($refs.editor)"
          x-on:click.away="inFocus = false"
+         x-on:keydown.cmd.k="openLinkPanel"
          class="mt-2 border shadow-sm sm:text-sm border-gray-300 rounded-md relative"
     >
         <template x-if="editor">
@@ -122,7 +123,7 @@
                     {# Add link #}
                     <button type="button"
                             class="-ml-px relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-action-500 focus:border-action-500"
-                            x-on:click="setLink"
+                            x-on:click="openLinkPanel"
                             x-bind:class="{ 'bg-gray-100': editor.isActive('link') }"
                     >
                         <svg class="p-1 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -170,34 +171,133 @@
 
         <div x-ref="editor"></div>
 
-        <div x-show="showLinkPanel" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
-            <div class="absolute inset-0 overflow-hidden">
+        <div x-show="showLinkPanel"
+             x-cloak
+             aria-labelledby="field-{{ field.id }}-link-panel-title"
+             role="dialog"
+             aria-modal="true"
+             class="absolute inset-0 overflow-hidden z-60 rounded-md"
+        >
+            {# Overlay #}
+            <div x-show="showLinkPanel"
+                 x-transition:enter="ease-in-out duration-500"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in-out duration-500"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                 x-on:click="closeLinkPanel"
+                 aria-hidden="true"
+            ></div>
 
-                <div class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            {# Panel #}
+            <div x-show="showLinkPanel"
+                 x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full"
+                 class="absolute inset-y-0 right-0 pl-10 max-w-full flex"
+                 x-on:keydown.window.escape="closeLinkPanel"
+                 x-on:click.away="closeLinkPanel"
+            >
+                <div class="w-screen max-w-md">
+                    <div class="h-full flex flex-col py-6 bg-white shadow-xl overflow-hidden">
+                        {# Panel header #}
+                        <div class="flex-shrink-0 px-4 sm:px-6">
+                            <div class="flex items-start justify-between">
+                                <h2 class="text-lg font-medium text-gray-900" id="field-{{ field.id }}-link-panel-title">
+                                    Add a link
+                                </h2>
+                                <div class="ml-3 h-7 flex items-center">
+                                    <button x-on:click="closeLinkPanel"
+                                            type="button"
+                                            class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        <span class="sr-only">Close link panel</span>
+                                        {# Heroicon name: outline/x #}
+                                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="absolute inset-y-0 right-0 pl-10 max-w-full flex">
+                        <div class="mt-6 flex flex-col h-full border-t pt-6">
 
-                    <div class="w-screen max-w-md">
-                        <div class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
-                            <div class="px-4 sm:px-6">
-                                <div class="flex items-start justify-between">
-                                    <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">
-                                        Panel title
-                                    </h2>
-                                    <div class="ml-3 h-7 flex items-center">
-                                        <button class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            <span class="sr-only">Close panel</span>
-                                            <!-- Heroicon name: outline/x -->
-                                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
+                            {# Panel middle #}
+                            <div class="relative flex-1 overflow-y-auto px-4 sm:px-6">
+                                <div class="absolute inset-0 px-4 sm:px-6">
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="field-{{ field.id }}-link-panel-link-url" class="block text-sm font-medium text-gray-700">
+                                                URL
+                                            </label>
+                                            <input type="text"
+                                                   id="field-{{ field.id }}-link-panel-link-url"
+                                                   x-model="linkUrl"
+                                                   class="mt-1 block w-full shadow-sm sm:text-sm rounded-md border-gray-300 focus:ring-action-500 focus:border-action-500"
+                                            >
+                                        </div>
+
+                                        <div class="border-b pb-4">
+                                            <div class="relative flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input x-model="linkTarget"
+                                                           id="field-{{ field.id }}-link-panel-link-target"
+                                                           type="checkbox"
+                                                           class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="field-{{ field.id }}-link-panel-link-target" class="font-medium text-gray-700">Open in a new window?</label>
+                                                    <p class="text-gray-500">This will set the <code>target="_blank"</code> attribute on the link.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {# TODO #}
+                                        <div>
+                                            <label for="field-{{ field.id }}-link-panel-link-file" class="block text-sm font-medium text-gray-700">
+                                                Link to a file
+                                            </label>
+
+                                        </div>
+
+                                        {# TODO - pull up a list of products, in a small panel with only search? #}
+                                        <div>
+                                            <label for="field-{{ field.id }}-link-panel-link-product" class="block text-sm font-medium text-gray-700">
+                                                Link to a product
+                                            </label>
+
+                                            {{ sprig('_market/_components/richtext/link-to-products', {
+                                                _fieldId: field.id
+                                            }) }}
+                                        </div>
+
+
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-6 relative flex-1 px-4 sm:px-6">
-                                <div class="absolute inset-0 px-4 sm:px-6">
-                                    <div class="h-full border-2 border-dashed border-gray-200" aria-hidden="true"></div>
+
+                            {# Panel footer #}
+                            <div class="flex-none h-16 border-t">
+                                <div class="flex justify-between py-6 px-4 sm:px-6">
+                                    <button x-on:click.prevent="closeLinkPanel"
+                                            type="button"
+                                            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button x-on:click="setLink"
+                                            type="button"
+                                            class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
+                                    >
+                                        Save
+                                    </button>
                                 </div>
                             </div>
                         </div>
