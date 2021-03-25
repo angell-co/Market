@@ -154,12 +154,20 @@ class ShippingProfiles extends Component
         $record->validate();
         $model->addErrors($record->getErrors());
 
-//        // Validate the model too so we catch any requirements from that
-//        $model->validate();
+        // Validate the model too so we catch any requirements from that
+        $model->validate();
 
-//        if ($model->hasErrors()) {
-//            return false;
-//        }
+        // TODO: validate $model->getShippingDestinations()
+        // Should this be on the controller so we have access to the posted array key?
+        foreach ($model->getShippingDestinations() as $shippingDestination) {
+            $shippingDestination->validate();
+            $model->addErrors(['destinations.'.$shippingDestination->id => $shippingDestination->getErrors()]);
+        }
+
+
+        if ($model->hasErrors()) {
+            return false;
+        }
 
         $transaction = Craft::$app->getDb()->beginTransaction();
         try {

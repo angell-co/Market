@@ -10,6 +10,7 @@
 
 namespace angellco\market\web\twig;
 
+use angellco\market\helpers\ShippingProfileHelper;
 use angellco\market\Market;
 use angellco\market\services\Vendors;
 use Craft;
@@ -72,5 +73,13 @@ class MarketVariable extends ServiceLocator
         }
 
         return $elements;
+    }
+
+    /**
+     * @return ShippingProfileHelper
+     */
+    public function shippingProfileHelper(): ShippingProfileHelper
+    {
+        return new ShippingProfileHelper();
     }
 }

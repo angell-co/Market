@@ -194,8 +194,6 @@ class ShippingController extends Controller
 
         $shippingProfile->setShippingDestinations($destinations);
 
-        // TODO: return json as well so we can use this on the front
-
         // Save it
         if (Market::$plugin->getShippingProfiles()->saveShippingProfile($shippingProfile)) {
             $this->setSuccessFlash(Craft::t('market', 'Shipping profile saved.'));
