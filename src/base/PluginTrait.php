@@ -198,8 +198,11 @@ trait PluginTrait
 
                 $event->rules['market/files'] = ['template' => '_market/files/_index'];
                 $event->rules['market/files/<assetId:\d+>'] = ['template' => '_market/files/_edit'];
+
                 $event->rules['market/shipping'] = ['template' => '_market/shipping/_index'];
+                $event->rules['market/shipping/new'] = ['template' => '_market/shipping/_edit'];
                 $event->rules['market/shipping/<profileId:\d+>'] = ['template' => '_market/shipping/_edit'];
+
                 $event->rules['market/reports'] = ['template' => '_market/reports/_index'];
                 $event->rules['market/settings'] = ['template' => '_market/settings/_index'];
 

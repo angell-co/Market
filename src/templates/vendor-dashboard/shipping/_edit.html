@@ -20,23 +20,6 @@
     }) %}
 {% endif %}
 
-
-
-{#// Shared attributes#}
-{#$shippingProfile->id = Craft::$app->getRequest()->getBodyParam('profileId');#}
-{#$shippingProfile->name = Craft::$app->getRequest()->getBodyParam('name');#}
-{#$shippingProfile->originCountryId = Craft::$app->getRequest()->getBodyParam('originCountryId');#}
-{#$shippingProfile->processingTime = Craft::$app->getRequest()->getBodyParam('processingTime');#}
-
-{#// Sort out the vendor ID#}
-{#$vendorId = Craft::$app->getRequest()->getBodyParam('vendorId');#}
-{#if (is_array($vendorId)) {#}
-{#$vendorId = array_shift($vendorId);#}
-{#}#}
-{#$shippingProfile->vendorId = $vendorId;#}
-
-
-
 {% set breadcrumbs = [
     {
         url: url('market/shipping'),
@@ -95,7 +78,7 @@
             <div class="shadow rounded-md overflow-hidden">
                 <div class="px-4 py-5 bg-white sm:p-6">
 
-                    <div class="grid grid-cols-2 gap-4 sm:gap-6">
+                    <div class="grid grid-cols-3 gap-4 sm:gap-6">
 
                         {# Left col #}
                         <div class="space-y-6">
@@ -137,186 +120,82 @@
                         </div>
 
                         {# Right col #}
-                        <div>
-                            <label for="destinations-list" class="block text-sm font-medium text-gray-700">
-                                {{ 'Shipping Costs'|t('app') }}
-                                <span class="text-red-600">*</span>
-                            </label>
+                        <div class="col-span-2">
 
-                            <p class="text-xs text-gray-500">{{ 'Add a shipping cost for each destination you ship to.'|t('market') }}</p>
+                            {% set generalDestinationErrors = shippingProfile.getErrors('shippingDestinations') %}
+                            <div{% if generalDestinationErrors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
+                                <div class="flex">
+                                    <div class="flex-grow">
+                                        <label for="variants" class="block text-sm font-medium text-gray-700">
+                                            {{ 'Shipping Costs'|t('market') }}
+                                            <span class="text-red-600">*</span>
+                                        </label>
+                                    </div>
 
-                            <input type="hidden" name="destinations" value="">
+                                    {% if generalDestinationErrors %}
+                                        <div class="ml-3 leading-1 space-y-1.5">
+                                            {% for error in generalDestinationErrors %}
+                                                <p class="text-sm text-red-600">{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
 
-                            <div id="destinations-list" class="mt-2 space-y-6">
-                                {% set count = 0 %}
-                                {% for destination in shippingProfile.getShippingDestinations() %}
-                                    {% if destination.id %}
-                                        {% set destinationKey = destination.id %}
-                                    {% else %}
-                                        {% set count = count + 1 %}
-                                        {% set destinationKey = 'new'~count %}
+                                        <div class="flex-shrink-0 ml-3">
+                                            {# Heroicon name: solid/exclamation-circle #}
+                                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
                                     {% endif %}
+                                </div>
 
-                                    {% set destinationErrors = destination.getErrors() %}
+                                <p class="text-xs text-gray-500">{{ 'Add a shipping cost for each destination you ship to.'|t('market') }}</p>
 
-                                    <div {#x-data="Market.shippingDestinationBlock()"#}
-                                            class="destination-block bg-white shadow rounded-md relative{% if destinationErrors %} border border-red-500{% endif %}"
-                                            {#x-show="visible"#}
-                                            x-transition:enter="ease-in-out duration-500"
-                                            x-transition:enter-start="opacity-0"
-                                            x-transition:enter-end="opacity-100"
-                                            x-transition:leave="ease-in-out duration-500"
-                                            x-transition:leave-start="opacity-100"
-                                            x-transition:leave-end="opacity-0"
-                                    >
+                                <input type="hidden" name="destinations" value="">
 
-                                        {% if destinationErrors %}
-                                            <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                <div id="destinations-list" class="mt-2 space-y-6">
+                                    {% set count = 0 %}
+                                    {% for destination in shippingProfile.getShippingDestinations() %}
+                                        {% if destination.id %}
+                                            {% set destinationKey = destination.id %}
+                                        {% else %}
+                                            {% set count = count + 1 %}
+                                            {% set destinationKey = 'new'~count %}
                                         {% endif %}
 
-                                        <div class="bg-gray-50 px-2 py-2.5 sm:p-3 rounded-md space-y-6">
+                                        {% set destinationErrors = destination.getErrors() %}
 
-                                            {# Destination #}
-                                            <div>
-                                                <label for="destinations-{{ destinationKey }}-processingTime" class="block text-sm font-medium text-gray-700">
-                                                    {{ 'Destination Zone'|t('market') }}
-                                                    <span class="text-red-600">*</span>
-                                                </label>
+                                        <div x-data="Market.shippingDestinationBlock()"
+                                             x-init="initBlock(false, {{ shippingZones|length }})"
+                                             class="destination-block bg-white shadow rounded-md relative{% if destinationErrors %} border border-red-500{% endif %}"
+                                             x-show="visible"
+                                             x-transition:enter="ease-in-out duration-500"
+                                             x-transition:enter-start="opacity-0"
+                                             x-transition:enter-end="opacity-100"
+                                             x-transition:leave="ease-in-out duration-500"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                        >
 
-                                                <select id="destinations-{{ destinationKey }}-zone"
-                                                        name="destinations[{{ destinationKey }}][zone]"
-                                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-action-500 focus:border-action-500 sm:text-sm rounded-md"
-                                                >
-                                                    {% for zone in shippingZones %}
-                                                        <option {{ zone.id == destination.shippingZoneId ? 'selected' }} value="{{ zone.id }}">{{ zone.name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
+                                            {% if destinationErrors %}
+                                                <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                            {% endif %}
 
-                                            {# Primary Rate #}
-                                            <div>
-                                                <label for="destinations-{{ destinationKey }}-primaryRate" class="block text-sm font-medium text-gray-700">
-                                                    {{ 'Price for the first item'|t('market') }}
-                                                    <span class="text-red-600">*</span>
-                                                </label>
-
-                                                <div class="mt-1 relative rounded-md shadow-sm">
-                                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                        <span class="text-gray-500 sm:text-sm">
-                                                            {{ craft.app.locale.getCurrencySymbol(currentCurrency.iso) }}
-                                                        </span>
-                                                    </div>
-                                                    <input type="number"
-                                                           step=".01"
-                                                           min="0"
-                                                           id="destinations-{{ destinationKey }}-primaryRate"
-                                                           name="destinations[{{ destinationKey }}][primaryRate]"
-                                                           value="{{ craft.app.getFormatter().asDecimal(destination.primaryRate, 2) }}"
-                                                           class="block w-full pl-7 sm:text-sm rounded-md {{ destination.getErrors('primaryRate') ? 'pr-20 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'pr-12 border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
-                                                           placeholder="0.00"
-                                                           aria-describedby="destinations-{{ destinationKey }}-primaryRate-currency"
-                                                    >
-                                                    <div class="absolute inset-y-0 {{ destination.getErrors('primaryRate') ? 'right-10' : 'right-0 pr-3' }} flex items-center pointer-events-none">
-                                                        <span class="text-gray-500 sm:text-sm" id="destinations-{{ destinationKey }}-primaryRate-currency">
-                                                            {{ currentCurrency.iso }}
-                                                        </span>
-                                                    </div>
-                                                    {% if destination.getErrors('primaryRate') %}
-                                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                            {# Heroicon name: solid/exclamation-circle #}
-                                                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                            </svg>
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-
-                                                {% for error in destination.getErrors('primaryRate') %}
-                                                    <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                                                {% endfor %}
-                                            </div>
-
-                                            {# Secondary Rate #}
-                                            <div>
-                                                <label for="destinations-{{ destinationKey }}-secondaryRate" class="block text-sm font-medium text-gray-700">
-                                                    {{ 'Price for each additional item'|t('market') }}
-                                                </label>
-
-                                                <div class="mt-1 relative rounded-md shadow-sm">
-                                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                        <span class="text-gray-500 sm:text-sm">
-                                                            {{ craft.app.locale.getCurrencySymbol(currentCurrency.iso) }}
-                                                        </span>
-                                                    </div>
-                                                    <input type="number"
-                                                           step=".01"
-                                                           min="0"
-                                                           id="destinations-{{ destinationKey }}-secondaryRate"
-                                                           name="destinations[{{ destinationKey }}][secondaryRate]"
-                                                           value="{{ craft.app.getFormatter().asDecimal(destination.secondaryRate, 2) }}"
-                                                           class="block w-full pl-7 sm:text-sm rounded-md {{ destination.getErrors('secondaryRate') ? 'pr-20 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'pr-12 border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
-                                                           placeholder="0.00"
-                                                           aria-describedby="destinations-{{ destinationKey }}-secondaryRate-currency"
-                                                    >
-                                                    <div class="absolute inset-y-0 {{ destination.getErrors('secondaryRate') ? 'right-10' : 'right-0 pr-3' }} flex items-center pointer-events-none">
-                                                        <span class="text-gray-500 sm:text-sm" id="destinations-{{ destinationKey }}-secondaryRate-currency">
-                                                            {{ currentCurrency.iso }}
-                                                        </span>
-                                                    </div>
-                                                    {% if destination.getErrors('secondaryRate') %}
-                                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                            {# Heroicon name: solid/exclamation-circle #}
-                                                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                            </svg>
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-
-                                                {% for error in destination.getErrors('secondaryRate') %}
-                                                    <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                                                {% endfor %}
-                                            </div>
-
-                                            {# Delivery Time #}
-                                            <div>
-                                                <label for="destinations-{{ destinationKey }}-deliveryTime" class="block text-sm font-medium text-gray-700">
-                                                    {{ 'Estimated delivery time'|t('market') }}
-                                                    <span class="text-red-600">*</span>
-                                                </label>
-
-                                                <div class="mt-1 relative rounded-md shadow-sm">
-                                                    <input type="text"
-                                                           name="destinations[{{ destinationKey }}][deliveryTime]"
-                                                           id="destinations-{{ destinationKey }}-deliveryTime"
-                                                           value="{{ destination.deliveryTime }}"
-                                                           class="mt-1 block w-full sm:text-sm rounded-md {{ destination.getErrors('deliveryTime') ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
-                                                    >
-                                                    {% if destination.getErrors('deliveryTime') %}
-                                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                            {# Heroicon name: solid/exclamation-circle #}
-                                                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                            </svg>
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-
-                                                {% for error in destination.getErrors('deliveryTime') %}
-                                                    <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                                                {% endfor %}
-                                            </div>
+                                            {% include '_market/_includes/shipping-destination-block.html' %}
                                         </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
+                                    {% endfor %}
+                                </div>
 
+                                {{ sprig('_market/_components/add-destination', {
+                                    startingCount: shippingProfile.getShippingDestinations()|length,
+                                    _limit: shippingZones|length
+                                }, {
+                                    'id': 'add-destinations',
+                                    'class': 'mt-6'
+                                }) }}
+                            </div>
                         </div>
 
                     </div>
-
-                    {# TODO: ERRORS #}
-                    <pre>{{ dump(shippingProfile.getErrors()) }}</pre>
                 </div>
             </div>
         </div>

@@ -66,7 +66,7 @@ class ShippingDestination extends Model
     {
         $rules = parent::defineRules();
 
-        $rules[] = [['shippingProfileId', 'shippingZoneId', 'primaryRate', 'deliveryTime'], 'required'];
+        $rules[] = [['shippingZoneId', 'primaryRate', 'deliveryTime'], 'required'];
 
         return $rules;
     }

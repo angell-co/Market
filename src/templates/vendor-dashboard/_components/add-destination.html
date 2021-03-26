@@ -1,0 +1,40 @@
+{% if count is not defined %}
+    {% set count = startingCount %}
+{% endif %}
+
+{% if count > startingCount %}
+    {% set destinationKey = 'new'~count %}
+
+    <div x-data="Market.shippingDestinationBlock()"
+         x-init="initBlock(true, {{ _limit }})"
+         class="destination-block bg-white shadow rounded-md relative"
+         x-show="visible"
+         x-transition:enter="ease-in-out duration-500"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in-out duration-500"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+    >
+
+        {% include '_market/_includes/shipping-destination-block.html' %}
+
+    </div>
+{% endif %}
+
+<button sprig
+        s-val:count="{{ count + 1 }}"
+        s-select=".destination-block"
+        s-target="#destinations-list"
+        s-swap="beforeend swap:200ms"
+        s-swap-oob="true"
+        id="add-destination-button"
+        type="button"
+        class="mr-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-action-700 bg-action-100 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+>
+    {# Heroicon name: plus-circle #}
+    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-action-500" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+    </svg>
+    Add a destination
+</button>

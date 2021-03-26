@@ -4,6 +4,7 @@ import Sortable from 'sortablejs';
 import tabs from './modules/tabs.js';
 import assetIndex from './modules/assetIndex.js';
 import variantBlock from './modules/variantBlock.js';
+import shippingDestinationBlock from './modules/shippingDestinationBlock.js';
 
 import assetField from './modules/fields/assetField.js';
 import categoryField from './modules/fields/categoryField.js';
@@ -23,6 +24,7 @@ export default {
     tabs,
     assetIndex,
     variantBlock,
+    shippingDestinationBlock,
 
     categoryFields: {},
     assetFields: {},

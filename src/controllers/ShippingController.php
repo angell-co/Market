@@ -193,6 +193,13 @@ class ShippingController extends Controller
 
         // Set the shipping destinations as an array of models
         $destinationsPost = Craft::$app->getRequest()->getBodyParam('destinations');
+        if (empty($destinationsPost)) {
+            $shippingProfile->addErrors(['shippingDestinations' => 'Please add at least one destination.']);
+            $this->setFailFlash(Craft::t('market', 'Couldn’t save shipping profile.'));
+            Craft::$app->getUrlManager()->setRouteParams(['shippingProfile' => $shippingProfile]);
+            return;
+        }
+
         $destinations = [];
         foreach ($destinationsPost as $id => $destination) {
 
