@@ -54,53 +54,94 @@
 {% endblock %}
 
 {% block main %}
-    <div class="py-6 grid grid">
-        {% if asset.kind == 'image' %}
-            <img class="max-h-screen smh:max-h-screen-minus-header rounded-lg"
-                 src="{{ asset.url({
-                     width: 1024,
-                     height: 1024,
-                     mode: 'fit'
-                 }) }}"
-                 alt="{{ asset.title }}"
-            >
-        {% endif %}
+    <div class="py-6 lg:grid lg:grid-cols-3 lg:gap-6">
+        {# Preview #}
+        <div class="lg:col-span-2">
+            {% switch asset.kind %}
+                {% case 'image' %}
+                    <img class="max-h-screen smh:max-h-screen-minus-header rounded-lg"
+                         src="{{ asset.url({
+                             width: 1024,
+                             height: 1024,
+                             mode: 'fit'
+                         }) }}"
+                         alt="{{ asset.title }}"
+                    >
+
+                {% default %}
+                    <div class="h-screen max-h-screen smh:max-h-screen-minus-header rounded-lg bg-gray-300 relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <span class="w-full text-center text-gray-500 text-sm">Loading preview …</span>
+                        </div>
+                        <iframe class="absolute inset-0 w-full h-full rounded-lg"
+                                src="https://docs.google.com/viewer?url={{ asset.url }}&embedded=true"
+                                frameborder="0"
+                        ></iframe>
+                    </div>
+
+            {% endswitch %}
+        </div>
 
         {# Meta #}
-        <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+        <div x-data="{ showCopySuccess: false }" class="mt-6 lg:mt-0">
+            <div class="mt-1 space-y-4">
 
-            <div class="mt-2 flex items-center text-sm text-gray-500">
-                {# Heroicon name: document-text #}
-                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                </svg>
-                {{ asset.filename }}
-            </div>
-
-            {% if asset.kind == 'image' %}
-                <div class="mt-2 flex items-center text-sm text-gray-500">
-                    {# Heroicon name: photograph #}
-                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                <div class="flex items-top text-sm text-gray-500 overflow-hidden">
+                    {# Heroicon name: document-text #}
+                    <svg class="flex-shrink-0 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                     </svg>
-                    {{ asset.width }}x{{ asset.height }}
+                    <span class="truncate">{{ asset.filename }}</span>
                 </div>
-            {% endif %}
 
-            <div class="mt-2 flex items-center text-sm text-gray-500">
-                {# Heroicon name: scale #}
-                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clip-rule="evenodd" />
-                </svg>
-                {{ asset.size|filesize }}
-            </div>
+                <div class="flex items-top text-sm text-gray-500 relative">
+                    {# Heroicon name: link #}
+                    <svg class="flex-shrink-0 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                    </svg>
+                    <input x-ref="urlInput" class="sr-only" value="{{ asset.url }}">
+                    <a href="{{ asset.url }}"
+                       target="_blank"
+                       class="truncate hover:text-action-500"
+                       x-on:click.prevent="$refs.urlInput.select(); document.execCommand('copy'); showCopySuccess = true; setTimeout(() => {showCopySuccess = false}, 2000)"
+                    >{{ asset.url }}</a>
 
-            <div class="mt-2 flex items-center text-sm text-gray-500">
-                {# Heroicon name: calendar #}
-                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-                </svg>
-                {{ asset.dateCreated|datetime('d M Y, g:i A') }}
+                    <span x-show="showCopySuccess"
+                          x-transition:enter="ease-in-out duration-100"
+                          x-transition:enter-start="opacity-0"
+                          x-transition:enter-end="opacity-100"
+                          x-transition:leave="ease-in-out duration-100"
+                          x-transition:leave-start="opacity-100"
+                          x-transition:leave-end="opacity-0"
+                          class="absolute -bottom-8 left-1/2 -ml-10 w-20 px-2.5 py-0.5 rounded-full text-center text-xs font-medium bg-action-100 text-action-800 border border-action-400 focus:outline-none"
+                    >Copied!</span>
+                </div>
+
+                {% if asset.kind == 'image' %}
+                    <div class="flex items-top text-sm text-gray-500 overflow-hidden">
+                        {# Heroicon name: photograph #}
+                        <svg class="flex-shrink-0 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="truncate">{{ asset.width }}x{{ asset.height }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="flex items-top text-sm text-gray-500 overflow-hidden">
+                    {# Heroicon name: scale #}
+                    <svg class="flex-shrink-0 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="truncate">{{ asset.size|filesize }}</span>
+                </div>
+
+                <div class="flex items-top text-sm text-gray-500 overflow-hidden">
+                    {# Heroicon name: calendar #}
+                    <svg class="flex-shrink-0 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="truncate">{{ asset.dateCreated|datetime('d M Y, g:i A') }}</span>
+                </div>
             </div>
         </div>
     </div>

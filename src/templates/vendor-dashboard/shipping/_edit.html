@@ -78,7 +78,7 @@
             <div class="shadow rounded-md overflow-hidden">
                 <div class="px-4 py-5 bg-white sm:p-6">
 
-                    <div class="grid grid-cols-3 gap-4 sm:gap-6">
+                    <div class="lg:grid lg:grid-cols-3 lg:gap-6">
 
                         {# Left col #}
                         <div class="space-y-6">
@@ -120,7 +120,7 @@
                         </div>
 
                         {# Right col #}
-                        <div class="col-span-2">
+                        <div class="mt-6 lg:mt-0 lg:col-span-2">
 
                             {% set generalDestinationErrors = shippingProfile.getErrors('shippingDestinations') %}
                             <div{% if generalDestinationErrors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>

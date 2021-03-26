@@ -31,6 +31,9 @@ module.exports = {
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
+      height: {
+        'screen-minus-header': 'calc(100vh - 13rem)',
+      },
       maxHeight: {
         'screen-minus-header': 'calc(100vh - 13rem)',
       },
