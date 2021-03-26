@@ -12,6 +12,7 @@ namespace angellco\market\models;
 use angellco\market\elements\Vendor;
 use angellco\market\helpers\ShippingProfileHelper;
 use angellco\market\Market;
+use angellco\market\validators\ShippingDestinationValidator;
 use Craft;
 use craft\base\Model;
 use craft\commerce\models\Country;
@@ -106,7 +107,10 @@ class ShippingProfile extends Model
 
         $rules[] = [['vendorId', 'originCountryId', 'name', 'processingTime', 'shippingDestinations'], 'required'];
 
-        // TODO: shippingDestinations needs has its own validator. Or, use the same method as siteSettings on CategoryGroup
+        $rules[] = [
+            ['shippingDestinations'],
+            ShippingDestinationValidator::class,
+        ];
 
         return $rules;
     }

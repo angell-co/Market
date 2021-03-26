@@ -9,9 +9,13 @@
  */
 
 namespace angellco\market\models;
+use angellco\market\records\ShippingDestination as ShippingDestinationRecord;
+use angellco\market\validators\ShippingDestinationValidator;
+use Craft;
 use craft\base\Model;
 use craft\commerce\models\ShippingAddressZone;
 use craft\commerce\Plugin as Commerce;
+use craft\validators\UniqueValidator;
 
 /**
  * Shipping destination model
@@ -66,11 +70,6 @@ class ShippingDestination extends Model
 
         return $rules;
     }
-
-//    public function getShippingProfile()
-//    {
-        // TODO with shippingProfiles service
-//    }
 
     /**
      * Returns the shipping zone set on the destination.

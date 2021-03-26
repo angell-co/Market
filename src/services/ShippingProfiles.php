@@ -157,15 +157,16 @@ class ShippingProfiles extends Component
         // Validate the model too so we catch any requirements from that
         $model->validate();
 
-        // TODO: validate $model->getShippingDestinations()
-        // Should this be on the controller so we have access to the posted array key?
+        // Validate the shipping destinations as well
+        $shippingDestinationErrors = false;
         foreach ($model->getShippingDestinations() as $shippingDestination) {
             $shippingDestination->validate();
-            $model->addErrors(['destinations.'.$shippingDestination->id => $shippingDestination->getErrors()]);
+            if ($shippingDestination->hasErrors()) {
+                $shippingDestinationErrors = true;
+            }
         }
 
-
-        if ($model->hasErrors()) {
+        if ($model->hasErrors() || $shippingDestinationErrors) {
             return false;
         }
 

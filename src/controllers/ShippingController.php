@@ -111,12 +111,32 @@ class ShippingController extends Controller
         // Get existing destinations or make a default blank row
         if ($variables['shippingProfile']->getShippingDestinations()) {
             $variables['destinationsTableRows'] = [];
+            $count = 1;
             foreach ($variables['shippingProfile']->getShippingDestinations() as $shippingDestination) {
-                $variables['destinationsTableRows'][$shippingDestination->id] = [
-                    'zone' => $shippingDestination->shippingZoneId,
-                    'primaryRate' => Craft::$app->getFormatter()->asDecimal($shippingDestination->primaryRate),
-                    'secondaryRate' => $shippingDestination->secondaryRate > 0 ? Craft::$app->getFormatter()->asDecimal($shippingDestination->secondaryRate) : '',
-                    'deliveryTime' => $shippingDestination->deliveryTime
+
+                $rowKey = $shippingDestination->id;
+                if (!$rowKey) {
+                    $rowKey = 'new'.$count;
+                    $count++;
+                }
+
+                $variables['destinationsTableRows'][$rowKey] = [
+                    'zone' => [
+                        'value' => $shippingDestination->shippingZoneId,
+                        'hasErrors' => $shippingDestination->getErrors('shippingZoneId')
+                    ],
+                    'primaryRate' => [
+                        'value' => $shippingDestination->primaryRate > 0 ? Craft::$app->getFormatter()->asDecimal($shippingDestination->primaryRate) : '',
+                        'hasErrors' => $shippingDestination->getErrors('primaryRate')
+                    ],
+                    'secondaryRate' => [
+                        'value' => $shippingDestination->secondaryRate > 0 ? Craft::$app->getFormatter()->asDecimal($shippingDestination->secondaryRate) : '',
+                        'hasErrors' => $shippingDestination->getErrors('secondaryRate')
+                    ],
+                    'deliveryTime' => [
+                        'value' => $shippingDestination->deliveryTime,
+                        'hasErrors' => $shippingDestination->getErrors('deliveryTime')
+                    ]
                 ];
             }
         } else {
