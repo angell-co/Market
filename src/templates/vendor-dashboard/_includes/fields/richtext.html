@@ -13,7 +13,7 @@
         <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
     {% endif %}
 
-    <div x-data="Market.richtextField('{{ value|e }}', '{{ field.id }}')"
+    <div x-data="Market.richtextField('{{ value|e('js') }}', '{{ field.id }}')"
          x-init="() => init($refs.editor)"
          x-on:click.away="inFocus = false"
          x-on:keydown.cmd.k="openLinkPanel"
