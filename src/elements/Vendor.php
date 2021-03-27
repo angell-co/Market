@@ -552,6 +552,37 @@ class Vendor extends Element
 
     /**
      * @inheritdoc
+     *
+     * @return string|null
+     * @throws SiteNotFoundException
+     * @throws VendorSettingsNotFoundException
+     */
+    public function getUriFormat(): ?string
+    {
+        return $this->getSettings()->urlFormat;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return array|mixed|null
+     * @throws SiteNotFoundException
+     * @throws VendorSettingsNotFoundException
+     */
+    protected function route()
+    {
+        return [
+            'templates/render', [
+                'template' => (string)$this->getSettings()->template,
+                'variables' => [
+                    'vendor' => $this,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
      * @noinspection PhpUnhandledExceptionInspection
      */
     public function getEditorHtml(): string

@@ -7,9 +7,8 @@
         <label for="slug" class="flex-grow block text-sm font-medium text-gray-700">
             {{ 'Slug'|t('app') }}
         </label>
-        {% if product is defined and product.enabled and product.id %}
-
-            <input x-ref="urlInput" class="sr-only" value="{{ product.getUrl() }}">
+        {% if element is defined and element.enabled and element.id %}
+            <input x-ref="urlInput" class="sr-only" value="{{ element.getUrl() }}">
             <button type="button"
                     class="mr-2 -mt-1 mb-1 inline-flex items-center px-1.5 py-0.5 border border-transparent text-xs font-medium rounded focus:outline-none"
                     :class="{
@@ -30,7 +29,7 @@
                 </svg>
             </button>
 
-            <a href="{{ product.getUrl() }}" target="_blank" class="-mt-1 mb-1 inline-flex items-center px-1.5 py-0.5 border border-transparent text-xs font-medium rounded text-action-700 bg-action-100 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500">
+            <a href="{{ element.getUrl() }}" target="_blank" class="-mt-1 mb-1 inline-flex items-center px-1.5 py-0.5 border border-transparent text-xs font-medium rounded text-action-700 bg-action-100 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500">
                 View
                 <svg class="ml-1 -mr-0.5 h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
