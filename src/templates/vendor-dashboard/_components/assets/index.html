@@ -4,13 +4,18 @@
 {% set limit = limit ?? 36 %}
 {% if limit > 60 %}{% set limit = 60 %}{% endif %}
 {% set query = query ?? '' %}
-{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&query='~query) %}
+
+{% set folder = folder ?? 'main' %}
+{% set folderId = currentVendor.filesFolderId %}
+{% if folder == 'account' %}{% set folderId = currentVendor.accountFolderId %}{% endif %}
+
+{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&folder='~folder~'&query='~query) %}
 
 {% set assetsQuery = craft.assets
     .limit(limit)
     .search(query)
     .orderBy(sort)
-    .folderId(currentVendor.filesFolderId)
+    .folderId(folderId)
 %}
 
 {% set pageInfo = sprig.paginate(assetsQuery, page) %}
@@ -98,7 +103,7 @@
             >
 
                 {{ csrfInput() }}
-                {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
+                {{ hiddenInput('folderId', folderId) }}
 
                 <label for="file-uploader-input"
                        class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
@@ -131,8 +136,9 @@
 
     {# Search and filters #}
     <div class="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-4">
+
         {# Search #}
-        <div class="col-span-2 sm:col-span-3 md:col-span-6 lg:col-span-4">
+        <div class="sm:col-span-6 md:col-span-3">
             <label for="query" class="block text-sm font-medium text-gray-700">Search</label>
             <div class="mt-1 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -145,17 +151,26 @@
                        s-trigger="keyup changed delay:250ms"
                        s-replace="#results"
                        type="text" name="query" id="query"
-                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                        placeholder="Search files"
                        value="{{ query }}"
                 >
             </div>
         </div>
 
+        {# Folder #}
+        <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
+            <label for="folder" class="block text-sm font-medium text-gray-700">Folder</label>
+            <select sprig id="folder" name="folder" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
+                <option value="main" {{ folder == 'main' ? 'selected' }}>Main Folder</option>
+                <option value="account" {{ folder == 'account' ? 'selected' }}>Account Folder</option>
+            </select>
+        </div>
+
         {# Sort #}
         <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
             <label for="sort" class="block text-sm font-medium text-gray-700">Sort</label>
-            <select sprig id="sort" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+            <select sprig id="sort" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
                 <option value="title asc" {{ sort == 'title asc' ? 'selected' }}>A-Z</option>
                 <option value="title desc" {{ sort == 'title desc' ? 'selected' }}>Z-A</option>
                 <option value="dateCreated desc" {{ sort == 'dateCreated desc' ? 'selected' }}>Date Created (↓)</option>
@@ -166,9 +181,9 @@
         </div>
 
         {# Limit #}
-        <div class="md:col-span-3 lg:col-span-1">
+        <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
             <label for="limit" class="block text-sm font-medium text-gray-700">Limit</label>
-            <select sprig id="limit" name="limit" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+            <select sprig id="limit" name="limit" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
                 <option value="12" {{ limit == 12 ? 'selected' }}>12</option>
                 <option value="24" {{ limit == 24 ? 'selected' }}>24</option>
                 <option value="36" {{ limit == 36 ? 'selected' }}>36</option>
@@ -195,7 +210,7 @@
                             >
                                 <button x-on:click.prevent="open = !open"
                                         type="button"
-                                        class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                        class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                                         id="asset-options-menu-{{ asset.id }}"
                                         aria-haspopup="true"
                                         x-bind:aria-expanded="open"
@@ -203,7 +218,7 @@
                                     <span class="sr-only">Open options menu</span>
                                     <span class="flex items-center justify-center h-full w-full rounded-full">
                                         {# Heroicon name: dots-vertical #}
-                                        <svg class="w-5 h-5 text-brand-400 group-hover:text-brand-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <svg class="w-5 h-5 text-action-400 group-hover:text-action-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
                                         </svg>
                                     </span>
@@ -281,7 +296,7 @@
                                                type="checkbox"
                                                value="{{ asset.id }}"
                                                {% if asset.id in selectedIds %}checked{% endif %}
-                                               class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                               class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
                                         >
                                     </div>
                                     <div class="ml-3 text-sm truncate">
