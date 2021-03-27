@@ -39,6 +39,7 @@ module.exports = {
       },
       maxWidth: {
         '36': '9rem',
+        '64': '16rem',
       },
       screens: {
         'smh': {'raw': '(min-height: 560px)'},
