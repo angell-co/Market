@@ -198,6 +198,15 @@
                     </div>
                 </div>
             </div>
+
+            {# Delete action #}
+            {% if shippingProfile.id %}
+                <div class="mt-6 text-right">
+                    {{ sprig('_market/_components/delete-shipping-profile', {
+                        _profileId: shippingProfile.id
+                    }) }}
+                </div>
+            {% endif %}
         </div>
     </form>
 {% endblock %}
