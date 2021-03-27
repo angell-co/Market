@@ -66,7 +66,7 @@
                        s-replace="#field-{{ _fieldId }}-assets-index-results"
                        s-val:selected-ids="{{ selectedIds|join(',') }}"
                        type="text" name="query" id="query"
-                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                        placeholder="Search files"
                        value="{{ query }}"
                 >
@@ -79,7 +79,7 @@
             <select sprig
                     id="sort"
                     name="sort"
-                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md"
             >
                 <option value="title asc" {{ sort == 'title asc' ? 'selected' }}>A-Z</option>
                 <option value="title desc" {{ sort == 'title desc' ? 'selected' }}>Z-A</option>
@@ -131,16 +131,16 @@
                                                s-val:page="{{ page }}"
                                                s-val:sort="{{ sort }}"
                                                s-val:query="{{ query }}"
-                                                {% if vendorAsset.id in selectedIds %}
-                                                    checked
-                                                    s-val:selected-ids="{{ selectedIds|filter(v => v != vendorAsset.id)|join(',') }}"
-                                                {% else %}
-                                                    s-val:selected-ids="{{ selectedIds|push(vendorAsset.id)|join(',') }}"
-                                                {% endif %}
-                                                {% if selectedIds|length == _fieldLimit and vendorAsset.id not in selectedIds %}
-                                                    disabled
-                                                {% endif %}
-                                               class="asset-toggle focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                               {% if vendorAsset.id in selectedIds %}
+                                                   checked
+                                                   s-val:selected-ids="{{ selectedIds|filter(v => v != vendorAsset.id)|join(',') }}"
+                                               {% else %}
+                                                   s-val:selected-ids="{{ selectedIds|push(vendorAsset.id)|join(',') }}"
+                                               {% endif %}
+                                               {% if selectedIds|length == _fieldLimit and vendorAsset.id not in selectedIds %}
+                                                   disabled
+                                               {% endif %}
+                                               class="asset-toggle focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
                                         >
                                     </div>
                                     <div class="ml-3 text-sm truncate">

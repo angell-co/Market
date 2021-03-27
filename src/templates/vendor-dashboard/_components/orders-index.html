@@ -58,7 +58,7 @@
             >
                 <div>
                     <button x-on:click="open = !open"
-                            class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-500"
+                            class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
                             id="status-menu" aria-haspopup="true" x-bind:aria-expanded="open"
                     >
                         {{ 'Update Status'|t('market') }}
@@ -89,7 +89,7 @@
             </div>
 
             {# TODO #}
-            <a href="#" class="ml-3 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+            <a href="#" class="ml-3 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500">
                 {# Heroicon name: document-download #}
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
@@ -116,7 +116,7 @@
                        s-trigger="keyup changed delay:250ms"
                        s-replace="#results"
                        type="text" name="query" id="query"
-                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                        placeholder="Search orders by email, customer name, order number or address"
                        value="{{ query }}"
                 >
@@ -126,7 +126,7 @@
         {# Status #}
         <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
             <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-            <select sprig id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+            <select sprig id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
                 <option value="" {{ status == '' ? 'selected' }}>View all</option>
                 {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
                     <option value="{{ orderStatus.handle }}" {{ status == orderStatus.handle ? 'selected' }}>{{ orderStatus.name }}</option>
@@ -137,7 +137,7 @@
         {# Limit #}
         <div class="md:col-span-3 lg:col-span-1">
             <label for="limit" class="block text-sm font-medium text-gray-700">Limit</label>
-            <select sprig id="limit" name="limit" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:text-sm rounded-md">
+            <select sprig id="limit" name="limit" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
                 <option value="5" {{ limit == 5 ? 'selected' }}>5</option>
                 <option value="10" {{ limit == 10 ? 'selected' }}>10</option>
                 <option value="20" {{ limit == 20 ? 'selected' }}>20</option>
@@ -163,7 +163,7 @@
                                                    name="orders[]"
                                                    type="checkbox"
                                                    x-on:click="allchecked = !allchecked"
-                                                   class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                                   class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
                                             >
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -180,7 +180,7 @@
                                                     s-val:sort="totalPrice"
                                                     s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
                                                     type="button"
-                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-action-500 ring-inset"
                                             >
                                                 {{ 'Amount'|t('market') }}
                                                 {% if sort == 'totalPrice' and sortDir == 'desc' %}
@@ -201,7 +201,7 @@
                                                     s-val:sort="dateOrdered"
                                                     s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
                                                     type="button"
-                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 ring-inset"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-action-500 ring-inset"
                                             >
                                                 {{ 'Date'|t('market') }}
                                                 {% if sort == 'dateOrdered' and sortDir == 'desc' %}
@@ -229,7 +229,7 @@
                                                    type="checkbox"
                                                    value="{{ order.id }}"
                                                    x-bind:checked="allchecked"
-                                                   class="focus:ring-brand-500 h-4 w-4 text-brand-600 border-gray-300 rounded"
+                                                   class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
                                             >
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

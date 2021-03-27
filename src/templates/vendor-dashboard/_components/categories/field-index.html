@@ -78,7 +78,7 @@
                    s-replace="#field-{{ _fieldId }}-categories-index-results"
                    s-val:selected-ids="{{ selectedIds|join(',') }}"
                    type="text" name="query" id="query"
-                   class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                   class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                    placeholder="Search categories"
                    value="{{ query }}"
             >
@@ -107,7 +107,7 @@
                                     s-val:selected-ids="{{ selectedIds|push(addIds)|join(',') }}"
                                 {% endif %}
                                 type="button"
-                                class="category-toggle group inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+                                class="category-toggle group inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                         >
                             {{ category.title }}
 
