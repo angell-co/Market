@@ -84,10 +84,10 @@
 
     {# Header #}
     <div class="bg-white shadow">
-        <div class="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div class="py-6 md:flex md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
-                    <!-- Profile -->
+                    {# Profile #}
                     <div class="flex items-center">
                         {% if profilePicture %}
                             <img class="hidden h-16 w-16 rounded-full sm:block" src="{{ profilePicture.url({width:256, height: 256}) }}" alt="">
@@ -215,148 +215,147 @@
     </div>
 
     {# Main #}
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="text-lg leading-6 font-medium text-gray-900">{{ 'Overview'|t('market') }}</h2>
-                <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div class="py-6">
 
-                    {# Total New Orders #}
-                    <div class="bg-white overflow-hidden shadow rounded-lg">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
-                                    {# Heroicon name: sparkles #}
-                                    <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="ml-5 w-0 flex-1">
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ 'New Orders'|t('market') }}
-                                    </dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">
-                                            {{ totalNewOrders }}
-                                        </div>
-                                    </dd>
-                                </div>
+            <h2 class="text-lg leading-6 font-medium text-gray-900">{{ 'Overview'|t('market') }}</h2>
+            <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+                {# Total New Orders #}
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
+                                {# Heroicon name: sparkles #}
+                                <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
+                                </svg>
                             </div>
-                        </div>
-                        <div class="bg-gray-50 px-5 py-3">
-                            <div class="text-sm">
-                                <a href="{{ url('market/orders', {status: 'new'}) }}" class="font-medium text-action-700 hover:text-action-900">
-                                    {{ 'View all'|t('market') }}
-                                </a>
+                            <div class="ml-5 w-0 flex-1">
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    {{ 'New Orders'|t('market') }}
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {{ totalNewOrders }}
+                                    </div>
+                                </dd>
                             </div>
                         </div>
                     </div>
-
-                    {# Total Orders #}
-                    <div class="bg-white overflow-hidden shadow rounded-lg">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
-                                    {# Heroicon name: clipboard-list #}
-                                    <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                                    </svg>
-                                </div>
-                                <div class="ml-5 w-0 flex-1">
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ 'Total Orders'|t('market') }}
-                                    </dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">
-                                            {{ totalOrders }}
-                                        </div>
-
-                                        {% if totalOrdersDiff > 0 %}
-                                            <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                                <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="sr-only">{{ 'Increased by'|t('market') }}</span>
-                                                {{ totalOrdersDiff|abs }}
-                                            </div>
-                                        {% elseif totalOrdersDiff < 0 %}
-                                            <div class="ml-2 flex items-baseline text-sm font-semibold text-red-600">
-                                                <svg class="self-center flex-shrink-0 h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="sr-only">{{ 'Decreased by'|t('market') }}</span>
-                                                {{ totalOrdersDiff|abs }}
-                                            </div>
-                                        {% endif %}
-                                    </dd>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 px-5 py-3">
-                            <div class="flex items-center">
-                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-action-700 hover:text-action-900">
-                                    {{ 'View all'|t('market') }}
-                                </a>
-                                <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
-                            </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="{{ url('market/orders', {status: 'new'}) }}" class="font-medium text-action-700 hover:text-action-900">
+                                {{ 'View all'|t('market') }}
+                            </a>
                         </div>
                     </div>
-
-                    {# Total Revenue #}
-                    <div class="bg-white overflow-hidden shadow rounded-lg">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
-                                    {# Heroicon name: credit-card #}
-                                    <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                    </svg>
-                                </div>
-                                <div class="ml-5 w-0 flex-1">
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ 'Total Revenue'|t('market') }}
-                                    </dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">
-                                            {{ totalRevenue|currency(null, [], [], true) }}
-                                        </div>
-
-                                        {% if totalRevenueDiff > 0 %}
-                                            <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                                <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="sr-only">{{ 'Increased by'|t('market') }}</span>
-                                                {{ totalRevenueDiff|abs|currency(null, [], [], true) }}
-                                            </div>
-                                        {% elseif totalRevenueDiff < 0 %}
-                                            <div class="ml-2 flex items-baseline text-sm font-semibold text-red-600">
-                                                <svg class="self-center flex-shrink-0 h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="sr-only">{{ 'Decreased by'|t('market') }}</span>
-                                                {{ totalRevenueDiff|abs|currency(null, [], [], true) }}
-                                            </div>
-                                        {% endif %}
-                                    </dd>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 px-5 py-3">
-                            <div class="flex items-center">
-                                <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-action-700 hover:text-action-900">
-                                    {{ 'View all'|t('market') }}
-                                </a>
-                                <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
+
+                {# Total Orders #}
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
+                                {# Heroicon name: clipboard-list #}
+                                <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    {{ 'Total Orders'|t('market') }}
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {{ totalOrders }}
+                                    </div>
+
+                                    {% if totalOrdersDiff > 0 %}
+                                        <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                            <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="sr-only">{{ 'Increased by'|t('market') }}</span>
+                                            {{ totalOrdersDiff|abs }}
+                                        </div>
+                                    {% elseif totalOrdersDiff < 0 %}
+                                        <div class="ml-2 flex items-baseline text-sm font-semibold text-red-600">
+                                            <svg class="self-center flex-shrink-0 h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="sr-only">{{ 'Decreased by'|t('market') }}</span>
+                                            {{ totalOrdersDiff|abs }}
+                                        </div>
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="flex items-center">
+                            <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-action-700 hover:text-action-900">
+                                {{ 'View all'|t('market') }}
+                            </a>
+                            <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Total Revenue #}
+                <div class="sm:col-span-2 lg:col-span-1 bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-brand-500 rounded-md p-3">
+                                {# Heroicon name: credit-card #}
+                                <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    {{ 'Total Revenue'|t('market') }}
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {{ totalRevenue|currency(null, [], [], true) }}
+                                    </div>
+
+                                    {% if totalRevenueDiff > 0 %}
+                                        <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                            <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="sr-only">{{ 'Increased by'|t('market') }}</span>
+                                            {{ totalRevenueDiff|abs|currency(null, [], [], true) }}
+                                        </div>
+                                    {% elseif totalRevenueDiff < 0 %}
+                                        <div class="ml-2 flex items-baseline text-sm font-semibold text-red-600">
+                                            <svg class="self-center flex-shrink-0 h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="sr-only">{{ 'Decreased by'|t('market') }}</span>
+                                            {{ totalRevenueDiff|abs|currency(null, [], [], true) }}
+                                        </div>
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="flex items-center">
+                            <a href="{{ url('market/orders') }}" class="flex-1 text-sm font-medium text-action-700 hover:text-action-900">
+                                {{ 'View all'|t('market') }}
+                            </a>
+                            <span class="flex-1 text-right text-gray-400 font-medium text-xs uppercase">{{ 'Last 30 days'|t('market') }}</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             {% if recentOrders %}
-                <h2 class="max-w-6xl mx-auto mt-8 text-lg leading-6 font-medium text-gray-900">
+                <h2 class="mt-8 text-lg leading-6 font-medium text-gray-900">
                     {{ 'Recent orders'|t('market') }}
                 </h2>
 
@@ -400,65 +399,63 @@
 
                 {# Small breakpoint and up #}
                 <div class="hidden sm:block">
-                    <div class="max-w-6xl mx-auto">
-                        <div class="flex flex-col mt-2">
-                            <div class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ 'Reference'|t('market') }}
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ 'Customer'|t('market') }}
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ 'Status'|t('market') }}
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ 'Amount'|t('market') }}
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ 'Date'|t('market') }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                    {% for order in recentOrders %}
-                                        {% set billingAddress = order.billingAddress %}
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="{{ url('market/orders/'~order.id) }}" class="text-action-600 hover:text-action-900">{{ order.reference }}</a>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {% if billingAddress %}
-                                                        {{ billingAddress.firstName }} {{ billingAddress.lastName }}
-                                                    {% endif %}
-                                                </div>
-                                                <a href="mailto:{{ order.email }}" class="text-sm text-gray-500 hover:underline">{{ order.email }}</a>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[order.orderStatus.color] is defined ? statusMap[order.orderStatus.color] : statusMap.default }}">
-                                                    {{ order.orderStatus }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ order.dateOrdered|datetime('short') }}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                                <div class="bg-gray-50 px-5 py-3 border-t">
-                                    <div class="text-sm">
-                                        <a href="{{ url('market/orders') }}" class="font-medium text-action-700 hover:text-action-900">
-                                            {{ 'View all'|t('market') }}
-                                        </a>
-                                    </div>
+                    <div class="flex flex-col mt-2">
+                        <div class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Reference'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Customer'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Status'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Amount'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Date'|t('market') }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                {% for order in recentOrders %}
+                                    {% set billingAddress = order.billingAddress %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="{{ url('market/orders/'~order.id) }}" class="text-action-600 hover:text-action-900">{{ order.reference }}</a>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {% if billingAddress %}
+                                                    {{ billingAddress.firstName }} {{ billingAddress.lastName }}
+                                                {% endif %}
+                                            </div>
+                                            <a href="mailto:{{ order.email }}" class="text-sm text-gray-500 hover:underline">{{ order.email }}</a>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[order.orderStatus.color] is defined ? statusMap[order.orderStatus.color] : statusMap.default }}">
+                                                {{ order.orderStatus }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.dateOrdered|datetime('short') }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="bg-gray-50 px-5 py-3 border-t">
+                                <div class="text-sm">
+                                    <a href="{{ url('market/orders') }}" class="font-medium text-action-700 hover:text-action-900">
+                                        {{ 'View all'|t('market') }}
+                                    </a>
                                 </div>
                             </div>
                         </div>
