@@ -1,3 +1,15 @@
+{% if useFieldsNamespace is not defined %}{% set useFieldsNamespace = true %}{% endif %}
+
+{% if useFieldsNamespace %}
+    {% set inputName = 'fields['~field.handle~']' %}
+{% else %}
+    {% set inputName = field.handle %}
+{% endif %}
+
+{% if useGrid is not defined %}
+    {% set useGrid = true %}
+{% endif %}
+
 {% set errors = element.getErrors(field.handle) %}
 <div{% if errors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
 
@@ -30,16 +42,23 @@
         {% endif %}
     </div>
 
-    {{ hiddenInput('fields['~field.handle~']', '') }}
+    {{ hiddenInput(inputName, '') }}
 
-    {% set value = element.getFieldValue(field.handle) %}
-    {% set selectedIds = value ? value.ids()|join(',') : '' %}
+    {% if value is not defined %}
+        {% set value = element.getFieldValue(field.handle) %}
+    {% endif %}
+    {% if selectedIds is not defined %}
+        {% set selectedIds = value ? value.ids()|join(',') : '' %}
+    {% endif %}
 
     {{ sprig('_market/_components/assets/field', {
         _fieldId: field.id,
         _fieldHandle: field.handle,
         _fieldLimit: field.limit,
-        _originalIds: selectedIds
+        _originalIds: selectedIds,
+        _folderId: assetsFolderId,
+        _inputName: inputName,
+        _useGrid: useGrid
     }, {
         id: 'field-'~field.id,
         class: 'field-assets'

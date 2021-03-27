@@ -71,7 +71,7 @@
      # Sortable is wired up here, we have swap the DOM so we submit the new order
      #}
     <ul id="field-{{ _fieldId }}-list"
-        class="grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"
+        class="{{ _useGrid ? 'grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5' : 'max-w-36' }}"
         sprig
         s-trigger="end"
     >
@@ -178,7 +178,7 @@
                 </div>
 
                 <input type="hidden"
-                       name="fields[{{ _fieldHandle }}][]"
+                       name="{{ _inputName }}[]"
                        value="{{ asset.id }}"
                 >
             </li>
@@ -284,6 +284,7 @@
                                     _fieldLimit: _fieldLimit,
                                     _fieldHandle: _fieldHandle,
                                     _originalIds: selectedIds[_fieldHandle]|join(','),
+                                    _folderId: _folderId
                                 }, {
                                     'id' : 'field-'~_fieldId~'-assets-index',
                                     'class' : 'flex flex-col h-full field-assets-index',

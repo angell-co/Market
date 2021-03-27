@@ -33,6 +33,10 @@ const variantBlock = function() {
             if (fadeIn) {
                 setTimeout(() => {
                     this.visible = true;
+
+                    setTimeout(() => {
+                        this.$el.querySelector('input[type=text]').focus();
+                    }, 250)
                 }, 200)
             }
         },

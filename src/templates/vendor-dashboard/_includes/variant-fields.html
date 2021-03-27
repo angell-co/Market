@@ -3,7 +3,7 @@
 {# SKU #}
 {% include '_market/_includes/fields/sku.html' with {
     variantKey: variantKey,
-    prefix: currentVendor.code~'-',
+    prefix: vendorCode~'-',
     value: variant ? variant.sku : '',
     errors: variant ? variant.getErrors('sku') : []
 } %}

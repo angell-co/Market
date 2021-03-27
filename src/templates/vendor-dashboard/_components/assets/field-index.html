@@ -32,7 +32,6 @@
 
 
 {# Run the queries for the actual display of the index #}
-{% set currentVendor = market.vendors.getCurrentVendor() %}
 {% set page = page ?? 1 %}
 {% set sort = sort ?? 'dateCreated desc' %}
 {% set query = query ?? '' %}
@@ -41,7 +40,7 @@
     .limit(12)
     .search(query)
     .orderBy(sort)
-    .folderId(currentVendor.filesFolderId)
+    .folderId(_folderId)
 %}
 
 {% set pageInfo = sprig.paginate(assetsQuery, page) %}
@@ -233,7 +232,7 @@
         >
 
             {{ csrfInput() }}
-            {{ hiddenInput('folderId', currentVendor.filesFolderId) }}
+            {{ hiddenInput('folderId', _folderId) }}
 
             <div>
                 <label for="field-{{ _fieldId }}-uploader-input"

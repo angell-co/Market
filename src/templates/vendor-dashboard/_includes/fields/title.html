@@ -3,12 +3,13 @@
 {% set errors = errors ?? (element is defined and element ? element.getErrors('title') : []) %}
 {% if name is not defined %}{% set name = 'title' %}{% endif %}
 {% if id is not defined %}{% set id = 'title' %}{% endif %}
+{% if label is not defined %}{% set label = 'Title'|t('app') %}{% endif %}
 
 {% set autoSlug = element is defined and not element.slug %}
 
 <div x-data="Market.titleField()" x-init="initField('{{ value|e('js') }}')">
     <label for="{{ id }}" class="block text-sm font-medium text-gray-700">
-        {{ 'Title'|t('app') }}
+        {{ label }}
         <span class="text-red-600">*</span>
     </label>
 

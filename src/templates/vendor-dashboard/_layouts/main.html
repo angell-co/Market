@@ -224,6 +224,17 @@
                             {{ 'Shipping'|t('market') }}
                         </a>
 
+                        <a href="{{ url('market/shop-front') }}"
+                           class="{{ craft.app.request.getSegment(2) == 'shop-front' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            {# Heroicon name: office building #}
+                            <svg class="mr-3 h-6 w-6 text-brand-300" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+
+                            {{ 'Shop Front'|t('market') }}
+                        </a>
+
                         <a href="{{ url('market/reports') }}"
                            class="{{ craft.app.request.getSegment(2) == 'reports' ? 'bg-brand-800 text-white' : 'text-brand-100 hover:bg-brand-600' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             {# Heroicon name: document-report #}
@@ -397,7 +408,7 @@
                                    role="menuitem">
                                     {{ 'View shop'|t('market') }}
                                 </a>
-                                <a href="{{ url('market/settings') }}"
+                                <a href="{{ url('market/shop-front') }}"
                                    class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                    role="menuitem">
                                     {{ 'Edit shop front'|t('market') }}

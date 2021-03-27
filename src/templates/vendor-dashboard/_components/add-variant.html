@@ -39,7 +39,8 @@
             } %}
 
             {% include '_market/_includes/variant-fields' with {
-                variant: false
+                variant: false,
+                vendorCode: currentVendor.code
             } %}
         </div>
     </div>

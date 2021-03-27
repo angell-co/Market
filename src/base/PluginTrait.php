@@ -203,6 +203,8 @@ trait PluginTrait
                 $event->rules['market/shipping/new'] = ['template' => '_market/shipping/_edit'];
                 $event->rules['market/shipping/<profileId:\d+>'] = ['template' => '_market/shipping/_edit'];
 
+                $event->rules['market/shop-front'] = ['template' => '_market/shop-front/_edit'];
+
                 $event->rules['market/reports'] = ['template' => '_market/reports/_index'];
                 $event->rules['market/settings'] = ['template' => '_market/settings/_index'];
 

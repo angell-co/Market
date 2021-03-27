@@ -1,3 +1,4 @@
+{% set currentVendor = market.vendors.getCurrentVendor() %}
 {% set generalVariantErrors = element.getErrors('variants') %}
 <div{% if generalVariantErrors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
     <div class="flex">
@@ -73,7 +74,9 @@
                         updateVariantTitle: true
                     } only %}
 
-                    {% include '_market/_includes/variant-fields' %}
+                    {% include '_market/_includes/variant-fields' with {
+                        vendorCode: currentVendor.code
+                    } %}
                 </div>
             </div>
         {% endfor %}

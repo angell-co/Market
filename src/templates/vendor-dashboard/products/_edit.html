@@ -118,7 +118,7 @@
                                 uielement: element,
                                 element: product is defined ? product : null,
                                 excludedFieldHandles: sidebarFields,
-                                currentVendor: currentVendor
+                                assetsFolderId: currentVendor.filesFolderId
                             } only %}
                         {% endfor %}
                     </div>
@@ -223,7 +223,8 @@
                         <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
                             {{ hiddenInput('variants['~variantKey~'][isDefault]', 1) }}
                             {% include '_market/_includes/variant-fields.html' with {
-                                singleVariant: true
+                                singleVariant: true,
+                                vendorCode: currentVendor.code
                             } %}
                         </div>
                     {% endif %}
