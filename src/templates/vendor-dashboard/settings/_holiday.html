@@ -1,0 +1,24 @@
+{% extends "_market/_layouts/main" %}
+
+{% set title = 'Holiday Mode'|t('market') %}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/settings'),
+        label: 'Settings'|t('market')
+    },
+    {
+        url: url('market/settings/holiday'),
+        label: title
+    }
+] %}
+
+{% block main %}
+<div class="py-6">
+    {% include '_market/settings/_nav.html' %}
+
+    <div class="space-y-6 sm:px-6 lg:px-0 mt-6">
+
+    </div>
+</div>
+{% endblock %}

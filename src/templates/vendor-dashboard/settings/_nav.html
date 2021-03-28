@@ -1,0 +1,56 @@
+<div>
+    <div class="sm:hidden">
+        <label for="tabs" class="sr-only">Select a tab</label>
+        <select id="tabs" class="block w-full focus:ring-action-500 focus:border-action-500 border-gray-300 rounded-md">
+            <option{{ craft.app.request.getSegment(3) == 'details' ? ' selected' }}>My Details</option>
+            <option{{ craft.app.request.getSegment(3) == 'password' ? ' selected' }}>Password</option>
+            <option{{ craft.app.request.getSegment(3) == 'payments' ? ' selected' }}>Payments</option>
+            <option{{ craft.app.request.getSegment(3) == 'holiday' ? ' selected' }}>Holiday Mode</option>
+            <option{{ craft.app.request.getSegment(3) == 'product-catalogue' ? ' selected' }}>Product Catalogue</option>
+        </select>
+    </div>
+    <div class="hidden sm:block">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <a href="{{ url('market/settings/details') }}" class="{{ craft.app.request.getSegment(3) == 'details' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm">
+                {# Heroicon name: solid/user #}
+                <svg class="{{ craft.app.request.getSegment(3) == 'details' ? 'text-action-500' : 'text-gray-400 group-hover:text-gray-500' }} -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
+                <span>My Details</span>
+            </a>
+
+            <a href="{{ url('market/settings/password') }}" class="{{ craft.app.request.getSegment(3) == 'password' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm">
+                {# Heroicon name: solid/key #}
+                <svg class="{{ craft.app.request.getSegment(3) == 'password' ? 'text-action-500' : 'text-gray-400 group-hover:text-gray-500' }} -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Password</span>
+            </a>
+
+            <a href="{{ url('market/settings/payments') }}" class="{{ craft.app.request.getSegment(3) == 'payments' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm">
+                {# Heroicon name: solid/credit-card #}
+                <svg class="{{ craft.app.request.getSegment(3) == 'payments' ? 'text-action-500' : 'text-gray-400 group-hover:text-gray-500' }} -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                    <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
+                </svg>
+                <span>Payments</span>
+            </a>
+
+            <a href="{{ url('market/settings/holiday') }}" class="{{ craft.app.request.getSegment(3) == 'holiday' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm">
+                {# Heroicon name: solid/sun #}
+                <svg class="{{ craft.app.request.getSegment(3) == 'holiday' ? 'text-action-500' : 'text-gray-400 group-hover:text-gray-500' }} -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                </svg>
+                <span>Holiday Mode</span>
+            </a>
+
+            <a href="{{ url('market/settings/product-catalogue') }}" class="{{ craft.app.request.getSegment(3) == 'product-catalogue' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm">
+                {# Heroicon name: solid/shopping-bag #}
+                <svg class="{{ craft.app.request.getSegment(3) == 'product-catalogue' ? 'text-action-500' : 'text-gray-400 group-hover:text-gray-500' }} -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
+                </svg>
+                <span>Product Catalogue</span>
+            </a>
+        </nav>
+    </div>
+</div>

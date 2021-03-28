@@ -206,7 +206,13 @@ trait PluginTrait
                 $event->rules['market/shop-front'] = ['template' => '_market/shop-front/_edit'];
 
                 $event->rules['market/reports'] = ['template' => '_market/reports/_index'];
+
                 $event->rules['market/settings'] = ['template' => '_market/settings/_index'];
+                $event->rules['market/settings/details'] = ['template' => '_market/settings/_details'];
+                $event->rules['market/settings/password'] = ['template' => '_market/settings/_password'];
+                $event->rules['market/settings/payments'] = ['template' => '_market/settings/_payments'];
+                $event->rules['market/settings/holiday'] = ['template' => '_market/settings/_holiday'];
+                $event->rules['market/settings/product-catalogue'] = ['template' => '_market/settings/_product-catalogue'];
 
                 $event->rules['market/login'] = ['template' => '_market/account/_login'];
             }

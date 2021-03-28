@@ -1,0 +1,25 @@
+{% extends "_market/_layouts/main" %}
+
+{% set title = 'My Details'|t('market') %}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/settings'),
+        label: 'Settings'|t('market')
+    },
+    {
+        url: url('market/settings/details'),
+        label: title
+    }
+] %}
+
+{% block main %}
+
+
+
+    <div class="py-6">
+        {% include '_market/settings/_nav.html' %}
+
+        {{ sprig('_market/_components/settings/account-details') }}
+    </div>
+{% endblock %}
