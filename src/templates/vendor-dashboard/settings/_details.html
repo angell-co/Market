@@ -37,34 +37,59 @@
                     </div>
 
                     <div class="mt-6 grid grid-cols-4 gap-6">
+
+                        {# First name #}
+                        {% set firstNameErrors = user.getErrors('firstName') %}
                         <div class="col-span-4 sm:col-span-2">
                             <label for="firstName" class="block text-sm font-medium text-gray-700">First name</label>
-                            <input type="text"
-                                   id="firstName"
-                                   name="firstName"
-                                   value="{{ user.firstName }}"
-                                   class="mt-1 block w-full shadow-sm focus:ring-action-500 focus:border-action-500 sm:text-sm border-gray-300 rounded-md"
-                            >
-
-                            {% if user.getErrors('firstName') %}
-                                {{ dump(user.getErrors('firstName')) }}
-                            {% endif %}
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="text"
+                                       id="firstName"
+                                       name="firstName"
+                                       value="{{ user.firstName }}"
+                                       class="block w-full shadow-sm sm:text-sm rounded-md {{ firstNameErrors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
+                                >
+                                {% if firstNameErrors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        {# Heroicon name: solid/exclamation-circle #}
+                                        <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% for error in firstNameErrors %}
+                                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
                         </div>
 
+                        {# Last name #}
+                        {% set lastNameErrors = user.getErrors('lastName') %}
                         <div class="col-span-4 sm:col-span-2">
                             <label for="lastName" class="block text-sm font-medium text-gray-700">Last name</label>
-                            <input type="text"
-                                   id="lastName"
-                                   name="lastName"
-                                   value="{{ user.lastName }}"
-                                   class="mt-1 block w-full shadow-sm focus:ring-action-500 focus:border-action-500 sm:text-sm border-gray-300 rounded-md"
-                            >
-
-                            {% if user.getErrors('lastName') %}
-                                {{ dump(user.getErrors('lastName')) }}
-                            {% endif %}
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="text"
+                                       id="lastName"
+                                       name="lastName"
+                                       value="{{ user.lastName }}"
+                                       class="block w-full shadow-sm sm:text-sm rounded-md {{ lastNameErrors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
+                                >
+                                {% if lastNameErrors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        {# Heroicon name: solid/exclamation-circle #}
+                                        <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% for error in lastNameErrors %}
+                                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
                         </div>
 
+                        {# Email #}
+                        {% set emailErrors = user.getErrors('email') %}
                         <div class="col-span-4 sm:col-span-2">
                             <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
                             <template x-if="newEmail !== existingEmail">
@@ -74,33 +99,54 @@
                                        value="{{ user.email }}"
                                 >
                             </template>
-                            <input type="email"
-                                   id="email"
-                                   x-model="newEmail"
-                                   x-on:keyup="$refs.emailInput.value = newEmail"
-                                   value="{{ user.email }}"
-                                   class="mt-1 block w-full shadow-sm focus:ring-action-500 focus:border-action-500 sm:text-sm border-gray-300 rounded-md"
-                            >
-
-                            {% if user.getErrors('email') %}
-                                {{ dump(user.getErrors('email')) }}
-                            {% endif %}
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="email"
+                                       id="email"
+                                       x-model="newEmail"
+                                       x-on:keyup="$refs.emailInput.value = newEmail"
+                                       value="{{ user.email }}"
+                                       class="block w-full shadow-sm sm:text-sm rounded-md {{ emailErrors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
+                                >
+                                {% if emailErrors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        {# Heroicon name: solid/exclamation-circle #}
+                                        <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% for error in emailErrors %}
+                                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
                         </div>
 
+
+                        {# Password #}
+                        {% set passwordErrors = user.getErrors('currentPassword') %}
                         <div x-show="newEmail !== existingEmail"
                              x-cloak
                              class="col-span-4 sm:col-span-2"
                         >
                             <label for="currentPassword" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input type="password"
-                                   id="currentPassword"
-                                   name="currentPassword"
-                                   class="mt-1 block w-full shadow-sm focus:ring-action-500 focus:border-action-500 sm:text-sm border-gray-300 rounded-md"
-                            >
-
-                            {% if user.getErrors('currentPassword') %}
-                                {{ dump(user.getErrors('currentPassword')) }}
-                            {% endif %}
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="password"
+                                       id="currentPassword"
+                                       name="currentPassword"
+                                       class="block w-full shadow-sm sm:text-sm rounded-md {{ passwordErrors ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-action-500 focus:border-action-500' }}"
+                                >
+                                {% if passwordErrors %}
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        {# Heroicon name: solid/exclamation-circle #}
+                                        <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% for error in passwordErrors %}
+                                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
                         </div>
 
                     </div>
