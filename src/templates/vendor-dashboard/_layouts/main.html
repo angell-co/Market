@@ -79,7 +79,9 @@
 
                     <div class="mt-6 pt-6">
                         <div class="px-2 space-y-1">
-                            {% include '_market/_layouts/_nav-links-bottom.html' %}
+                            {% include '_market/_layouts/_nav-links-bottom.html' with {
+                                mobile: true
+                            } %}
                         </div>
                     </div>
                 </nav>

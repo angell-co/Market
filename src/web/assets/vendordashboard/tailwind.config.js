@@ -1,6 +1,45 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
+const cgColours = {
+  teal: {
+    50: '#E8FFFE',
+    100: '#C0F7F3',
+    200: '#9BF0EB',
+    300: '#62E2DA',
+    400: '#5BD2CC',
+    500: '#52BBB5',
+    600: '#48A49E',
+    700: '#408C88',
+    800: '#2D726E',
+    900: '#215451',
+  },
+  pink: {
+    50: '#FFE6EB',
+    100: '#F7CCD6',
+    200: '#F0BCC7',
+    300: '#F0A7B7',
+    400: '#EC97AA',
+    500: '#F0869D',
+    600: '#DC778D',
+    700: '#C66D80',
+    800: '#AB5D6E',
+    900: '#8A4A58',
+  },
+  yellow: {
+    50: '#FFF8E1',
+    100: '#FFF1C0',
+    200: '#FFE89A',
+    300: '#FFDE70',
+    400: '#FFD340',
+    500: '#FDC300',
+    600: '#E6B100',
+    700: '#C49702',
+    800: '#9F7C06',
+    900: '#614B00',
+  },
+};
+
 module.exports = {
   purge: [
     '../../../templates/vendor-dashboard/**/*.html',
@@ -10,20 +49,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: colors.teal,
-        action: colors.fuchsia,
-        // brand: {
-        //   50: '#f1d4da',
-        //   100: '#f3cad2',
-        //   200: '#f5bcc7',
-        //   300: '#f3a2b3',
-        //   400: '#f194a8',
-        //   500: '#F0869D',
-        //   600: '#ef7590',
-        //   700: '#ef6584',
-        //   800: '#ef597b',
-        //   900: '#f14d72',
-        // },
+        brand: cgColours.teal,
+        action: cgColours.yellow,
+
         red: colors.rose,
         green: colors.emerald,
         orange: colors.orange,
