@@ -1,12 +1,15 @@
-<div>
+<div x-data="{}">
     <div class="sm:hidden">
         <label for="tabs" class="sr-only">Select a tab</label>
-        <select id="tabs" class="block w-full focus:ring-action-500 focus:border-action-500 border-gray-300 rounded-md">
-            <option{{ craft.app.request.getSegment(3) == 'details' ? ' selected' }}>My Details</option>
-            <option{{ craft.app.request.getSegment(3) == 'password' ? ' selected' }}>Password</option>
-            <option{{ craft.app.request.getSegment(3) == 'payments' ? ' selected' }}>Payments</option>
-            <option{{ craft.app.request.getSegment(3) == 'holiday' ? ' selected' }}>Holiday Mode</option>
-            <option{{ craft.app.request.getSegment(3) == 'product-catalogue' ? ' selected' }}>Product Catalogue</option>
+        <select x-on:change.prevent="window.location.href = '/market/settings/'+$event.target.value"
+                id="tabs"
+                class="block w-full focus:ring-action-500 focus:border-action-500 border-gray-300 rounded-md"
+        >
+            <option value="details"{{ craft.app.request.getSegment(3) == 'details' ? ' selected' }}>My Details</option>
+            <option value="password"{{ craft.app.request.getSegment(3) == 'password' ? ' selected' }}>Password</option>
+            <option value="payments"{{ craft.app.request.getSegment(3) == 'payments' ? ' selected' }}>Payments</option>
+            <option value="holiday"{{ craft.app.request.getSegment(3) == 'holiday' ? ' selected' }}>Holiday Mode</option>
+            <option value="product-catalogue"{{ craft.app.request.getSegment(3) == 'product-catalogue' ? ' selected' }}>Product Catalogue</option>
         </select>
     </div>
     <div class="hidden sm:block">

@@ -5,6 +5,8 @@
 
             {% if flash == 'Vendor saved.' %}{% set flash = 'Shop front saved.' %}{% endif %}
             {% if flash == 'Couldn’t save vendor.' %}{% set flash = 'Couldn’t save shop front.' %}{% endif %}
+            {% if flash == 'User saved.' %}{% set flash = 'Details updated.' %}{% endif %}
+            {% if flash == 'Couldn’t save user.' %}{% set flash = 'Couldn’t update details.' %}{% endif %}
 
 
             <div x-data="{ show: true, pointerActive: false }"
