@@ -52,9 +52,8 @@ class StripeController extends Controller
             $state = $request->getParam('state');
 
             if (!$state || !$request->validateCsrfToken($state)) {
-                throw new HttpException(400, Craft::t('app','The CSRF token could not be verified.'));
+                throw new HttpException(400, Craft::t('app', 'The CSRF token could not be verified.'));
             }
-
         }
 
         // Get the Stripe authorization code
@@ -89,7 +88,6 @@ class StripeController extends Controller
                 Craft::$app->getSession()->setError(Craft::t('market', 'Couldn’t connect to Stripe.'));
                 $this->redirect($settings->redirectError);
             }
-
         } catch (OAuthErrorException $e) {
             // Failed to get the access token or user details.
 
@@ -99,7 +97,6 @@ class StripeController extends Controller
 
             Craft::$app->getSession()->setError(Craft::t('market', 'Couldn’t connect to Stripe as their was a problem with your account.'));
             $this->redirect($settings->redirectError);
-
         } catch (Exception $e) {
             Craft::$app->getSession()->setError(Craft::t('market', 'There was a problem connecting to Stripe.'));
             $this->redirect($settings->redirectError);
@@ -146,7 +143,6 @@ class StripeController extends Controller
 
             // If that worked, then remove the stripe details
             $this->_removeStripeDetailsFromVendor($vendor);
-
         } catch (OAuthErrorException $e) {
 
             // If it is an invalid client, then they aren’t connected, so just
@@ -158,7 +154,6 @@ class StripeController extends Controller
             // Fallback to sending the actual error back
             Craft::$app->getSession()->setError($e->getError()->error_description);
             $this->redirect($settings->redirectError);
-
         } catch (Exception $e) {
             // TODO: Log this
             throw $e;
@@ -166,7 +161,6 @@ class StripeController extends Controller
 
         Craft::$app->getSession()->setError(Craft::t('app', 'Sorry there was an unknown error.'));
         $this->redirect($settings->redirectError);
-
     }
 
     // Private Methods
@@ -195,30 +189,6 @@ class StripeController extends Controller
             Craft::$app->getSession()->setNotice(Craft::t('market', 'Account disconnected.'));
             $this->redirect($settings->redirectSuccess);
         }
-
     }
 
-    // ProtectedMethods
-    // =========================================================================
-
-    /**
-     * Creates a new instance of the OAuth2 Provider
-     */
-//    protected function getProvider()
-//    {
-
-//        // Get the provider instance
-//        if (!$this->_provider) {
-//            $this->_provider = new GenericProvider([
-//                'clientId'                => $this->_settings->clientId,
-//                'clientSecret'            => $this->_settings->secretKey,
-//                'redirectUri'             => UrlHelper::getActionUrl('marketplace/stripe/handleOnboarding'),
-//                'urlAuthorize'            => 'https://connect.stripe.com/oauth/authorize',
-//                'urlAccessToken'          => 'https://connect.stripe.com/oauth/token',
-//                'urlResourceOwnerDetails' => 'https://api.stripe.com/v1/accounts'
-//            ]);
-//        }
-//
-//        return $this->_provider;
-//    }
 }
