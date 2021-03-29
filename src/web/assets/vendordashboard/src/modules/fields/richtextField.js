@@ -116,7 +116,7 @@ const richtextField = function (content, fieldId, heightClass) {
                 }
 
                 // Sort the scroll
-                htmx.find('#field-'+this.fieldId+'-link-panel-container').scrollTop = 240;
+                htmx.find('#field-'+this.fieldId+'-link-panel-container').scrollTop = 0;
             }
 
             // File queries
@@ -129,7 +129,7 @@ const richtextField = function (content, fieldId, heightClass) {
                 }
 
                 // Sort the scroll
-                htmx.find('#field-'+this.fieldId+'-link-panel-container').scrollTop = 150;
+                htmx.find('#field-'+this.fieldId+'-link-panel-container').scrollTop = 100;
             }
         }
     }

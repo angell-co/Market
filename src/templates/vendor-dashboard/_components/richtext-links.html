@@ -3,6 +3,81 @@
 {% set productQuery = productQuery ?? '' %}
 
 <div>
+    <label for="field-{{ _fieldId }}-link-panel-link-product" class="block text-sm font-medium text-gray-700">
+        Link to a product
+    </label>
+
+    <input sprig
+           s-trigger="keyup changed delay:250ms"
+           s-replace="#field-{{ _fieldId }}-link-panel-link-product-results"
+           value="{{ productQuery }}"
+           type="text"
+           name="productQuery"
+           id="field-{{ _fieldId }}-link-panel-link-product"
+           placeholder="Search for products"
+           class="mt-1 block w-full shadow-sm sm:text-sm rounded-md border-gray-300 focus:ring-action-500 focus:border-action-500"
+    >
+
+    <div id="field-{{ _fieldId }}-link-panel-link-product-results">
+        {% set products = craft.products
+            .limit(5)
+            .search(productQuery)
+            .orderBy('dateCreated desc')
+            .relatedTo({
+            'targetElement': currentVendor.id,
+            'field': 'vendor'
+        })
+            .all()
+        %}
+
+        {% if productQuery and products %}
+            <div id="field-{{ _fieldId }}-link-panel-link-product-results-inner" class="flow-root mt-6">
+                <ul class="-my-5 divide-y divide-gray-200">
+                    {% for product in products %}
+                        <li class="py-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    {% set img = product.primaryImage[0] ?? null %}
+                                    {% if img %}
+                                        <img class="h-8 w-8 rounded-full"
+                                             src="{{ img.getUrl({
+                                                 width: 120,
+                                                 height: 120,
+                                             }) }}"
+                                             alt="{{ img.title }}"
+                                        >
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">
+                                        {{ product.title }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 truncate">
+                                        {{ product.defaultVariant.sku }}
+                                    </p>
+                                </div>
+                                <div>
+                                    {% set linkUrl = product.url ~ '#' ~ product.refHandle ~ ':' ~ product.id ~ '@' ~ product.siteId %}
+                                    <button sprig
+                                            s-val:file-query=""
+                                            s-val:product-query=""
+                                            x-on:htmx:before-request="linkUrl = '{{ linkUrl }}'"
+                                            type="button"
+                                            class="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
+                                    >
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div>
     <label for="field-{{ _fieldId }}-link-panel-link-file" class="block text-sm font-medium text-gray-700">
         Link to a file
     </label>
@@ -72,79 +147,4 @@
         {% endif %}
     </div>
 
-</div>
-
-<div>
-    <label for="field-{{ _fieldId }}-link-panel-link-product" class="block text-sm font-medium text-gray-700">
-        Link to a product
-    </label>
-
-    <input sprig
-           s-trigger="keyup changed delay:250ms"
-           s-replace="#field-{{ _fieldId }}-link-panel-link-product-results"
-           value="{{ productQuery }}"
-           type="text"
-           name="productQuery"
-           id="field-{{ _fieldId }}-link-panel-link-product"
-           placeholder="Search for products"
-           class="mt-1 block w-full shadow-sm sm:text-sm rounded-md border-gray-300 focus:ring-action-500 focus:border-action-500"
-    >
-
-    <div id="field-{{ _fieldId }}-link-panel-link-product-results">
-        {% set products = craft.products
-            .limit(5)
-            .search(productQuery)
-            .orderBy('dateCreated desc')
-            .relatedTo({
-                'targetElement': currentVendor.id,
-                'field': 'vendor'
-            })
-            .all()
-        %}
-
-        {% if productQuery and products %}
-            <div id="field-{{ _fieldId }}-link-panel-link-product-results-inner" class="flow-root mt-6">
-                <ul class="-my-5 divide-y divide-gray-200">
-                    {% for product in products %}
-                        <li class="py-4">
-                            <div class="flex items-center space-x-4">
-                                <div class="flex-shrink-0">
-                                    {% set img = product.primaryImage[0] ?? null %}
-                                    {% if img %}
-                                        <img class="h-8 w-8 rounded-full"
-                                             src="{{ img.getUrl({
-                                                 width: 120,
-                                                 height: 120,
-                                             }) }}"
-                                             alt="{{ img.title }}"
-                                        >
-                                    {% endif %}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 truncate">
-                                        {{ product.title }}
-                                    </p>
-                                    <p class="text-sm text-gray-500 truncate">
-                                        {{ product.defaultVariant.sku }}
-                                    </p>
-                                </div>
-                                <div>
-                                    {% set linkUrl = product.url ~ '#' ~ product.refHandle ~ ':' ~ product.id ~ '@' ~ product.siteId %}
-                                    <button sprig
-                                            s-val:file-query=""
-                                            s-val:product-query=""
-                                            x-on:htmx:before-request="linkUrl = '{{ linkUrl }}'"
-                                            type="button"
-                                            class="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
-                                    >
-                                        Select
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-    </div>
 </div>

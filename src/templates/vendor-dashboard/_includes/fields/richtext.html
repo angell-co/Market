@@ -233,7 +233,16 @@
                                 <div class="absolute inset-0 px-6">
 
                                     <div class="space-y-4 py-6">
-                                        <div>
+
+                                        {# TODO: fix scroll distances and swap them over #}
+                                        {{ sprig('_market/_components/richtext-links', {
+                                            _fieldId: field.id
+                                        }, {
+                                            class: 'space-y-4',
+                                            'x-on:htmx:after-swap' : 'fixScroll'
+                                        }) }}
+
+                                        <div class="border-t pt-4">
                                             <label for="field-{{ field.id }}-link-panel-link-url" class="block text-sm font-medium text-gray-700">
                                                 URL
                                             </label>
@@ -244,7 +253,7 @@
                                             >
                                         </div>
 
-                                        <div class="border-b pb-4">
+                                        <div>
                                             <div class="relative flex items-start">
                                                 <div class="flex items-center h-5">
                                                     <input x-model="linkTarget"
@@ -258,13 +267,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {{ sprig('_market/_components/richtext-links', {
-                                            _fieldId: field.id
-                                        }, {
-                                            class: 'space-y-4',
-                                            'x-on:htmx:after-swap' : 'fixScroll'
-                                        }) }}
                                     </div>
                                 </div>
                             </div>
