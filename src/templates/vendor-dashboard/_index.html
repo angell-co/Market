@@ -27,12 +27,12 @@
 
     {% set totalOrders = ordersQuery
         .dateOrdered('>= '~thirtyDays)
-        .total()
+        .count()
     %}
 
     {% set totalOrdersPrev30 = ordersQuery
         .dateOrdered(['and', '>= '~sixtyDays, '<= '~thirtyDays])
-        .total()
+        .count()
     %}
 
     {% set totalOrdersDiff = (totalOrders - totalOrdersPrev30) %}
@@ -41,7 +41,7 @@
     {% set totalNewOrders = ordersQuery
         .orderStatus('new')
         .dateOrdered(null)
-        .total()
+        .count()
     %}
 
     {# Main orders loop #}

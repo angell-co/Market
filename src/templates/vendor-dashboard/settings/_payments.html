@@ -17,8 +17,78 @@
 <div class="py-6">
     {% include '_market/settings/_nav.html' %}
 
-    <div class="space-y-6 sm:px-6 lg:px-0 mt-6">
+    <div class="mt-6 shadow rounded-md overflow-hidden">
+        <div class="bg-white py-6 px-4 sm:p-6">
+            <div>
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Payment status</h2>
+                <p class="mt-1 text-sm text-gray-500">We take payments on your behalf using Stripe. Please note that you <strong>must</strong> connect your Stripe account here before you will be able to sell anything.</p>
+            </div>
 
+            {% if currentVendor.stripeUserId %}
+                {# Active #}
+                <div class="mt-6 rounded-md shadow-md bg-green-100 border border-green-300 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {# Heroicon name: solid/check-circle #}
+                            <svg class="h-5 w-5 text-green-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-green-800">
+                                Payments are active
+                            </h3>
+                            <div class="mt-2 text-sm text-green-700 space-y-2">
+                                <p>Customers can purchase your products and you will get paid directly into your connected Stripe account.</p>
+                            </div>
+                            <div class="mt-4">
+                                <form class="-mx-2 -my-1.5 flex">
+                                    {{ csrfInput() }}
+                                    {{ actionInput('market/stripe/disconnect') }}
+                                    <button type="submit"
+                                            class="bg-green-100 px-2 py-1.5 rounded-md text-sm font-medium text-green-800 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-100 focus:ring-green-600"
+                                    >
+                                        Disconnect
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+
+                {# Inactive #}
+                <div class="mt-6 rounded-md shadow-md bg-red-100 border border-green-300 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {# Heroicon name: solid/exclamation #}
+                            <svg class="h-5 w-5 text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                Payments are inactive
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700 space-y-2">
+                                <p>Customers cannot purchase your products and you will not get paid.</p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="-mx-2 -my-1.5 flex">
+{#                                    {% dd(craft.app.request.csrfToken) %}#}
+                                    <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id={{ market.getStripeClientId() }}&scope=read_write&state={{ craft.app.request.csrfToken }}"
+                                       class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600"
+                                    >
+                                        Connect now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

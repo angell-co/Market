@@ -30,6 +30,7 @@ use yii\web\ServerErrorHttpException;
 /**
  * Vendors service
  *
+ * @property Vendor $vendorPending
  * @property null|bool|array|ElementInterface $currentVendor
  *
  * @author    Angell & Co

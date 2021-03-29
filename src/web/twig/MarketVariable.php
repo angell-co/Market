@@ -12,6 +12,7 @@ namespace angellco\market\web\twig;
 
 use angellco\market\helpers\ShippingProfileHelper;
 use angellco\market\Market;
+use angellco\market\models\StripeSettings;
 use angellco\market\services\Vendors;
 use Craft;
 use craft\base\ElementInterface;
@@ -30,6 +31,11 @@ class MarketVariable extends ServiceLocator
     public $plugin;
 
     /**
+     * @var StripeSettings
+     */
+    private $_stripeSettings;
+
+    /**
      * @inheritdoc
      */
     public function __construct($config = [])
@@ -45,12 +51,15 @@ class MarketVariable extends ServiceLocator
 
     /**
      * @inheritdoc
+     *
+     * @throws \craft\errors\SiteNotFoundException
      */
     public function init(): void
     {
         parent::init();
 
         $this->plugin = Market::$plugin;
+        $this->_stripeSettings = $this->plugin->getStripeSettings()->getSettings();
     }
 
     /**
@@ -81,5 +90,13 @@ class MarketVariable extends ServiceLocator
     public function shippingProfileHelper(): ShippingProfileHelper
     {
         return new ShippingProfileHelper();
+    }
+
+    /**
+     * @return string
+     */
+    public function getStripeClientId(): string
+    {
+        return $this->_stripeSettings->clientId;
     }
 }

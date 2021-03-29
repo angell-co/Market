@@ -28,6 +28,9 @@
         required: true
     }) }}
 
+    <p>This is the redirect URI that you’ll need to add:</p>
+    <code>{{ actionUrl('market/stripe/handle-onboarding') }}</code>
+
     {{ forms.textField({
         label: 'Secret Key'|t('market'),
         instructions: 'This can be found in your {api_settings_link}.'|t('market', params = {api_settings_link: '<a href="https://dashboard.stripe.com/account/apikeys" target="_blank">API settings</a>'}),
