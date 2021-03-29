@@ -92,6 +92,12 @@
         {% set fl = productType.getFieldLayout() %}
         {% set tabs = fl.getTabs() %}
         {% set tabErrors = [] %}
+        {% set excludedFldElements = [
+            'craft\\fieldlayoutelements\\Heading',
+            'craft\\fieldlayoutelements\\HorizontalRule',
+            'craft\\fieldlayoutelements\\Template',
+            'craft\\fieldlayoutelements\\Tip',
+        ] %}
 
         {% set tabContent %}
             {% for tab in tabs %}
@@ -102,24 +108,26 @@
                 >
                     <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                         {% for element in tab.elements %}
-                            {% if product is defined and product.getErrors(element.attribute) %}
-                                {% set tabErrors = tabErrors|merge([tab.id]) %}
-                            {% endif %}
+                            {% if className(element) not in excludedFldElements %}
+                                {% if product is defined and product.getErrors(element.attribute) %}
+                                    {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                {% endif %}
 
-                            {% if element.attribute == 'variants' %}
-                                {% for v in product.variants %}
-                                    {% if v.getErrors() %}
-                                        {% set tabErrors = tabErrors|merge([tab.id]) %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
+                                {% if element.attribute == 'variants' %}
+                                    {% for v in product.variants %}
+                                        {% if v.getErrors() %}
+                                            {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
 
-                            {% include '_market/_includes/fld-element' with {
-                                uielement: element,
-                                element: product is defined ? product : null,
-                                excludedFieldHandles: sidebarFields,
-                                assetsFolderId: currentVendor.filesFolderId
-                            } only %}
+                                {% include '_market/_includes/fld-element' with {
+                                    uielement: element,
+                                    element: product is defined ? product : null,
+                                    excludedFieldHandles: sidebarFields,
+                                    assetsFolderId: currentVendor.filesFolderId
+                                } only %}
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>

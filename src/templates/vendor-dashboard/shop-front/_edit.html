@@ -31,6 +31,9 @@
         {{ hiddenInput('code', currentVendor.code) }}
         {{ hiddenInput('userId', currentVendor.userId) }}
 
+        {{ hiddenInput('successMessage', 'Shop front saved.'|hash) }}
+        {{ hiddenInput('failMessage', 'Couldn’t save shop front.'|hash) }}
+
         {# Header #}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div class="lg:flex lg:items-center lg:justify-between mb-4">
@@ -59,7 +62,12 @@
         {% set fl = currentVendor.getFieldLayout() %}
         {% set tabs = fl.getTabs() %}
         {% set tabErrors = [] %}
-
+        {% set excludedFldElements = [
+            'craft\\fieldlayoutelements\\Heading',
+            'craft\\fieldlayoutelements\\HorizontalRule',
+            'craft\\fieldlayoutelements\\Template',
+            'craft\\fieldlayoutelements\\Tip',
+        ] %}
 
         {% set tabContent %}
             {% for tab in tabs %}
@@ -69,16 +77,18 @@
                 >
                     <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                         {% for element in tab.elements %}
-                            {% if currentVendor.getErrors(element.attribute) %}
-                                {% set tabErrors = tabErrors|merge([tab.id]) %}
-                            {% endif %}
+                            {% if className(element) not in excludedFldElements %}
+                                {% if currentVendor.getErrors(element.attribute) %}
+                                    {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                {% endif %}
 
-                            {% include '_market/_includes/fld-element' with {
-                                uielement: element,
-                                element: currentVendor,
-                                excludedFieldHandles: [],
-                                assetsFolderId: currentVendor.accountFolderId
-                            } only %}
+                                {% include '_market/_includes/fld-element' with {
+                                    uielement: element,
+                                    element: currentVendor,
+                                    excludedFieldHandles: ['holidayMode', 'holidayModeMessage'],
+                                    assetsFolderId: currentVendor.accountFolderId
+                                } only %}
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>

@@ -54,7 +54,7 @@ module.exports = {
 
         red: colors.rose,
         green: colors.emerald,
-        orange: colors.orange,
+        orange: cgColours.yellow,
       },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],

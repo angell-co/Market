@@ -2,13 +2,6 @@
 {% if flashes %}
     <div class="fixed z-30 top-16 right-0 w-96 flex flex-col space-y-4 sm:space-y-6 items-end justify-center p-4 sm:p-6 pointer-events-none">
         {% for kind, flash in flashes %}
-
-            {% if flash == 'Vendor saved.' %}{% set flash = 'Shop front saved.' %}{% endif %}
-            {% if flash == 'Couldn’t save vendor.' %}{% set flash = 'Couldn’t save shop front.' %}{% endif %}
-            {% if flash == 'User saved.' %}{% set flash = 'Details updated.' %}{% endif %}
-            {% if flash == 'Couldn’t save user.' %}{% set flash = 'Couldn’t update details.' %}{% endif %}
-
-
             <div x-data="{ show: true, pointerActive: false }"
                  x-init="() => { setTimeout(() => show = false, 5000) }"
                  x-show="show || pointerActive"

@@ -16,7 +16,7 @@ import Blockquote from '@tiptap/extension-blockquote';
 
 import Link from '@tiptap/extension-link';
 
-const richtextField = function (content, fieldId) {
+const richtextField = function (content, fieldId, heightClass) {
     return {
         fieldId: fieldId,
         content: content,
@@ -28,6 +28,7 @@ const richtextField = function (content, fieldId) {
         showLinkPanel: false,
         linkUrl: '',
         linkTarget: '',
+        heightClass: heightClass,
 
         init(el) {
             let editor = new TipTap({
@@ -55,7 +56,7 @@ const richtextField = function (content, fieldId) {
                 content: this.content,
                 editorProps: {
                     attributes: {
-                        class: "prose prose-action text-gray-500 max-w-none h-96 overflow-x-auto p-3 rounded-b-md focus:outline-none focus:ring-2 focus:ring-action-500 focus:border-action-500"
+                        class: "prose prose-action text-gray-500 max-w-none "+this.heightClass+" overflow-x-auto p-3 rounded-b-md focus:outline-none focus:ring-2 focus:ring-action-500 focus:border-action-500"
                     }
                 }
             });

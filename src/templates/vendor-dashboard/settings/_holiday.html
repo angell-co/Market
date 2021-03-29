@@ -14,11 +14,133 @@
 ] %}
 
 {% block main %}
-<div class="py-6">
-    {% include '_market/settings/_nav.html' %}
+    <div     class="py-6">
+        {% include '_market/settings/_nav.html' %}
 
-    <div class="space-y-6 sm:px-6 lg:px-0 mt-6">
+        {# Activate / deactivate alert panel #}
+        <div class="mt-6 shadow rounded-md overflow-hidden">
+            <div class="bg-white py-6 px-4 sm:p-6">
+                <div>
+                    <h2 class="text-lg leading-6 font-medium text-gray-900">Going on holiday?</h2>
+                    <p class="mt-1 text-sm text-gray-500">Put your shop into holiday mode - this will deactivate purchasing on all your products, but leave them visible and active on the site.</p>
+                </div>
 
+                <form method="POST" class="mt-6">
+                    {{ csrfInput() }}
+                    {{ actionInput('market/vendors/save-vendor') }}
+                    {% if craft.app.getIsMultiSite() %}{{ hiddenInput('siteId', currentVendor.siteId) }}{% endif %}
+
+                    {{ hiddenInput('vendorId', currentVendor.id) }}
+                    {{ hiddenInput('code', currentVendor.code) }}
+                    {{ hiddenInput('userId', currentVendor.userId) }}
+                    {{ hiddenInput('profilePictureId', currentVendor.profilePictureId) }}
+
+                    {% if currentVendor.holidayMode %}
+                        {{ hiddenInput('successMessage', 'Holiday mode deactivated.'|hash) }}
+                        {{ hiddenInput('failMessage', 'Couldn’t deactivate holiday mode.'|hash) }}
+                        {{ hiddenInput('fields[holidayMode]', '0') }}
+
+                        <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    {# Heroicon name: solid/sun #}
+                                    <svg class="h-5 w-5 text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        Holiday mode is currently active
+                                    </h3>
+                                    <div class="mt-2 text-sm text-red-700 space-y-2">
+                                        <p>Customers cannot purchase any of your products, use the button below to reactivate all purchasing on your shop.</p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="-mx-2 -my-1.5 flex">
+                                            <button type="submit" class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600">
+                                                Deactivate now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% else %}
+                        {{ hiddenInput('successMessage', 'Holiday mode activated.'|hash) }}
+                        {{ hiddenInput('failMessage', 'Couldn’t activate holiday mode.'|hash) }}
+                        {{ hiddenInput('fields[holidayMode]', '1') }}
+
+                        <div class="rounded-md shadow-md bg-orange-100 border border-orange-300 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    {# Heroicon name: solid/moon #}
+                                    <svg class="h-5 w-5 text-orange-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-orange-800">
+                                        Holiday mode is currently inactive
+                                    </h3>
+                                    <div class="mt-2 text-sm text-orange-700 space-y-2">
+                                        <p>Customers can purchase your products, use the button below to stop all purchasing on your shop.</p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="-mx-2 -my-1.5 flex">
+                                            <button type="submit" class="bg-orange-100 px-2 py-1.5 rounded-md text-sm font-medium text-orange-800 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-orange-100 focus:ring-orange-600">
+                                                Activate now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        {# Message form #}
+        <form method="POST" class="mt-6">
+            {{ csrfInput() }}
+            {{ actionInput('market/vendors/save-vendor') }}
+            {% if craft.app.getIsMultiSite() %}{{ hiddenInput('siteId', currentVendor.siteId) }}{% endif %}
+
+            {{ hiddenInput('vendorId', currentVendor.id) }}
+            {{ hiddenInput('code', currentVendor.code) }}
+            {{ hiddenInput('userId', currentVendor.userId) }}
+            {{ hiddenInput('profilePictureId', currentVendor.profilePictureId) }}
+
+            {{ hiddenInput('successMessage', 'Holiday message updated.'|hash) }}
+            {{ hiddenInput('failMessage', 'Couldn’t update holiday message.'|hash) }}
+
+            <div class="shadow rounded-md overflow-hidden">
+                <div class="bg-white py-6 px-4 sm:p-6">
+                    <div>
+                        <h2 class="text-lg leading-6 font-medium text-gray-900">Holiday message</h2>
+                        <p class="mt-1 text-sm text-gray-500">You can also add an optional message that will be output on the product detail pages in place of the add to cart button.</p>
+                    </div>
+
+                    <div class="mt-6">
+                        {% set field = craft.app.fields.getFieldByHandle('holidayModeMessage') %}
+                        {% include '_market/_includes/fields/richtext.html' with {
+                            element: currentVendor,
+                            field: field,
+                            heightClass: 'h-56',
+                            showLabel: false
+                        } only %}
+                    </div>
+                </div>
+
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <button type="submit"
+                            class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500"
+                    >
+                        Update message
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
-</div>
 {% endblock %}

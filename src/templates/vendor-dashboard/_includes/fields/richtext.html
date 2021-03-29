@@ -1,19 +1,21 @@
 {% set value = '' %}
 {% if element %}{% set value = element.getFieldValue(field.handle) %}{% endif %}
-
-{# TODO: errors #}
+{% if heightClass is not defined %}{% set heightClass = 'h-96' %}{% endif %}
+{% if showLabel is not defined %}{% set showLabel = true %}{% endif %}
 
 <div>
-    <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
-        {{ field.name }}
-        {% if field.required %}<span class="text-red-600">*</span>{% endif %}
-    </label>
+    {% if showLabel %}
+        <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
+            {{ field.name }}
+            {% if field.required %}<span class="text-red-600">*</span>{% endif %}
+        </label>
+    {% endif %}
 
     {% if field.instructions %}
         <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
     {% endif %}
 
-    <div x-data="Market.richtextField('{{ value|e('js') }}', '{{ field.id }}')"
+    <div x-data="Market.richtextField('{{ value|e('js') }}', '{{ field.id }}', '{{ heightClass }}')"
          x-init="() => init($refs.editor)"
          x-on:click.away="inFocus = false"
          x-on:keydown.cmd.k="openLinkPanel"

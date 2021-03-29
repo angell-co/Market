@@ -24,11 +24,14 @@
             {{ actionInput('users/save-user') }}
             {{ hiddenInput('userId', user.id) }}
 
+            {{ hiddenInput('successMessage', 'Details updated.'|hash) }}
+            {{ hiddenInput('failMessage', 'Couldn’t update details.'|hash) }}
+
             <div x-data="{
                      existingEmail: '{{ currentUser.email }}',
                      newEmail: '{{ user.email }}',
                  }"
-                 class="shadow sm:rounded-md sm:overflow-hidden"
+                 class="shadow rounded-md overflow-hidden"
             >
                 <div class="bg-white py-6 px-4 sm:p-6">
                     <div>

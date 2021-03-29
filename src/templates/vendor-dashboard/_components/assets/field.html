@@ -27,7 +27,7 @@
 
 
 {# If the field values are submitted, then we need to use them to sort the selectedIds by #}
-{% if fields is defined and fields[_fieldHandle] %}
+{% if fields is defined and fields[_fieldHandle] is defined %}
     {% set sortedIds = [] %}
 
     {% for id in fields[_fieldHandle] %}
