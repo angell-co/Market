@@ -40,24 +40,24 @@
                         {{ hiddenInput('failMessage', 'Couldn’t deactivate holiday mode.'|hash) }}
                         {{ hiddenInput('fields[holidayMode]', '0') }}
 
-                        <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">
+                        <div class="rounded-md shadow-md bg-action-100 border border-action-300 p-4">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     {# Heroicon name: solid/sun #}
-                                    <svg class="h-5 w-5 text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <svg class="h-5 w-5 text-action-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">
-                                        Holiday mode is currently active
+                                    <h3 class="text-sm font-medium text-action-800">
+                                        Holiday mode is active
                                     </h3>
-                                    <div class="mt-2 text-sm text-red-700 space-y-2">
-                                        <p>Customers cannot purchase any of your products, use the button below to reactivate all purchasing on your shop.</p>
+                                    <div class="mt-2 text-sm text-action-700 space-y-2">
+                                        <p>Customers cannot currently purchase any of your products, use the button below to reactivate all purchasing on your shop.</p>
                                     </div>
                                     <div class="mt-4">
                                         <div class="-mx-2 -my-1.5 flex">
-                                            <button type="submit" class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600">
+                                            <button type="submit" class="bg-action-100 px-2 py-1.5 rounded-md text-sm font-medium text-action-800 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-action-100 focus:ring-action-600">
                                                 Deactivate now
                                             </button>
                                         </div>
@@ -71,24 +71,24 @@
                         {{ hiddenInput('failMessage', 'Couldn’t activate holiday mode.'|hash) }}
                         {{ hiddenInput('fields[holidayMode]', '1') }}
 
-                        <div class="rounded-md shadow-md bg-orange-100 border border-orange-300 p-4">
+                        <div class="rounded-md shadow-md bg-gray-100 border border-gray-300 p-4">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     {# Heroicon name: solid/moon #}
-                                    <svg class="h-5 w-5 text-orange-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <svg class="h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-orange-800">
-                                        Holiday mode is currently inactive
+                                    <h3 class="text-sm font-medium text-gray-800">
+                                        Holiday mode is inactive
                                     </h3>
-                                    <div class="mt-2 text-sm text-orange-700 space-y-2">
-                                        <p>Customers can purchase your products, use the button below to stop all purchasing on your shop.</p>
+                                    <div class="mt-2 text-sm text-gray-700 space-y-2">
+                                        <p>Customers can currently purchase your products, use the button below to stop all purchasing on your shop.</p>
                                     </div>
                                     <div class="mt-4">
                                         <div class="-mx-2 -my-1.5 flex">
-                                            <button type="submit" class="bg-orange-100 px-2 py-1.5 rounded-md text-sm font-medium text-orange-800 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-orange-100 focus:ring-orange-600">
+                                            <button type="submit" class="bg-gray-100 px-2 py-1.5 rounded-md text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-600">
                                                 Activate now
                                             </button>
                                         </div>
