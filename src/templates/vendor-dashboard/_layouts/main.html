@@ -252,6 +252,15 @@
                                     {{ 'Account settings'|t('market') }}
                                 </a>
                             </div>
+                            {% if currentVendor.holidayMode %}
+                            <div class="py-1">
+                                <a href="{{ url('market/settings/holiday') }}"
+                                   class="group flex items-center px-4 py-2 text-sm text-action-700 hover:bg-action-100 hover:text-action-900"
+                                   role="menuitem">
+                                    {{ 'Holiday mode active'|t('market') }}
+                                </a>
+                            </div>
+                            {% endif %}
                             <div class="py-1">
                                 <a href="{{ url('logout') }}"
                                    class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900"
