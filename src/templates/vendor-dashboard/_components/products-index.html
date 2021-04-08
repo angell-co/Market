@@ -387,20 +387,20 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm font-medium">
                                             <a href="{{ productUrl }}" class="flex text-action-600 hover:text-action-900">
-                                                <div class="mr-4 flex-shrink-0 rounded border border-gray-300 text-gray-300 overflow-hidden">
+                                                <div class="mr-4 flex-shrink-0 text-gray-300 overflow-hidden">
                                                 {% set img = product.primaryImage[0] ?? null %}
                                                     {% if img %}
-                                                        <img class="h-10 w-10" src="{{ img.getUrl({
+                                                        <img class="h-10 w-10 rounded border border-gray-300 " src="{{ img.getUrl({
                                                             width: 120,
                                                             height: 120,
                                                         }) }}" alt="">
                                                     {% else %}
-                                                        <svg class="h-10 w-10 p-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <svg class="h-10 w-10 p-2 rounded border border-gray-300 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                             <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
                                                         </svg>
                                                     {% endif %}
                                                 </div>
-                                                <div class="self-center">
+                                                <div class="self-center max-w-xs whitespace-nowrap truncate">
                                                     {{ product.title }}
                                                 </div>
                                             </a>

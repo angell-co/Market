@@ -249,10 +249,12 @@
                         <tbody>
                             {% for item in order.lineItems %}
                                 <tr class="{{ loop.index is odd ? 'bg-white' : 'bg-gray-50' }}">
-                                    <td class="px-6 py-4 max-w-xs text-sm font-medium text-gray-900">
+                                    <td class="px-6 py-4 min-w-xs text-sm font-medium text-gray-900">
                                         {% if item.purchasable.product is defined  %}
                                             {% set product = item.purchasable.product %}
-                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-action-600 hover:text-action-900">{{ product.title }}</a>
+                                            <a href="{{ url('market/products/'~product.type.handle~'/'~product.id~'-'~product.slug) }}" class="text-action-600 hover:text-action-900">
+                                                {{ product.title }}
+                                            </a>
                                         {% else %}
                                             {{ item.description }}
                                         {% endif %}

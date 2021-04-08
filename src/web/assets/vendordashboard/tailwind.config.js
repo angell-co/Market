@@ -69,6 +69,9 @@ module.exports = {
         '36': '9rem',
         '64': '16rem',
       },
+      minWidth: {
+        'xs': '20rem',
+      },
       screens: {
         'smh': {'raw': '(min-height: 560px)'},
       },

@@ -2173,6 +2173,10 @@ select {
   min-width: 100%;
 }
 
+.min-w-xs {
+  min-width: 20rem;
+}
+
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
