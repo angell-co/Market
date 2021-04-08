@@ -9,7 +9,9 @@
 {% set folderId = currentVendor.filesFolderId %}
 {% if folder == 'account' %}{% set folderId = currentVendor.accountFolderId %}{% endif %}
 
-{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&folder='~folder~'&query='~query) %}
+{% set urlParams = '?page='~page~'&limit='~limit~'&sort='~sort~'&folder='~folder~'&query='~query %}
+
+{% do sprig.pushUrl(urlParams) %}
 
 {% set assetsQuery = craft.assets
     .limit(limit)
@@ -33,7 +35,7 @@
 
 {% if successfulNotice is defined %}
     {% do craft.app.session.setNotice(successfulNotice) %}
-    {% do sprig.redirect('/market/files') %}
+    {% do sprig.redirect('/market/files'~urlParams) %}
 {% endif %}
 
 {# Header #}
@@ -292,11 +294,19 @@
                                     <div class="h-5 flex items-center">
                                         <input sprig
                                                id="asset-checkbox-{{ asset.id }}"
-                                               name="selectedIds[]"
                                                type="checkbox"
                                                value="{{ asset.id }}"
-                                               {% if asset.id in selectedIds %}checked{% endif %}
                                                class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
+                                               s-val:page="{{ page }}"
+                                               s-val:sort="{{ sort }}"
+                                               s-val:limit="{{ limit }}"
+                                               s-val:query="{{ query }}"
+                                               {% if asset.id in selectedIds %}
+                                                   checked
+                                                   s-val:selected-ids="{{ selectedIds|filter(v => v != asset.id)|join(',') }}"
+                                               {% else %}
+                                                   s-val:selected-ids="{{ selectedIds|push(asset.id)|join(',') }}"
+                                               {% endif %}
                                         >
                                     </div>
                                     <div class="ml-3 text-sm truncate">
