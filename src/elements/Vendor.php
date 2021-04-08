@@ -622,6 +622,10 @@ class Vendor extends Element
      */
     public function getSettings(): VendorSettings
     {
+        if ($this->siteId === null && Craft::$app->getIsInstalled()) {
+            $this->siteId = Craft::$app->getSites()->getPrimarySite()->id;
+        }
+
         if ($this->_vendorSettings[$this->siteId]) {
             return $this->_vendorSettings[$this->siteId];
         }
