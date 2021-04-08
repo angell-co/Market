@@ -622,7 +622,7 @@ class Vendor extends Element
      */
     public function getSettings(): VendorSettings
     {
-        if ($this->_vendorSettings[$this->siteId]) {
+        if (isset($this->_vendorSettings[$this->siteId])) {
             return $this->_vendorSettings[$this->siteId];
         }
 
