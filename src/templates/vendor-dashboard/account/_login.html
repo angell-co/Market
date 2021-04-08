@@ -1,5 +1,13 @@
 {% extends "_market/_layouts/auth" %}
 
+{% if currentUser %}
+    {% if market.vendors.getCurrentVendor() %}
+        {% redirect url('market') %}
+    {% else %}
+        {% redirect url('/') %}
+    {% endif %}
+{% endif %}
+
 {% set title = 'Login'|t('market') %}
 
 {% block main %}
