@@ -215,6 +215,9 @@ trait PluginTrait
                 $event->rules['market/settings/product-catalogue'] = ['template' => '_market/settings/_product-catalogue'];
 
                 $event->rules['market/login'] = ['template' => '_market/account/_login'];
+                $event->rules['market/forgot-password'] = ['template' => '_market/account/_forgot-pass'];
+                $event->rules['market/reset-password'] = ['template' => '_market/account/_set-pass'];
+                $event->rules['market/invalid-password-reset-link'] = ['template' => '_market/account/_invalid-token'];
             }
         );
     }

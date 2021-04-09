@@ -204,6 +204,7 @@ Correct the inability to style clickable types in iOS and Safari.
 
 button,
 [type='button'],
+[type='reset'],
 [type='submit'] {
   -webkit-appearance: button;
 }
@@ -1438,11 +1439,6 @@ select {
   background-color: rgba(89, 206, 199, var(--tw-bg-opacity));
 }
 
-.hover\:bg-brand-600:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgba(72, 164, 158, var(--tw-bg-opacity));
-}
-
 .hover\:bg-brand-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(64, 140, 136, var(--tw-bg-opacity));
@@ -1548,6 +1544,11 @@ select {
 .border-green-300 {
   --tw-border-opacity: 1;
   border-color: rgba(110, 231, 183, var(--tw-border-opacity));
+}
+
+.border-brand-500 {
+  --tw-border-opacity: 1;
+  border-color: rgba(82, 187, 181, var(--tw-border-opacity));
 }
 
 .border-action-300 {

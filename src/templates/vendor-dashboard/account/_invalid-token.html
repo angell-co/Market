@@ -1,0 +1,48 @@
+{% extends "_market/_layouts/auth" %}
+
+{% set title = 'Invalid Password Reset Link'|t('market') %}
+
+{% block main %}
+    <main class="min-h-screen flex relative">
+        <div class="relative z-10 bg-white bg-opacity-90 flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+            <div class="mx-auto w-full max-w-sm lg:w-96">
+                <div>
+                    {% include '_market/_layouts/_logo.html' with {
+                        class: 'w-full text-brand-500'
+                    } %}
+
+                    <h2 class="mt-8 text-3xl font-extrabold text-gray-900">
+                        Invalid reset link
+                    </h2>
+
+                    <p class="mt-2 text-sm text-gray-600 max-w">
+                        Your link may have expired or you have already used it.
+                    </p>
+                </div>
+                <div class="mt-6">
+                    <a href="{{ url('market/forgot-password') }}"
+                       class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-500 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-400"
+                    >
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            {# Heroicon name: solid/lock-closed #}
+                            <svg class="h-5 w-5 text-brand-300 group-hover:text-brand-400"
+                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                 aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                        Request a new password reset link
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="hidden lg:block absolute top-0 left-0 right-0 bottom-0">
+            <img class="absolute inset-0 h-full w-full object-cover"
+                 src="https://cheerfully-given.imgix.net/files/CG-Group.jpg?auto=format%2Ccompress&w=1080&dpr=3&s=97882ceb8c751a89d9a96e3a807cdb59"
+                 alt="">
+        </div>
+    </main>
+{% endblock %}
+

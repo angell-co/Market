@@ -1,14 +1,6 @@
 {% extends "_market/_layouts/auth" %}
 
-{% if currentUser %}
-    {% if market.vendors.getCurrentVendor() %}
-        {% redirect url('market') %}
-    {% else %}
-        {% redirect url('/') %}
-    {% endif %}
-{% endif %}
-
-{% set title = 'Login'|t('market') %}
+{% set title = 'Reset Password'|t('market') %}
 
 {% block main %}
     <main class="min-h-screen flex relative">
@@ -18,63 +10,34 @@
                     {% include '_market/_layouts/_logo.html' with {
                         class: 'w-full text-brand-500'
                     } %}
+
                     <h2 class="mt-8 text-3xl font-extrabold text-gray-900">
-                        Sign in to your account
+                        Choose a new password
                     </h2>
 
-                    {% set settings = market.plugin.getSettings() %}
-                    {% if settings and settings.applyToSell %}
-                        <p class="mt-2 text-sm text-gray-600 max-w">
-                            Or
-                            <a href="{{ settings.applyToSell }}" class="font-medium text-brand-600 hover:text-brand-500">
-                                apply to sell with us
-                            </a>
-                        </p>
-                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-600 max-w">
+
+                    </p>
                 </div>
 
                 <form method="POST" class="mt-8 space-y-6">
                     {{ csrfInput() }}
-                    {{ actionInput('users/login') }}
-                    {{ redirectInput('market') }}
-                    <div>
-                        <label for="loginName" class="block text-sm font-medium text-gray-700">
-                            Email address
-                        </label>
-                        <div class="mt-1">
-                            <input id="loginName" name="loginName" type="email" autocomplete="email" required
-                                   class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
-                        </div>
-                    </div>
+                    {{ actionInput('users/set-password') }}
+                    {{ hiddenInput('code', code) }}
+                    {{ hiddenInput('id', id) }}
 
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">
-                            Password
+                        <label for="newPassword" class="block text-sm font-medium text-gray-700">
+                            New Password
                         </label>
                         <div class="mt-1">
-                            <input id="password" name="password" type="password" autocomplete="current-password"
+                            <input id="newPassword" name="newPassword" type="password"
                                    required
                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input id="rememberMe" name="rememberMe" type="checkbox"
-                                   class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded">
-                            <label for="rememberMe" class="ml-2 block text-sm text-gray-900">
-                                Remember me
-                            </label>
-                        </div>
-
-                        <div class="text-sm">
-                            <a href="{{ url('market/forgot-password') }}" class="font-medium text-brand-600 hover:text-brand-500">
-                                Forgot your password?
-                            </a>
-                        </div>
-                    </div>
-
-                    {% if errorMessage is defined %}
+                    {% if errors ?? false %}
                         <div class="relative mt-2 p-2 pl-9 rounded-md border border-red-500">
                             <div class="absolute inset-y-0 left-2 flex items-center pointer-events-none">
                                 {# Heroicon name: solid/exclamation-circle #}
@@ -86,7 +49,7 @@
                                 </svg>
                             </div>
 
-                            <p class="text-sm text-red-600">{{ errorMessage }}</p>
+                            <p class="text-sm text-red-600">{{ errors[0] }}</p>
                         </div>
                     {% endif %}
 
@@ -103,9 +66,23 @@
                                           clip-rule="evenodd"/>
                                 </svg>
                             </span>
-                            Sign in
+                            Submit
                         </button>
                     </div>
+
+                    {% set flashes = craft.app.session.getAllFlashes() %}
+                    {% if flashes and flashes['notice'] is defined  %}
+                        <div class="relative mt-2 p-2 pl-9 rounded-md border border-brand-500">
+                            <div class="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                                {# Heroicon name: solid/check-circle #}
+                                <svg class="h-5 w-5 text-brand-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+
+                            <p class="text-sm text-brand-600">{{ flashes['notice'] }}</p>
+                        </div>
+                    {% endif %}
                 </form>
             </div>
         </div>
