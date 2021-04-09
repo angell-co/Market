@@ -1,0 +1,49 @@
+{% if successfulNotice is defined %}
+    {% do craft.app.session.setNotice(successfulNotice) %}
+    {% do sprig.redirect('/market/orders/'~_orderId) %}
+{% endif %}
+
+{% set statusMap = {
+    green: 'bg-green-600 hover:bg-green-700 focus:ring-green-500',
+    blue: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+    pink: 'bg-pink-600 hover:bg-pink-700 focus:ring-pink-500',
+    default: 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-500',
+} %}
+
+{% set order = craft.commerce.orders.getOrderById(_orderId) %}
+
+{# Mark as ... #}
+{% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
+    {% if orderStatus.handle not in ['new','refunded'] and order.orderStatusId != orderStatus.id %}
+        <button sprig
+                s-action="market/orders/set-status"
+                s-method="post"
+                s-val:status-id="{{ orderStatus.id }}"
+                s-val:order-ids="{{ _orderId }}"
+                s-val:successful-notice="Order marked as {{ orderStatus.name }}."
+                type="button"
+                class="ml-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 {{ statusMap[orderStatus.color] }}"
+        >
+            {% if orderStatus.handle == 'posted' %}
+                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                </svg>
+            {% endif %}
+            Mark as {{ orderStatus.name }}
+        </button>
+    {% endif %}
+{% endfor %}
+
+{# TODO: Refund #}
+<button sprig
+        s-confirm="Not yet implemented."
+        type="button"
+        class="ml-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 {{ statusMap.pink }}"
+>
+    {# Heroicon name: receipt-refund #}
+    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clip-rule="evenodd" />
+    </svg>
+    {{ 'Refund'|t('market') }}
+</button>

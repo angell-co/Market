@@ -54,6 +54,7 @@ module.exports = {
 
         red: colors.rose,
         green: colors.emerald,
+        blue: colors.lightBlue,
         orange: cgColours.yellow,
       },
       fontFamily: {

@@ -23,14 +23,14 @@
 
 {% set statusMap = {
     green: 'bg-green-200 text-green-800',
-    action: 'bg-action-200 text-action-800',
+    blue: 'bg-blue-200 text-blue-800',
     pink: 'bg-pink-200 text-pink-800',
     default: 'bg-gray-200 text-gray-800',
 } %}
 
 {% set statusOptionMap = {
     green: 'text-green-700 hover:bg-green-100 hover:text-green-900',
-    action: 'text-action-700 hover:bg-action-100 hover:text-action-900',
+    blue: 'text-blue-700 hover:bg-blue-100 hover:text-blue-900',
     pink: 'text-pink-700 hover:bg-pink-100 hover:text-pink-900',
     default: 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
 } %}
@@ -94,46 +94,8 @@
 
         {# Actions #}
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
-            {# Update status #}
-            <div class="relative z-10 inline-block text-left"
-                 x-data="{ open: false }"
-                 x-on:keydown.window.escape="open = false"
-                 x-on:click.away="open = false"
-            >
-                <div>
-                    <button x-on:click="open = !open"
-                            class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-500"
-                            id="status-menu" aria-haspopup="true" x-bind:aria-expanded="open"
-                    >
-                        {{ 'Update Status'|t('market') }}
-                        {# Heroicon name: chevron-down #}
-                        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div x-show="open"
-                     x-cloak
-                     x-transition:enter="transition ease-out duration-100"
-                     x-transition:enter-start="transform opacity-0 scale-95"
-                     x-transition:enter-end="transform opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-75"
-                     x-transition:leave-start="transform opacity-100 scale-100"
-                     x-transition:leave-end="transform opacity-0 scale-95"
-                     class="origin-top-right absolute right-0 mt-2 w-56 py-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
-                     role="menu" aria-orientation="vertical" aria-labelledby="status-menu"
-                >
-                    {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
-                        <a href="#" class="group flex items-center px-4 py-2 text-sm {{ statusOptionMap[orderStatus.color] is defined ? statusOptionMap[orderStatus.color] : statusOptionMap.default }}" role="menuitem">
-                            {{ orderStatus.name }}
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-
             {# Packing slip #}
-            <a href="{{ order.getPdfUrl() }}" class="ml-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-500">
+            <a href="{{ order.getPdfUrl() }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-500">
                 {# Heroicon name: document-download #}
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
@@ -141,14 +103,9 @@
                 {{ 'Packing Slip'|t('market') }}
             </a>
 
-            {# Refund #}
-            <button type="button" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-pink-500">
-                {# Heroicon name: receipt-refund #}
-                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clip-rule="evenodd" />
-                </svg>
-                {{ 'Refund'|t('market') }}
-            </button>
+            {{ sprig('_market/_components/order-edit-actions', {
+                _orderId: order.id
+            }) }}
         </div>
     </div>
 {% endblock %}
@@ -345,5 +302,46 @@
         </div>
     </div>
 
+    {% set allOrderIds = craft.orders
+        .isCompleted(true)
+        .limit(null)
+        .orderBy('dateOrdered desc')
+        .relatedTo({
+            'targetElement': currentVendor,
+            'field': 'vendor'
+        })
+        .ids()
+    %}
+
+    {% if allOrderIds|length > 1 %}
+        <nav class="flex items-center justify-between sm:px-0 mt-6">
+        {% for id in allOrderIds %}
+            {% if id == order.id %}
+                {% if not loop.first %}
+                    <div class="w-0 flex-1 flex">
+                        <a href="{{ url('market/orders/'~allOrderIds[loop.index0-1]) }}" class="pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                            {# Heroicon name: solid/arrow-narrow-left #}
+                            <svg class="mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Previous
+                        </a>
+                    </div>
+                {% endif %}
+                {% if not loop.last %}
+                    <div class="w-0 flex-1 flex justify-end">
+                        <a href="{{ url('market/orders/'~allOrderIds[loop.index0+1]) }}" class="pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                            Next
+                            {# Heroicon name: solid/arrow-narrow-right #}
+                            <svg class="ml-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        </nav>
+    {% endif %}
 {% endblock %}
 
