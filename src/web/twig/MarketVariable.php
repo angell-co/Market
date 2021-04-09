@@ -10,12 +10,17 @@
 
 namespace angellco\market\web\twig;
 
+use angellco\market\db\Table;
 use angellco\market\helpers\ShippingProfileHelper;
 use angellco\market\Market;
 use angellco\market\models\StripeSettings;
 use angellco\market\services\Vendors;
 use Craft;
 use craft\base\ElementInterface;
+use craft\commerce\db\Table as CommerceTable;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Query;
+use craft\db\Table as CraftTable;
 use yii\di\ServiceLocator;
 
 /**
@@ -98,5 +103,41 @@ class MarketVariable extends ServiceLocator
     public function getStripeClientId(): string
     {
         return $this->_stripeSettings->clientId;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrderCountByStatus(): array
+    {
+        $vendorId = Market::$plugin->getVendors()->getCurrentVendor()->id;
+
+        $countGroupedByStatusId = (new Query())
+            ->select(['[[o.orderStatusId]]', 'count(o.id) as orderCount'])
+            ->where(['[[o.isCompleted]]' => true, '[[e.dateDeleted]]' => null, '[[v.id]]' => $vendorId])
+            ->from([CommerceTable::ORDERS . ' o'])
+            ->innerJoin([CraftTable::ELEMENTS . ' e'], '[[o.id]] = [[e.id]]')
+            ->innerJoin([CraftTable::RELATIONS . ' r'], '[[o.id]] = [[r.sourceId]]')
+            ->innerJoin([Table::VENDORS . ' v'], '[[r.targetId]] = [[v.id]]')
+            ->groupBy(['[[o.orderStatusId]]'])
+            ->indexBy('orderStatusId')
+            ->all();
+
+        // For those not in the groupBy
+        $allStatuses = Commerce::getInstance()->getOrderStatuses()->getAllOrderStatuses();
+        foreach ($allStatuses as $status) {
+            if (!isset($countGroupedByStatusId[$status->id])) {
+                $countGroupedByStatusId[$status->id] = [
+                    'orderStatusId' => $status->id,
+                    'handle' => $status->handle,
+                    'orderCount' => 0
+                ];
+            }
+
+            // Make sure all have their handle
+            $countGroupedByStatusId[$status->id]['handle'] = $status->handle;
+        }
+
+        return $countGroupedByStatusId;
     }
 }

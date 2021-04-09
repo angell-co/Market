@@ -1,7 +1,7 @@
 {% if mobile is not defined %}{% set mobile = false %}{% endif %}
 
 <a href="{{ url('market') }}"
-   class="{{ craft.app.request.getSegment(2) is empty ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+   class="{{ craft.app.request.getSegment(2) is empty ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
 >
     {# Heroicon name: home #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -13,7 +13,8 @@
 </a>
 
 <a href="{{ url('market/orders') }}"
-   class="{{ craft.app.request.getSegment(2) == 'orders' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">
+   class="{{ craft.app.request.getSegment(2) == 'orders' ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+>
     {# Heroicon name: clipboard-list #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
          viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -22,10 +23,26 @@
         " />
     </svg>
     {{ 'Orders'|t('market') }}
+
+    {# New orders count #}
+    {% set counts = market.getOrderCountByStatus() %}
+    {% set newCount = null %}
+    {% for count in counts %}
+        {% if count.handle == 'new' %}
+            {% set newCount = count %}
+        {% endif %}
+    {% endfor %}
+
+    {% if newCount %}
+        <span class="{{ craft.app.request.getSegment(2) == 'orders' ? 'bg-brand-500' : 'bg-brand-700' }} ml-auto py-0.5 px-3 text-xs font-medium rounded-full">
+            {{ newCount.orderCount }}
+        </span>
+    {% endif %}
 </a>
 
 <a href="{{ url('market/products') }}"
-   class="{{ craft.app.request.getSegment(2) == 'products' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">
+   class="{{ craft.app.request.getSegment(2) == 'products' ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+>
     {# Heroicon name: gift #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
          viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -36,7 +53,8 @@
 </a>
 
 <a href="{{ url('market/files') }}"
-   class="{{ craft.app.request.getSegment(2) == 'files' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">
+   class="{{ craft.app.request.getSegment(2) == 'files' ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+>
     {# Heroicon name: photograph #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
          viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -47,7 +65,7 @@
 </a>
 
 <a href="{{ url('market/shipping') }}"
-   class="{{ craft.app.request.getSegment(2) == 'shipping' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">
+   class="{{ craft.app.request.getSegment(2) == 'shipping' ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">
     {# Heroicon name: truck #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
          viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -58,7 +76,8 @@
 </a>
 
 <a href="{{ url('market/shop-front') }}"
-   class="{{ craft.app.request.getSegment(2) == 'shop-front' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">
+   class="{{ craft.app.request.getSegment(2) == 'shop-front' ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+>
     {# Heroicon name: office building #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
          viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -67,14 +86,3 @@
 
     {{ 'Shop Front'|t('market') }}
 </a>
-
-{#<a href="{{ url('market/reports') }}"#}
-{#   class="{{ craft.app.request.getSegment(2) == 'reports' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md">#}
-{#    #}{# Heroicon name: document-report #}
-{#    <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"#}
-{#         viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">#}
-{#        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"#}
-{#              d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>#}
-{#    </svg>#}
-{#    {{ 'Reports'|t('market') }}#}
-{#</a>#}

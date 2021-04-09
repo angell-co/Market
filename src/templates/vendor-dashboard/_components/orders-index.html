@@ -128,8 +128,12 @@
             <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
             <select sprig id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
                 <option value="" {{ status == '' ? 'selected' }}>View all</option>
+                {% set counts = market.getOrderCountByStatus() %}
                 {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
-                    <option value="{{ orderStatus.handle }}" {{ status == orderStatus.handle ? 'selected' }}>{{ orderStatus.name }}</option>
+                    <option value="{{ orderStatus.handle }}" {{ status == orderStatus.handle ? 'selected' }}>
+                        ({{ counts[orderStatus.id].orderCount }})
+                        {{ orderStatus.name }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
