@@ -302,6 +302,7 @@
         </div>
     </div>
 
+    {# Next / prev links #}
     {% set allOrderIds = craft.orders
         .isCompleted(true)
         .limit(null)
