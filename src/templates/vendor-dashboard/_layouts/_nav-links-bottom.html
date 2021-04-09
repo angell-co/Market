@@ -1,6 +1,6 @@
 {% if mobile is not defined %}{% set mobile = false %}{% endif %}
 <a href="{{ url('market/settings') }}"
-   class="{{ craft.app.request.getSegment(2) == 'settings' ? 'bg-brand-700 text-white' : 'text-white hover:bg-brand-600' }} group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+   class="{{ craft.app.request.getSegment(2) == 'settings' ? 'bg-brand-700' : 'hover:bg-brand-400' }} text-white group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
 >
     {# Heroicon name: cog #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -13,7 +13,7 @@
     {{ 'Settings'|t('market') }}
 </a>
 <a href="{{ url('logout') }}"
-   class="text-white hover:bg-brand-600 group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
+   class="text-white hover:bg-brand-400 group flex items-center px-2 py-2 {{ mobile ? 'text-base' : 'text-sm' }} font-medium rounded-md"
 >
     {# Heroicon name: logout #}
     <svg class="{{ mobile ? 'mr-4' : 'mr-3' }} h-6 w-6 text-brand-100" xmlns="http://www.w3.org/2000/svg" fill="none"
