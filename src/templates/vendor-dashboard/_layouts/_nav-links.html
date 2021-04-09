@@ -33,7 +33,7 @@
         {% endif %}
     {% endfor %}
 
-    {% if newCount %}
+    {% if newCount and newCount.orderCount > 0 %}
         <span class="{{ craft.app.request.getSegment(2) == 'orders' ? 'bg-brand-500' : 'bg-brand-700' }} ml-auto py-0.5 px-3 text-xs font-medium rounded-full">
             {{ newCount.orderCount }}
         </span>
