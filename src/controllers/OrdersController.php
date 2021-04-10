@@ -10,10 +10,12 @@
 
 namespace angellco\market\controllers;
 
+use angellco\market\Market;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\errors\ElementNotFoundException;
 use craft\web\Controller;
+use League\Csv\Writer;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
 
@@ -41,8 +43,8 @@ class OrdersController extends Controller
         $this->requirePostRequest();
         $elementsService = Craft::$app->getElements();
 
-        $statusId = Craft::$app->getRequest()->getRequiredParam('statusId');
-        $orderIds = Craft::$app->getRequest()->getRequiredParam('orderIds');
+        $statusId = $this->request->getRequiredParam('statusId');
+        $orderIds = $this->request->getRequiredParam('orderIds');
         $orderIds = explode(',', $orderIds);
 
         $query = Order::find()
@@ -56,6 +58,33 @@ class OrdersController extends Controller
         }
 
         return true;
+    }
+
+    /**
+     * Creates a CSV of the given order IDs and downloads them.
+     *
+     * @throws BadRequestHttpException
+     * @throws \Throwable
+     */
+    public function actionExport()
+    {
+        $filename = 'cheerfully-given-orders';
+
+        $orderIds = $this->request->getRequiredParam('orderIds');
+        $orderIds = explode(',', $orderIds);
+
+        $format = $this->request->getRequiredParam('format');
+
+        /** @var Writer $csv */
+        $csv = Market::$plugin->reports->createOrdersCsv($orderIds, $format);
+
+        if ($format === 'expanded') {
+            $filename .= '_expanded';
+        }
+
+        $csv->output($filename.'.csv');
+
+        return $this->response->sendAndClose();
     }
 
 }

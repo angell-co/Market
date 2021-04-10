@@ -14,6 +14,7 @@ use angellco\market\elements\Vendor;
 use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
 use angellco\market\Market;
+use angellco\market\services\Reports;
 use angellco\market\services\ShippingDestinations;
 use angellco\market\services\ShippingProfiles;
 use angellco\market\services\StripeSettings;
@@ -117,7 +118,10 @@ trait PluginTrait
             ],
             'shippingDestinations' => [
                 'class' => ShippingDestinations::class,
-            ]
+            ],
+            'reports' => [
+                'class' => Reports::class,
+            ],
         ]);
     }
 

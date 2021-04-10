@@ -99,7 +99,7 @@
                         </button>
                     </div>
 
-                    <dv x-show="open"
+                    <div x-show="open"
                          x-cloak
                          x-transition:enter="transition ease-out duration-100"
                          x-transition:enter-start="transform opacity-0 scale-95"
@@ -112,9 +112,10 @@
                     >
                         <div class="px-4 py-3" role="none">
                             <p class="text-sm font-medium text-gray-900" role="none">
-                                Applies to {{ selectedIds|length }} orders
+                                Applies to {{ selectedIds|length }} order{{ selectedIds|length > 1 ? 's' }}
                             </p>
                         </div>
+                        {# Order status change #}
                         <div class="py-1" role="none">
                             {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
                                 {% if orderStatus.handle not in ['new','refunded'] %}
@@ -139,18 +140,47 @@
                                 {% endif %}
                             {% endfor %}
                         </div>
+
+                        {# Exports #}
+                        <div class="py-1" role="none">
+
+                            <form method="POST">
+                                {{ csrfInput() }}
+                                {{ actionInput('market/orders/export') }}
+                                {{ hiddenInput('orderIds', selectedIds|join(',')) }}
+                                {{ hiddenInput('format', 'standard') }}
+                                <button x-on:click.debounce="open = false"
+                                        type="submit"
+                                        class="w-full group flex items-center px-4 py-2 text-sm focus:rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 {{ statusOptionMap.default.button }}"
+                                        role="menuitem"
+                                >
+                                    <svg class="-ml-0.25 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                                    </svg>
+                                    Standard export
+                                </button>
+                            </form>
+
+                            <form method="POST">
+                                {{ csrfInput() }}
+                                {{ actionInput('market/orders/export') }}
+                                {{ hiddenInput('orderIds', selectedIds|join(',')) }}
+                                {{ hiddenInput('format', 'expanded') }}
+                                <button x-on:click.debounce="open = false"
+                                        type="submit"
+                                        class="w-full group flex items-center px-4 py-2 text-sm focus:rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 {{ statusOptionMap.default.button }}"
+                                        role="menuitem"
+                                >
+                                    <svg class="-ml-0.25 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                                    </svg>
+                                    Expanded export
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             {% endif %}
-
-{#            #}{# TODO: Exports #}
-{#            <a href="#" class="ml-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500">#}
-{#                #}{# Heroicon name: document-download #}
-{#                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">#}
-{#                    <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />#}
-{#                </svg>#}
-{#                Export#}
-{#            </a>#}
         </div>
     </div>
 </div>
