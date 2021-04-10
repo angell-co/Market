@@ -87,6 +87,7 @@ class StripeController extends Controller
             $response = OAuth::token([
                 'grant_type' => 'authorization_code',
                 'code' => $code,
+                // TODO: Redirect URI - redirect_uri param
             ]);
 
             // Set the new Stripe data on it
