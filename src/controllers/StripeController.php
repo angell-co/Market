@@ -12,6 +12,7 @@ namespace angellco\market\controllers;
 
 use angellco\market\elements\Vendor;
 use angellco\market\Market;
+use angellco\market\models\StripeSettings;
 use Craft;
 use craft\errors\ElementNotFoundException;
 use craft\errors\MissingComponentException;
@@ -32,20 +33,33 @@ use yii\web\HttpException;
 class StripeController extends Controller
 {
 
+    /**
+     * @var StripeSettings
+     */
+    private $_settings;
+
     // Public Methods
     // =========================================================================
 
+    public function init()
+    {
+        parent::init();
+
+        $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
+    }
+
     /**
+     * Connects the user to their Stripe account and saves the details back on to the Vendor.
+     *
      * @throws BadRequestHttpException
      * @throws Exception
      * @throws HttpException
      * @throws \Throwable
      * @throws SiteNotFoundException
      */
-    public function actionHandleOnboarding(): void
+    public function actionHandleOnboarding()
     {
         $request = Craft::$app->getRequest();
-        $settings = Market::$plugin->getStripeSettings()->getSettings();
 
         // Validate CSRF if enabled
         if (Craft::$app->getConfig()->general->enableCsrfProtection) {
@@ -69,7 +83,7 @@ class StripeController extends Controller
             }
 
             // Make the token call
-            Stripe::setApiKey($settings->secretKey);
+            Stripe::setApiKey($this->_settings->secretKey);
             $response = OAuth::token([
                 'grant_type' => 'authorization_code',
                 'code' => $code,
@@ -82,11 +96,9 @@ class StripeController extends Controller
 
             // Save it
             if (Craft::$app->getElements()->saveElement($vendor)) {
-                Craft::$app->getSession()->setNotice(Craft::t('market', 'Successfully connected to Stripe.'));
-                $this->redirect($settings->redirectSuccess);
+                return $this->_returnSuccess(Craft::t('market', 'Successfully connected to Stripe.'));
             } else {
-                Craft::$app->getSession()->setError(Craft::t('market', 'Couldn’t connect to Stripe.'));
-                $this->redirect($settings->redirectError);
+                return $this->_returnError(Craft::t('market', 'Couldn’t connect to Stripe.'));
             }
         } catch (OAuthErrorException $e) {
             // Failed to get the access token or user details.
@@ -95,15 +107,12 @@ class StripeController extends Controller
             // throw new HttpException(403, Craft::t('Couldn’t complete Stripe authorization.'));
             // See here: https://stripe.com/docs/connect/standalone-accounts#token-request
 
-            Craft::$app->getSession()->setError(Craft::t('market', 'Couldn’t connect to Stripe as their was a problem with your account.'));
-            $this->redirect($settings->redirectError);
+            return $this->_returnError(Craft::t('market', 'Couldn’t connect to Stripe as their was a problem with your account.'));
         } catch (Exception $e) {
-            Craft::$app->getSession()->setError(Craft::t('market', 'There was a problem connecting to Stripe.'));
-            $this->redirect($settings->redirectError);
+            return $this->_returnError(Craft::t('market', 'There was a problem connecting to Stripe.'));
         }
 
-        Craft::$app->getSession()->setError(Craft::t('market', 'There was a problem connecting to Stripe.'));
-        $this->redirect($settings->redirectError);
+        return $this->_returnError(Craft::t('market', 'There was a problem connecting to Stripe.'));
     }
 
 
@@ -115,9 +124,9 @@ class StripeController extends Controller
      * @throws MissingComponentException
      * @throws \Throwable
      */
-    public function actionDisconnect(): void
+    public function actionDisconnect()
     {
-        $settings = Market::$plugin->getStripeSettings()->getSettings();
+        $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
 
         // Get the currently logged in Vendor
         /** @var Vendor $vendor */
@@ -128,21 +137,21 @@ class StripeController extends Controller
 
         // Check if they are already disconnected
         if (!$vendor->stripeUserId) {
-            Craft::$app->getSession()->setNotice(Craft::t('market', 'Already disconnected.'));
-            $this->redirect($settings->redirectSuccess);
+            return $this->_returnSuccess(Craft::t('market', 'Already disconnected.'));
         }
 
         try {
-            Stripe::setApiKey($settings->secretKey);
+            Stripe::setApiKey($this->_settings->secretKey);
 
             // Call stripe deauthorize
             OAuth::deauthorize([
-                'client_id' => $settings->clientId,
+                'client_id' => $this->_settings->clientId,
                 'stripe_user_id' => $vendor->stripeUserId,
             ]);
 
             // If that worked, then remove the stripe details
             $this->_removeStripeDetailsFromVendor($vendor);
+
         } catch (OAuthErrorException $e) {
 
             // If it is an invalid client, then they aren’t connected, so just
@@ -152,19 +161,40 @@ class StripeController extends Controller
             }
 
             // Fallback to sending the actual error back
-            Craft::$app->getSession()->setError($e->getError()->error_description);
-            $this->redirect($settings->redirectError);
+            return $this->_returnError($e->getError()->error_description);
         } catch (Exception $e) {
             // TODO: Log this
             throw $e;
+            return $this->_returnError(Craft::t('app', 'Sorry there was an unknown error.'));
         }
 
-        Craft::$app->getSession()->setError(Craft::t('app', 'Sorry there was an unknown error.'));
-        $this->redirect($settings->redirectError);
+        return $this->_returnSuccess(Craft::t('market', 'Successfully disconnected.'));
     }
 
     // Private Methods
     // =========================================================================
+
+    /**
+     * @param $message
+     * @return \yii\web\Response
+     * @throws MissingComponentException
+     */
+    private function _returnSuccess($message)
+    {
+        Craft::$app->getSession()->setNotice($message);
+        return $this->redirect($this->_settings->redirectSuccess);
+    }
+
+    /**
+     * @param $message
+     * @return \yii\web\Response
+     * @throws MissingComponentException
+     */
+    private function _returnError($message)
+    {
+        Craft::$app->getSession()->setError($message);
+        return $this->redirect($this->_settings->redirectError);
+    }
 
     /**
      * Removes the Stripe details from the Vendor
@@ -175,9 +205,9 @@ class StripeController extends Controller
      * @throws ElementNotFoundException
      * @throws Exception
      */
-    private function _removeStripeDetailsFromVendor(Vendor $vendor): void
+    private function _removeStripeDetailsFromVendor(Vendor $vendor)
     {
-        $settings = Market::$plugin->getStripeSettings()->getSettings();
+        $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
 
         // Null the Stripe details
         $vendor->stripeUserId = null;
@@ -186,9 +216,10 @@ class StripeController extends Controller
 
         // Save the Vendor
         if (Craft::$app->getElements()->saveElement($vendor)) {
-            Craft::$app->getSession()->setNotice(Craft::t('market', 'Account disconnected.'));
-            $this->redirect($settings->redirectSuccess);
+            return true;
         }
+
+        return false;
     }
 
 }
