@@ -76,8 +76,7 @@
                             </div>
                             <div class="mt-4">
                                 <div class="-mx-2 -my-1.5 flex">
-{#                                    {% dd(craft.app.request.csrfToken) %}#}
-                                    <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id={{ market.getStripeClientId() }}&scope=read_write&state={{ craft.app.request.csrfToken }}"
+                                    <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id={{ market.getStripeClientId() }}&scope=read_write&state={{ craft.app.request.csrfToken }}&redirect_uri={{ actionUrl('market/stripe/handle-onboarding') }}"
                                        class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600"
                                     >
                                         Connect now
