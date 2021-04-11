@@ -210,6 +210,7 @@ trait PluginTrait
                 $event->rules['market/shop-front'] = ['template' => '_market/shop-front/_edit'];
 
                 $event->rules['market/reports'] = ['template' => '_market/reports/_index'];
+                $event->rules['market/training'] = ['template' => '_market/_training'];
 
                 $event->rules['market/settings'] = ['template' => '_market/settings/_index'];
                 $event->rules['market/settings/details'] = ['template' => '_market/settings/_details'];

@@ -4,15 +4,39 @@ const colors = require('tailwindcss/colors')
 const cgColours = {
   teal: {
     50: '#E8FFFE',
-    100: '#C0F7F3',
-    200: '#9BF0EB',
-    300: '#5DDBD3',
-    400: '#59CEC7',
+    100: '#C4FCF9',
+    200: '#9EF2ED',
+    300: '#7EE6DF',
+    400: '#65DAD3',
     500: '#52BBB5',
     600: '#48A49E',
     700: '#408C88',
     800: '#2D726E',
     900: '#215451',
+  },
+  darkBlue: {
+    50: '#EAF4FF',
+    100: '#BCDCFF',
+    200: '#7DBCFF',
+    300: '#56A4F7',
+    400: '#1A76D9',
+    500: '#024995',
+    600: '#044183',
+    700: '#05366B',
+    800: '#092F58',
+    900: '#002145',
+  },
+  paleBlue: {
+    50: '#E2F6FF',
+    100: '#BEECFF',
+    200: '#9CE2FF',
+    300: '#7ED9FF',
+    400: '#6ECFF9',
+    500: '#5BC5F2',
+    600: '#37B4E9',
+    700: '#0D9BD7',
+    800: '#007CB0',
+    900: '#005174',
   },
   pink: {
     50: '#FFE6EB',
@@ -50,6 +74,7 @@ module.exports = {
     extend: {
       colors: {
         brand: cgColours.teal,
+        brandsecondary: cgColours.paleBlue,
         action: cgColours.yellow,
 
         red: colors.rose,
