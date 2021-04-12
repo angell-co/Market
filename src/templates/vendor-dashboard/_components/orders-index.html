@@ -3,7 +3,7 @@
 {% set sort = sort ?? 'dateOrdered' %}
 {% set sortDir = sortDir ?? 'desc' %}
 {% set limit = limit ?? 10 %}
-{% if limit > 50 %}{% set limit = 50 %}{% endif %}
+{% if limit > 100 %}{% set limit = 100 %}{% endif %}
 {% set query = query ?? '' %}
 {% set status = status ?? '' %}
 {% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&sortDir='~sortDir~'&status='~status~'&query='~query) %}
@@ -184,7 +184,10 @@
         </div>
     </div>
 </div>
-<div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 md:px-8">
+<div x-data="{}"
+     {% if sprig.isInclude %}x-init="$refs.searchInput.focus()"{% endif %}
+     class="max-w-7xl mx-auto px-4 py-4 sm:px-6 md:px-8"
+>
     {# Search and filters #}
     <div class="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-4">
         {# Search #}
@@ -200,6 +203,9 @@
                 <input sprig
                        s-trigger="keyup changed delay:250ms"
                        s-replace="#results"
+                       s-val:sort="{{ sort }}"
+                       s-val:sort-dir="{{ sortDir }}"
+                       x-ref="searchInput"
                        type="text" name="query" id="query"
                        class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
                        placeholder="Search orders by email, customer name, order number or address"
@@ -211,7 +217,13 @@
         {# Status #}
         <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
             <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-            <select sprig id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
+            <select sprig
+                    id="status"
+                    name="status"
+                    s-val:sort="{{ sort }}"
+                    s-val:sort-dir="{{ sortDir }}"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md"
+            >
                 <option value="" {{ status == '' ? 'selected' }}>View all</option>
                 {% set counts = market.getOrderCountByStatus() %}
                 {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
@@ -226,11 +238,18 @@
         {# Limit #}
         <div class="md:col-span-3 lg:col-span-1">
             <label for="limit" class="block text-sm font-medium text-gray-700">Limit</label>
-            <select sprig id="limit" name="limit" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md">
+            <select sprig
+                    id="limit"
+                    name="limit"
+                    s-val:sort="{{ sort }}"
+                    s-val:sort-dir="{{ sortDir }}"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md"
+            >
                 <option value="5" {{ limit == 5 ? 'selected' }}>5</option>
                 <option value="10" {{ limit == 10 ? 'selected' }}>10</option>
                 <option value="20" {{ limit == 20 ? 'selected' }}>20</option>
                 <option value="50" {{ limit == 50 ? 'selected' }}>50</option>
+                <option value="100" {{ limit == 100 ? 'selected' }}>100</option>
             </select>
         </div>
     </div>
@@ -251,12 +270,14 @@
                                             <input sprig
                                                    id="orders-checkbox-all"
                                                    type="checkbox"
-                                                    {% if orders|length == selectedIds|length %}
-                                                        checked
-                                                        s-val:selected-ids=""
-                                                    {% else %}
-                                                        s-val:selected-ids="{{ orders|map(o => o.id)|join(',') }}"
-                                                    {% endif %}
+                                                   {% if orders|length == selectedIds|length %}
+                                                       checked
+                                                       s-val:selected-ids=""
+                                                   {% else %}
+                                                       s-val:selected-ids="{{ orders|map(o => o.id)|join(',') }}"
+                                                   {% endif %}
+                                                   s-val:sort="{{ sort }}"
+                                                   s-val:sort-dir="{{ sortDir }}"
                                                    class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
                                             >
                                             {% if selectedIds|length >= 1 and orders|length != selectedIds|length %}
@@ -329,6 +350,8 @@
                                                    type="checkbox"
                                                    value="{{ order.id }}"
                                                    {% if order.id in selectedIds %}checked{% endif %}
+                                                   s-val:sort="{{ sort }}"
+                                                   s-val:sort-dir="{{ sortDir }}"
                                                    class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
                                             >
                                         </td>
@@ -365,8 +388,13 @@
 
             {# Pagination #}
             {% include '_market/_includes/pagination' with {
-                itemType: 'orders'
+                itemType: 'orders',
+                vals: {
+                    'sort': sort,
+                    'sort-dir': sortDir
+                },
             } %}
+
         {% elseif query or status %}
             {# No results #}
             <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">
