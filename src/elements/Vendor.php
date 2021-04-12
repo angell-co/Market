@@ -605,6 +605,10 @@ class Vendor extends Element
      */
     public function getFieldLayout(): ?FieldLayout
     {
+        if (($fieldLayout = parent::getFieldLayout()) !== null) {
+            return $fieldLayout;
+        }
+
         $vendorSettings = $this->getSettings();
 
         if ($vendorSettings && $vendorSettings->fieldLayoutId) {
