@@ -14,6 +14,7 @@ use angellco\market\db\Table;
 use angellco\market\helpers\ShippingProfileHelper;
 use angellco\market\Market;
 use angellco\market\models\StripeSettings;
+use angellco\market\services\ShippingProfiles;
 use angellco\market\services\Vendors;
 use Craft;
 use craft\base\ElementInterface;
@@ -47,6 +48,7 @@ class MarketVariable extends ServiceLocator
     {
         $components = [
             'vendors' => Vendors::class,
+            'shippingProfiles' => ShippingProfiles::class,
         ];
 
         $config['components'] = $components;
