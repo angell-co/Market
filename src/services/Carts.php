@@ -13,6 +13,7 @@ namespace angellco\market\services;
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
+use craft\commerce\helpers\Currency;
 use craft\commerce\Plugin as Commerce;
 use craft\errors\ElementNotFoundException;
 use craft\errors\MissingComponentException;
@@ -148,6 +149,11 @@ class Carts extends Component
             $data['totalPrice'] += $cart->totalPrice;
             $data['totalShippingCost'] += $cart->totalShippingCost;
         }
+
+        // Round the resulting currency values
+        $data['itemSubtotal'] = Currency::round($data['itemSubtotal']);
+        $data['totalPrice'] = Currency::round($data['totalPrice']);
+        $data['totalShippingCost'] = Currency::round($data['totalShippingCost']);
 
         return $data;
     }
