@@ -13,11 +13,14 @@ namespace angellco\market\services;
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
+use craft\commerce\elements\Variant;
 use craft\commerce\helpers\Currency;
 use craft\commerce\Plugin as Commerce;
 use craft\errors\ElementNotFoundException;
+use craft\errors\InvalidFieldException;
 use craft\errors\MissingComponentException;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -161,12 +164,41 @@ class Carts extends Component
     /**
      * Returns the cart as an array ready for use in the API.
      *
+     * TODO: refactor out the custom field stuff into events or something
+     *
      * @param Order $cart
      * @return array
+     * @throws InvalidFieldException
+     * @throws InvalidConfigException
      */
     private function _cartToArray(Order $cart): array
     {
         $array = $cart->toArray();
+
+        $array['lineItems'] = [];
+
+        foreach ($cart->getLineItems() as $lineItem) {
+
+            /** @var Variant $variant */
+            $variant = $lineItem->getPurchasable();
+            $product = $variant->getProduct();
+            $img = $product->getFieldValue('primaryImage')[0] ?? null;
+            $imgUrl = $img->getUrl([
+                'w' => 200,
+                'h' => 200,
+                'fit' => 'crop',
+                'crop' => 'focalpoint',
+                'auto' => 'format,compress'
+            ]);
+
+            $array['lineItems'][] = array_merge($lineItem->toArray(), [
+                'product' => [
+                    'title' => $product->title,
+                    'url' => $product->getUrl(),
+                    'image' => $imgUrl
+                ]
+            ]);
+        }
 
         $array['vendor'] = $cart->getAttachedVendor()->toArray([
             'id',
