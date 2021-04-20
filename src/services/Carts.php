@@ -166,7 +166,15 @@ class Carts extends Component
      */
     private function _cartToArray(Order $cart): array
     {
-        return $cart->toArray(['*']);
+        $array = $cart->toArray();
+
+        $array['vendor'] = $cart->getAttachedVendor()->toArray([
+            'id',
+            'title',
+            'url'
+        ]);
+
+        return $array;
     }
 
     /**

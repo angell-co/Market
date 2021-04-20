@@ -10,6 +10,7 @@
 
 namespace angellco\market\base;
 
+use angellco\market\behaviors\OrderBehavior;
 use angellco\market\elements\Vendor;
 use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
@@ -23,6 +24,8 @@ use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
 use angellco\market\web\twig\MarketExtension;
 use Craft;
+use craft\commerce\elements\Order;
+use craft\events\DefineBehaviorsEvent;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
@@ -189,6 +192,17 @@ trait PluginTrait
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
                 $event->roots['_market'] = __DIR__ . '/../templates/vendor-dashboard';
+            }
+        );
+
+        // Order behaviors
+        Event::on(
+            Order::class,
+            Order::EVENT_DEFINE_BEHAVIORS,
+            function(DefineBehaviorsEvent $event) {
+                $event->sender->attachBehaviors([
+                    OrderBehavior::class,
+                ]);
             }
         );
     }
