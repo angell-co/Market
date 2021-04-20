@@ -92,7 +92,7 @@ class Carts extends Component
 
             $this->_carts = [];
 
-            foreach ($marketCartNumbers as $vendorId => $cartNumber) {
+            foreach ($marketCartNumbers as $cartKey => $cartNumber) {
 
                 $cart = $this->_commerce->getOrders()->getOrderByNumber($cartNumber);
 
@@ -101,10 +101,11 @@ class Carts extends Component
                 }
 
                 // If the cart is already completed or trashed, forget the cart and start again.
+                // TODO: do we need to check for lineitems here like before?
                 if ($cart->isCompleted || $cart->trashed) {
 
                     // Remove the reference to it from our cookie
-                    unset($marketCartNumbers[$vendorId]);
+                    unset($marketCartNumbers[$cartKey]);
                     $session->set($this->marketCartsName, $marketCartNumbers);
 
                     // Make sure commerce forgets it
@@ -114,7 +115,7 @@ class Carts extends Component
                     continue;
                 }
 
-                $this->_carts[$vendorId] = $cart;
+                $this->_carts[$cartKey] = $cart;
             }
         }
 
@@ -175,6 +176,8 @@ class Carts extends Component
      */
     public function switchCart(int $vendorId): bool
     {
+        $cartKey = 'vendor-'.$vendorId;
+
         $session = Craft::$app->getSession();
         $marketCartNumbers = $session->get($this->marketCartsName);
 
@@ -195,17 +198,17 @@ class Carts extends Component
 //                TODO throw error
             }
 
-            $session->set($this->marketCartsName, [$vendorId => $cart->number]);
+            $session->set($this->marketCartsName, [$cartKey => $cart->number]);
 
             return true;
         }
 
         // So, we have some vendor specific carts in play - but do we have any
         // for _this_ vendor?
-        if (isset($marketCartNumbers[$vendorId])) {
+        if (isset($marketCartNumbers[$cartKey])) {
 
             // Get the cart
-            $cartNumber = $marketCartNumbers[$vendorId];
+            $cartNumber = $marketCartNumbers[$cartKey];
             $currentCart = Order::find()->number($cartNumber)->trashed(null)->anyStatus()->one();
 
             if ($currentCart) {
@@ -261,7 +264,7 @@ class Carts extends Component
         $commerceCarts->forgetCart();
         $cart = $commerceCarts->getCart();
 
-        $marketCartNumbers = array_merge($marketCartNumbers, [$vendorId => $cart->number]);
+        $marketCartNumbers = array_merge($marketCartNumbers, [$cartKey => $cart->number]);
         $session->set($this->marketCartsName, $marketCartNumbers);
 
 
