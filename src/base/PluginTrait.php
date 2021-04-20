@@ -14,6 +14,7 @@ use angellco\market\elements\Vendor;
 use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
 use angellco\market\Market;
+use angellco\market\services\Carts;
 use angellco\market\services\Reports;
 use angellco\market\services\ShippingDestinations;
 use angellco\market\services\ShippingProfiles;
@@ -99,6 +100,16 @@ trait PluginTrait
     }
 
     /**
+     * Returns the carts service
+     *
+     * @return Carts The carts service
+     */
+    public function getCarts(): Carts
+    {
+        return $this->get('carts');
+    }
+
+    /**
      * Sets the components of the commerce plugin
      */
     private function _setPluginComponents(): void
@@ -121,6 +132,9 @@ trait PluginTrait
             ],
             'reports' => [
                 'class' => Reports::class,
+            ],
+            'carts' => [
+                'class' => Carts::class,
             ],
         ]);
     }
