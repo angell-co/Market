@@ -137,27 +137,33 @@ class Carts extends Component
      */
     public function getCartTotals(): array
     {
-        $data = [
-            'itemSubtotal' => 0,
-            'totalQty' => 0,
-            'totalPrice' => 0,
-            'totalShippingCost' => 0
-        ];
+        $itemSubtotal = 0;
+        $totalQty = 0;
+        $totalPrice = 0;
+        $totalShippingCost = 0;
 
         /** @var Order $cart */
         foreach ($this->getCarts() as $cart) {
-            $data['itemSubtotal'] += $cart->itemSubtotal;
-            $data['totalQty'] += $cart->totalQty;
-            $data['totalPrice'] += $cart->totalPrice;
-            $data['totalShippingCost'] += $cart->totalShippingCost;
+            $itemSubtotal += $cart->itemSubtotal;
+            $totalQty += $cart->totalQty;
+            $totalPrice += $cart->totalPrice;
+            $totalShippingCost += $cart->totalShippingCost;
         }
 
         // Round the resulting currency values
-        $data['itemSubtotal'] = Currency::round($data['itemSubtotal']);
-        $data['totalPrice'] = Currency::round($data['totalPrice']);
-        $data['totalShippingCost'] = Currency::round($data['totalShippingCost']);
+        $itemSubtotal = Currency::round($itemSubtotal);
+        $totalPrice = Currency::round($totalPrice);
+        $totalShippingCost = Currency::round($totalShippingCost);
 
-        return $data;
+        return [
+            'itemSubtotal' => $itemSubtotal,
+            'itemSubtotalAsCurrency' => Currency::formatAsCurrency($itemSubtotal, null, false, true, true),
+            'totalQty' => $totalQty,
+            'totalPrice' => $totalPrice,
+            'totalPriceAsCurrency' => Currency::formatAsCurrency($totalPrice, null, false, true, true),
+            'totalShippingCost' => $totalShippingCost,
+            'totalShippingCostAsCurrency' => Currency::formatAsCurrency($totalShippingCost, null, false, true, true),
+        ];
     }
 
     /**
