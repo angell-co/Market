@@ -104,9 +104,8 @@ class Carts extends Component
                     continue;
                 }
 
-                // If the cart is already completed or trashed, forget the cart and start again.
-                // TODO: do we need to check for lineitems here like before?
-                if ($cart->isCompleted || $cart->trashed) {
+                // If the cart is already completed, trashed or has no line items, forget the cart and start again.
+                if ($cart->isCompleted || $cart->trashed || !$cart->getLineItems()) {
 
                     // Remove the reference to it from our cookie
                     unset($marketCartNumbers[$cartKey]);
@@ -192,10 +191,19 @@ class Carts extends Component
             ]);
 
             $array['lineItems'][] = array_merge($lineItem->toArray(), [
+                'purchasable' => [
+                    'title' => $variant->title,
+                    'sku' => $variant->sku,
+                    'minQty' => $variant->minQty,
+                    'maxQty' => $variant->maxQty,
+                    'hasUnlimitedStock' => $variant->hasUnlimitedStock,
+                    'stock' => $variant->stock,
+                ],
                 'product' => [
                     'title' => $product->title,
                     'url' => $product->getUrl(),
-                    'image' => $imgUrl
+                    'image' => $imgUrl,
+                    'hasVariants' => (bool) $product->getType()->hasVariants
                 ]
             ]);
         }
