@@ -138,6 +138,7 @@ class Carts extends Component
     public function getCartTotals(): array
     {
         $itemSubtotal = 0;
+        $itemCount = 0;
         $totalQty = 0;
         $totalPrice = 0;
         $totalShippingCost = 0;
@@ -145,6 +146,7 @@ class Carts extends Component
         /** @var Order $cart */
         foreach ($this->getCarts() as $cart) {
             $itemSubtotal += $cart->itemSubtotal;
+            $itemCount += count($cart->getLineItems());
             $totalQty += $cart->totalQty;
             $totalPrice += $cart->totalPrice;
             $totalShippingCost += $cart->totalShippingCost;
@@ -158,6 +160,7 @@ class Carts extends Component
         return [
             'itemSubtotal' => $itemSubtotal,
             'itemSubtotalAsCurrency' => Currency::formatAsCurrency($itemSubtotal, null, false, true, true),
+            'itemCount' => $itemCount,
             'totalQty' => $totalQty,
             'totalPrice' => $totalPrice,
             'totalPriceAsCurrency' => Currency::formatAsCurrency($totalPrice, null, false, true, true),
