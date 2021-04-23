@@ -212,7 +212,8 @@ class Carts extends Component
                     'title' => $product->title,
                     'url' => $product->getUrl(),
                     'image' => $imgUrl,
-                    'hasVariants' => (bool) $product->getType()->hasVariants
+                    'hasVariants' => (bool) $product->getType()->hasVariants,
+                    'allowNotes' => (bool) $product->getFieldValue('allowNotes')
                 ]
             ]);
         }
