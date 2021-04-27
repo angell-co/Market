@@ -37,6 +37,7 @@ use craft\services\Fields;
 use craft\web\UrlManager;
 use craft\web\View;
 use yii\base\Event;
+use yii\web\User;
 
 /**
  * @property Vendors $vendors the vendors service
@@ -205,11 +206,17 @@ trait PluginTrait
                 ]);
             }
         );
+
+        if (!Craft::$app->getRequest()->isConsoleRequest) {
+            Event::on(User::class, User::EVENT_AFTER_LOGIN, [$this->getCarts(), 'loginHandler']);
+            Event::on(User::class, User::EVENT_AFTER_LOGOUT, [$this->getCarts(), 'logoutHandler']);
+        }
     }
 
     private function _installSiteEventListeners(): void
     {
         Craft::$app->view->registerTwigExtension(new MarketExtension());
+
         $this->_registerSiteRoutes();
     }
 
