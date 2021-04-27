@@ -207,6 +207,7 @@ trait PluginTrait
             }
         );
 
+        // Login / logout handlers
         if (!Craft::$app->getRequest()->isConsoleRequest) {
             Event::on(User::class, User::EVENT_AFTER_LOGIN, [$this->getCarts(), 'loginHandler']);
             Event::on(User::class, User::EVENT_AFTER_LOGOUT, [$this->getCarts(), 'logoutHandler']);
