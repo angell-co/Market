@@ -269,51 +269,30 @@ class Carts extends Component
             return true;
         }
 
+
         // So, we have some vendor specific carts in play - but do we have any
         // for _this_ vendor?
         if (isset($marketCartNumbers[$cartKey])) {
 
             // Get the cart
             $cartNumber = $marketCartNumbers[$cartKey];
-            $currentCart = Order::find()->number($cartNumber)->trashed(null)->anyStatus()->one();
+            $vendorCartToLoad = Order::find()->number($cartNumber)->trashed(null)->anyStatus()->one();
 
-            if ($currentCart) {
+            if ($vendorCartToLoad) {
 
                 // So the cart exists which means we can forget the current one
                 $commerceCarts->forgetCart();
 
-                // Add vendor one to the session for commerce to pick up
-                $session->set($this->commerceCartName, $currentCart->number);
+                // Add the vendor one to the session for commerce to pick up
+                $session->set($this->commerceCartName, $vendorCartToLoad->number);
 
                 // Finally, load it into commerce
                 $cart = $commerceCarts->getCart();
 
-//                // Also add on the addresses
-//                $shippingAddress = $currentCart->getShippingAddress();
-//                $billingAddress = $currentCart->getBillingAddress();
-//
-//                // If we don’t have any, check the other carts
-//                if (!$shippingAddress || !$billingAddress) {
-//                    $allCarts = $this->getVendorCarts();
-//                    foreach ($allCarts as $allCart) {
-//                        $shippingAddress = $allCart->getShippingAddress();
-//                        $billingAddress = $allCart->getBillingAddress();
-//
-//                        if ($shippingAddress && $billingAddress) {
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                if ($shippingAddress) {
-//                    $cart->setAttribute('shippingAddressId', $shippingAddress->id);
-//                }
-//
-//                if ($billingAddress) {
-//                    $cart->setAttribute('billingAddressId', $billingAddress->id);
-//                }
-//
-//
+                // TODO: Copy the stuff over that happens in CartController::actionUpdateCarts
+                //       otherwise it’ll get out of sync if they go through checkout then go add
+                //       more to a fresh Vendor cart
+
                 // Finally, set the vendor on it
                 $cart->setFieldValue('vendor', [$vendorId]);
                 if (!Craft::$app->getElements()->saveElement($cart, false)) {
@@ -324,6 +303,7 @@ class Carts extends Component
             }
         }
 
+
         // We have vendor specific carts present, but not one for _this_
         // vendor so we can forget the current cart, get a new one and store it
         // against this vendor.
@@ -333,32 +313,10 @@ class Carts extends Component
         $marketCartNumbers = array_merge($marketCartNumbers, [$cartKey => $cart->number]);
         $session->set($this->marketCartsName, $marketCartNumbers);
 
+        // TODO: Copy the stuff over that happens in CartController::actionUpdateCarts
+        //       otherwise it’ll get out of sync if they go through checkout then go add
+        //       more to a fresh Vendor cart
 
-//        // Given this is a new cart, there won’t be any addresses on it,
-//        // _but_ the user may have already added them to another cart - so lets
-//        // get and set them
-//        $allCarts = $this->getVendorCarts();
-//        $shippingAddress = null;
-//        $billingAddress = null;
-//        /** @var Commerce_OrderModel $allCart */
-//        foreach ($allCarts as $allCart) {
-//            $shippingAddress = $allCart->getShippingAddress();
-//            $billingAddress = $allCart->getBillingAddress();
-//
-//            if ($shippingAddress && $billingAddress) {
-//                break;
-//            }
-//        }
-//
-//        if ($shippingAddress) {
-//            $cart->setAttribute('shippingAddressId', $shippingAddress->id);
-//        }
-//
-//        if ($billingAddress) {
-//            $cart->setAttribute('billingAddressId', $billingAddress->id);
-//        }
-//
-//
         // Set the vendor on it
         $cart->setFieldValue('vendor', [$vendorId]);
         if (!Craft::$app->getElements()->saveElement($cart, false)) {
