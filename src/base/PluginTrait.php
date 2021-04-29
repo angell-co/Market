@@ -15,6 +15,7 @@ use angellco\market\elements\Vendor;
 use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
 use angellco\market\Market;
+use angellco\market\models\VendorsLinkItType;
 use angellco\market\services\Carts;
 use angellco\market\services\Reports;
 use angellco\market\services\ShippingDestinations;
@@ -36,6 +37,8 @@ use craft\services\Elements;
 use craft\services\Fields;
 use craft\web\UrlManager;
 use craft\web\View;
+use fruitstudios\linkit\events\RegisterLinkTypesEvent;
+use fruitstudios\linkit\services\LinkitService;
 use yii\base\Event;
 use yii\web\User;
 
@@ -173,6 +176,15 @@ trait PluginTrait
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = VendorsField::class;
                 $event->types[] = ShippingProfileField::class;
+            }
+        );
+
+        // Linkit types
+        Event::on(
+            LinkitService::class,
+            LinkitService::EVENT_REGISTER_LINKIT_FIELD_TYPES,
+            function (RegisterLinkTypesEvent $event) {
+                $event->types[] = new VendorsLinkItType();
             }
         );
 
