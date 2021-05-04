@@ -13,6 +13,7 @@ namespace angellco\market\controllers;
 use angellco\market\Market;
 use Craft;
 use craft\commerce\controllers\CartController as CommerceCartController;
+use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\errors\ElementNotFoundException;
 use craft\errors\MissingComponentException;
@@ -138,10 +139,10 @@ class CartController extends CommerceCartController
     /**
      * Directly ported from the parent controller.
      *
-     * @param $cart
+     * @param Order $cart
      * @noinspection NullPointerExceptionInspection
      */
-    private function _setAddresses($cart): void
+    private function _setAddresses(Order $cart): void
     {
         $addresses = Commerce::getInstance()->getAddresses();
 
