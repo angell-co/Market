@@ -126,7 +126,7 @@ class ShippingController extends Controller
                         'hasErrors' => $shippingDestination->getErrors('shippingZoneId')
                     ],
                     'primaryRate' => [
-                        'value' => $shippingDestination->primaryRate > 0 ? Craft::$app->getFormatter()->asDecimal($shippingDestination->primaryRate) : '',
+                        'value' => $shippingDestination->primaryRate > 0 ? Craft::$app->getFormatter()->asDecimal($shippingDestination->primaryRate) : 0,
                         'hasErrors' => $shippingDestination->getErrors('primaryRate')
                     ],
                     'secondaryRate' => [
