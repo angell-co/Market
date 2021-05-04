@@ -10,6 +10,7 @@
 
 namespace angellco\market\base;
 
+use angellco\market\adjusters\ShippingAdjuster;
 use angellco\market\behaviors\OrderBehavior;
 use angellco\market\elements\Vendor;
 use angellco\market\fields\ShippingProfile as ShippingProfileField;
@@ -25,7 +26,9 @@ use angellco\market\services\Vendors;
 use angellco\market\services\VendorSettings;
 use angellco\market\web\twig\MarketExtension;
 use Craft;
+use craft\commerce\adjusters\Shipping;
 use craft\commerce\elements\Order;
+use craft\commerce\services\OrderAdjustments;
 use craft\events\DefineBehaviorsEvent;
 use craft\events\DefineFieldLayoutFieldsEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -216,6 +219,25 @@ trait PluginTrait
                 $event->sender->attachBehaviors([
                     OrderBehavior::class,
                 ]);
+            }
+        );
+
+        // Order adjustments
+        Event::on(
+            OrderAdjustments::class,
+            OrderAdjustments::EVENT_REGISTER_ORDER_ADJUSTERS,
+            function(RegisterComponentTypesEvent $event) {
+                $adjusters = $event->types;
+
+                foreach ($adjusters as $key => $adjuster) {
+
+                    // Replace shipping one with our own one
+                    if ($adjuster == Shipping::class) {
+                        $adjusters[$key] = ShippingAdjuster::class;
+                    }
+                }
+
+                $event->types = $adjusters;
             }
         );
 

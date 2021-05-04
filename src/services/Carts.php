@@ -182,6 +182,8 @@ class Carts extends Component
      */
     private function _cartToArray(Order $cart): array
     {
+        $cart->typeCastAttributes();
+
         $array = $cart->toArray();
 
         $array['lineItems'] = [];

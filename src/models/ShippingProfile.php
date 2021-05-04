@@ -189,48 +189,46 @@ class ShippingProfile extends Model
         $this->_shippingDestinations = $shippingDestinations;
     }
 
+    /**
+     * Sets the destinations to those that match the given country ID.
+     *
+     * Used by the shipping adjuster.
+     *
+     * @param $countryId
+     */
+    public function setShippingDestinationsForCountry($countryId): void
+    {
+        $destinations = [];
 
-//    TODO: adjuster stuff
-//    /**
-//     * Sets the destinations to those that match the given country ID.
-//     *
-//     * This is for the adjuster
-//     *
-//     * @param $countryId
-//     */
-//    public function setDestinationsForCountry($countryId)
-//    {
-//        $destinations = [];
-//
-//        foreach ($this->getDestinations() as $destination) {
-//            $shippingZone = craft()->commerce_shippingZones->getShippingZoneById($destination->shippingZoneId);
-//            if (!$shippingZone)
-//            {
-//                continue;
-//            }
-//
-//            // Only support country based
-//            if (!$shippingZone->countryBased)
-//            {
-//                continue;
-//            }
-//
-//            // Get all the country ids for this zone
-//            $countryIds = $shippingZone->getCountryIds();
-//
-//            // Bail if the given country isn’t in there
-//            if (!in_array($countryId, $countryIds))
-//            {
-//                continue;
-//            }
-//
-//            // If we got this far then add the destination to the output
-//            $destinations[] = $destination;
-//        }
-//
-//        // Now override the original destinations with our filtered ones
-//        $this->setDestinations($destinations);
-//    }
+        foreach ($this->getShippingDestinations() as $destination) {
 
+            $shippingZone = $destination->getShippingZone();
+            if (!$shippingZone)
+            {
+                continue;
+            }
+
+            // Only support country based
+            if (!$shippingZone->getIsCountryBased())
+            {
+                continue;
+            }
+
+            // Get all the country ids for this zone
+            $countryIds = $shippingZone->getCountryIds();
+
+            // Bail if the given country isn’t in there
+            if (!in_array($countryId, $countryIds, true))
+            {
+                continue;
+            }
+
+            // If we got this far then add the destination to the output
+            $destinations[] = $destination;
+        }
+
+        // Now override the original destinations with our filtered ones
+        $this->setShippingDestinations($destinations);
+    }
 
 }

@@ -176,4 +176,5 @@ return [
     'Download' => 'Download',
     'New Orders' => 'New Orders',
     'Overview' => 'Overview',
+    'Usually dispatched in {dispatchTime}, estimated delivery to {country} in {deliveryTime}.' => 'Usually dispatched in {dispatchTime}, estimated delivery to {country} in {deliveryTime}.'
 ];
