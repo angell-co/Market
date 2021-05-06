@@ -194,13 +194,16 @@ class Carts extends Component
             $variant = $lineItem->getPurchasable();
             $product = $variant->getProduct();
             $img = $product->getFieldValue('primaryImage')[0] ?? null;
-            $imgUrl = $img->getUrl([
-                'w' => 200,
-                'h' => 200,
-                'fit' => 'crop',
-                'crop' => 'focalpoint',
-                'auto' => 'format,compress'
-            ]);
+            $imgUrl = null;
+            if ($img) {
+                $imgUrl = $img->getUrl([
+                    'w' => 200,
+                    'h' => 200,
+                    'fit' => 'crop',
+                    'crop' => 'focalpoint',
+                    'auto' => 'format,compress'
+                ]);
+            }
 
             $array['lineItems'][] = array_merge($lineItem->toArray(), [
                 'purchasable' => [
