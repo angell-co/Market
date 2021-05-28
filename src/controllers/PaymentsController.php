@@ -163,35 +163,60 @@ class PaymentsController extends Controller
 
         // If that worked we can start processing payments and completing carts
         foreach (Market::$plugin->getCarts()->getCarts() as $cart) {
-            // TODO: this should use try catch, if _payCart can’t complete the payment then it should throw something so
-            //       we can catch it and return here - or, it could always return an array - either success, needs action or error
-            $this->_payCart($cart, $stripeCustomerId, $paymentMethodId);
+            try {
+                $result = $this->_payCart($cart, $stripeCustomerId, $paymentMethodId);
+
+                // Return to the client if we have an error
+                if ($result['status'] === 'error') {
+                    return $this->asErrorJson($result['message']);
+                }
+
+                // If the response requires action, we have to tell the client and come back to this order later
+                if ($result['status'] === 'requires_action') {
+                    return $this->asJson([
+                        'status' => 'requires_action',
+                        'payload' => $result['payload']
+                    ]);
+                }
+
+                // No error, so crack on!
+                // TODO: for last cart, do something else
+            } catch (Exception $e) {
+                return $this->asErrorJson($e->getMessage());
+            } catch (\Throwable $e) {
+                return $this->asErrorJson($e->getMessage());
+            }
         }
 
+        // TODO: remove debugging
         return $this->asJson([
-            'aha' => 'oho!'
+            'status' => 'success',
         ]);
     }
 
     /**
      * This is essentially a cut-down version of the core commerce payments/pay action with no gateway and instead
-     * our custom stripe bits inserted
+     * our custom stripe bits inserted.
+     *
+     * It returns an array, which will have a status key with either error, requires_action or success as the value.
      *
      * @param Order $order
      * @param $stripeCustomerId
      * @param $paymentMethodId
-     * @return void|Response|null
      * @noinspection NullPointerExceptionInspection
+     * @return array
      * @throws Exception
      * @throws \Throwable
      */
-    private function _payCart(Order $order, $stripeCustomerId, $paymentMethodId)
+    private function _payCart(Order $order, $stripeCustomerId, $paymentMethodId): array
     {
         $commerce = Commerce::getInstance();
 
         if (!$commerce->getSettings()->allowEmptyCartOnCheckout && $order->getIsEmpty()) {
-            $error = Craft::t('commerce', 'Order can not be empty.');
-            return $this->asErrorJson($error);
+            return [
+                'status' => 'error',
+                'message' => Craft::t('commerce', 'Order can not be empty.')
+            ];
         }
 
         // Set if the customer should be registered on order completion
@@ -215,7 +240,10 @@ class PaymentsController extends Controller
                 $order->setPaymentCurrency($paymentCurrency);
             } catch (CurrencyException $exception) {
                 Craft::$app->getErrorHandler()->logException($exception);
-                return $this->asErrorJson($exception->getMessage());
+                return [
+                    'status' => 'error',
+                    'message' => $exception->getMessage()
+                ];
             }
         }
 
@@ -223,14 +251,18 @@ class PaymentsController extends Controller
 
         // Check email address exists on order.
         if (!$order->email) {
-            $error = Craft::t('commerce', 'No customer email address exists on this cart.');
-            return $this->asErrorJson($error);
+            return [
+                'status' => 'error',
+                'message' => Craft::t('commerce', 'No customer email address exists on this cart.')
+            ];
         }
 
         // Does the order require shipping
         if ($commerce->getSettings()->requireShippingMethodSelectionAtCheckout && !$order->getShippingMethod()) {
-            $error = Craft::t('commerce', 'There is no shipping method selected for this order.');
-            return $this->asErrorJson($error);
+            return [
+                'status' => 'error',
+                'message' => Craft::t('commerce', 'There is no shipping method selected for this order.')
+            ];
         }
 
         // Do one final save to confirm the price does not change out from under the customer. Also removes any out of stock items etc.
@@ -260,8 +292,10 @@ class PaymentsController extends Controller
                     $order->addError('totalAdjustments', Craft::t('commerce', 'The total number of order adjustments changed.'));
                 }
 
-                $error = Craft::t('commerce', 'Something changed with the order before payment, please review your order and submit payment again.');
-                return $this->asErrorJson($error);
+                return [
+                    'status' => 'error',
+                    'message' => Craft::t('commerce', 'Something changed with the order before payment, please review your order and submit payment again.')
+                ];
             }
         }
 
@@ -276,15 +310,19 @@ class PaymentsController extends Controller
         /** @noinspection PhpUndefinedMethodInspection */
         $vendor = $order->getAttachedVendor();
         if (!$vendor) {
-            $error = Craft::t('market', 'There is no Vendor attached to this order so it cannot be processed.');
-            return $this->asErrorJson($error);
+            return [
+                'status' => 'error',
+                'message' => Craft::t('market', 'There is no Vendor attached to this order so it cannot be processed.')
+            ];
         }
 
         // Check we have stripe details
         if (!$vendor->stripeUserId) {
-            $error = Craft::t('market', 'Sorry this Vendor is unable to accept payments right now.');
             // TODO: MarketplacePlugin::log(Craft::t('Vendor {code} with id {id} isn’t connected to Stripe.', ['title'=>$vendor->code,'id'=>$vendor->id]), LogLevel::Info);
-            return $this->asErrorJson($error);
+            return [
+                'status' => 'error',
+                'message' => Craft::t('market', 'Sorry this Vendor is unable to accept payments right now.')
+            ];
         }
 
         // Convert amounts to pence
@@ -310,7 +348,10 @@ class PaymentsController extends Controller
                     $intent = PaymentIntent::retrieve($paymentIntentId);
                     $intent->confirm();
                 } catch (ApiErrorException $e) {
-                    return $this->asErrorJson($e->getMessage());
+                    return [
+                        'status' => 'error',
+                        'message' => $e->getMessage()
+                    ];
                 }
 
             // Otherwise initially try and process the payment method with
@@ -318,6 +359,13 @@ class PaymentsController extends Controller
             } else {
                 try {
                     Stripe::setApiKey($this->_settings->secretKey);
+
+
+                    // TODO: getting double 3DS for this, because the payment method on the connected account
+                    //       needs SCA to run, even though its run on the platform account. Should probably look
+                    //       to clone the customer over and then charge it, rather than just sharing the payment
+                    //       method: https://stripe.com/docs/connect/cloning-customers-across-accounts
+
 
                     // Share the payment method with the connected account
                     $connectedAccountPaymentMethod = PaymentMethod::create([
@@ -341,28 +389,37 @@ class PaymentsController extends Controller
                         'stripe_account' => $vendor->stripeUserId
                     ]);
                 } catch (ApiErrorException $e) {
-                    return $this->asErrorJson($e->getMessage());
+                    return [
+                        'status' => 'error',
+                        'message' => $e->getMessage()
+                    ];
                 }
             }
 
             // If for some reason we don’t have any payment intents, throw an error
             if (!isset($intent)) {
-                $error = Craft::t('market', 'No Payment Intent exists.');
-                return $this->asErrorJson($error);
+                return [
+                    'status' => 'error',
+                    'message' => Craft::t('market', 'No Payment Intent exists.')
+                ];
             }
 
             // Handle the payment response
             if ($intent->status === 'requires_action' && $intent->next_action->type === 'use_stripe_sdk') {
                 // Tell the client to handle the action
-                $this->returnJson([
-                    'success' => false,
-                    'requiresAction' => true,
-                    'paymentIntentClientSecret' => $intent->client_secret,
-                    'connectedAccountId' => $vendor->stripeUserId
-                ]);
+                return [
+                    'status' => 'requires_action',
+                    'payload' => [
+                        'clientSecret' => $intent->client_secret,
+                        'connectedAccountId' => $vendor->stripeUserId
+                    ]
+                ];
+            }
 
             // The payment didn’t need any additional actions and completed!
-            } else if ($intent->status === 'succeeded') {
+            if ($intent->status === 'succeeded') {
+
+
 
 //                // At this point all the payment stuff has gone OK, so clear the
 //                // payment method on the Stripe Customer if its the last cart
@@ -389,7 +446,15 @@ class PaymentsController extends Controller
 //                $order->totalPaid = $order->totalPrice;
 //                $order->datePaid = DateTimeHelper::currentTimeForDb();
 //                $success = craft()->commerce_orders->completeOrder($order);
-//
+
+                return [
+                    'status' => 'success',
+                    'payload' => [
+                        'order' => $order->number,
+                    ]
+                ];
+
+
 //                // Successfully completed the order
 //                if ($success) {
 //                    $this->returnJson([
@@ -400,22 +465,18 @@ class PaymentsController extends Controller
 //                    $this->returnErrorJson(Craft::t('Sorry there was an internal error, please get in touch quoting #{number} to verify your order.', ['number' => $order->shortNumber]));
 //                    return;
 //                }
-            } else {
-                $error = Craft::t('market', 'Invalid PaymentIntent status');
-                return $this->asErrorJson($error);
             }
 
-
-        } else {
-            $error = Craft::t('commerce', 'Invalid payment or order. Please review.');
-            return $this->asErrorJson($error);
+            return [
+                'status' => 'error',
+                'message' => Craft::t('market', 'Invalid PaymentIntent status')
+            ];
         }
 
-
-
-
-
-
+        return [
+            'status' => 'error',
+            'message' => Craft::t('commerce', 'Invalid payment or order. Please review.')
+        ];
 
 
 //        if (!$success) {
