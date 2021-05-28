@@ -10,12 +10,14 @@
 
 namespace angellco\market\controllers;
 
+use angellco\market\elements\Vendor;
 use angellco\market\Market;
 use angellco\market\models\StripeSettings;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\errors\CurrencyException;
 use craft\commerce\Plugin as Commerce;
+use craft\commerce\records\Transaction as TransactionRecord;
 use craft\errors\ElementNotFoundException;
 use craft\errors\InvalidFieldException;
 use craft\errors\MissingComponentException;
@@ -27,7 +29,10 @@ use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
+use Stripe\SetupIntent;
 use Stripe\Stripe;
+use Stripe\StripeClient;
+use Stripe\Token;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
@@ -66,7 +71,7 @@ class PaymentsController extends Controller
         $this->requirePostRequest();
 
         $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
-        Stripe::setApiKey($this->_settings->secretKey);
+        $stripe = new StripeClient($this->_settings->secretKey);
 
         // Get all the carts
         $carts = Market::$plugin->getCarts()->getCarts();
@@ -90,7 +95,7 @@ class PaymentsController extends Controller
         $stripeCustomer = null;
         if ($stripeCustomerId) {
             try {
-                $stripeCustomer = Customer::retrieve($stripeCustomerId);
+                $stripeCustomer = $stripe->customers->retrieve($stripeCustomerId);
 
                 // If that customer was deleted, set it to false so we create a new one
                 if ($stripeCustomer->isDeleted()) {
@@ -105,9 +110,16 @@ class PaymentsController extends Controller
         // If we still don’t have a stripe customer, create it
         if (!$stripeCustomer) {
             try {
-                $stripeCustomer = Customer::create([
+                $stripeCustomer = $stripe->customers->create([
                     'email' => $firstCart->email,
-                    'name' => $billingAddress->firstName . ' ' . $billingAddress->lastName
+                    'name' => $billingAddress->firstName . ' ' . $billingAddress->lastName,
+                    'address' => [
+                        'city' => $billingAddress->city,
+                        'country' => $billingAddress->countryIso,
+                        'line1' => $billingAddress->address1,
+                        'postal_code' => $billingAddress->zipCode,
+                        'state' => $billingAddress->stateText
+                    ],
                 ]);
             } catch (ApiErrorException $e) {
                 return $this->asErrorJson($e->getMessage());
@@ -121,10 +133,12 @@ class PaymentsController extends Controller
             Craft::$app->getElements()->saveElement($user);
         }
 
-        // Finally create the SetupIntent - this will allow us to create a saved payment method we can re-use for each order
+        // Finally create the SetupIntent - this will automatically attach the card
+        // as a payment method to the platform customer
         try {
-            $setupIntent = \Stripe\SetupIntent::create([
-                'customer' => $stripeCustomer->id
+            $setupIntent = $stripe->setupIntents->create([
+                'customer' => $stripeCustomer->id,
+                'usage' => 'on_session'
             ]);
 
             return $this->asJson([
@@ -148,15 +162,15 @@ class PaymentsController extends Controller
         $this->requirePostRequest();
 
         $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
-        Stripe::setApiKey($this->_settings->secretKey);
+        $stripe = new StripeClient($this->_settings->secretKey);
 
-        // First up, save the payment method onto the stripe customer
+        // First up, get the payment method - its already saved onto the platform customer account
+        // because the SetupIntent triggered that
         $stripeCustomerId = $this->request->getRequiredParam('customerId');
         $paymentMethodId = $this->request->getRequiredParam('paymentMethodId');
 
         try {
-            $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
-            $paymentMethod->attach(['customer' => $stripeCustomerId]);
+            $paymentMethod = $stripe->paymentMethods->retrieve($paymentMethodId);
         } catch (ApiErrorException $e) {
             return $this->asErrorJson($e->getMessage());
         }
@@ -179,8 +193,8 @@ class PaymentsController extends Controller
                     ]);
                 }
 
-                // No error, so crack on!
-                // TODO: for last cart, do something else
+                // No error, so crack on
+
             } catch (Exception $e) {
                 return $this->asErrorJson($e->getMessage());
             } catch (\Throwable $e) {
@@ -188,7 +202,7 @@ class PaymentsController extends Controller
             }
         }
 
-        // TODO: remove debugging
+        // We got this far, so all the carts have been paid and completed
         return $this->asJson([
             'status' => 'success',
         ]);
@@ -308,6 +322,7 @@ class PaymentsController extends Controller
 
         // Get the vendor
         /** @noinspection PhpUndefinedMethodInspection */
+        /** @var Vendor $vendor */
         $vendor = $order->getAttachedVendor();
         if (!$vendor) {
             return [
@@ -358,25 +373,18 @@ class PaymentsController extends Controller
             // automatic confirmation
             } else {
                 try {
-                    Stripe::setApiKey($this->_settings->secretKey);
-
-
-                    // TODO: getting double 3DS for this, because the payment method on the connected account
-                    //       needs SCA to run, even though its run on the platform account. Should probably look
-                    //       to clone the customer over and then charge it, rather than just sharing the payment
-                    //       method: https://stripe.com/docs/connect/cloning-customers-across-accounts
-
+                    $stripe = new StripeClient($this->_settings->secretKey);
 
                     // Share the payment method with the connected account
-                    $connectedAccountPaymentMethod = PaymentMethod::create([
+                    $connectPaymentMethod = $stripe->paymentMethods->create([
                         'customer' => $stripeCustomerId,
                         'payment_method' => $paymentMethodId,
                     ], [
                         'stripe_account' => $vendor->stripeUserId
                     ]);
 
-                    // Create the PaymentIntent on the connected account
-                    $intent = PaymentIntent::create([
+                    // Now we can finally create the PaymentIntent on the connected account
+                    $intent = $stripe->paymentIntents->create([
                         'amount' => $totalPricePence,
                         'currency' => strtolower($currencyIso),
                         'application_fee_amount' => $fee,
@@ -384,7 +392,7 @@ class PaymentsController extends Controller
                         'confirmation_method' => 'manual',
                         'statement_descriptor_suffix' => 'CG',
                         // Here we use the payment method specific to the connected account
-                        'payment_method' => $connectedAccountPaymentMethod->id
+                        'payment_method' => $connectPaymentMethod->id
                     ], [
                         'stripe_account' => $vendor->stripeUserId
                     ]);
@@ -405,6 +413,7 @@ class PaymentsController extends Controller
             }
 
             // Handle the payment response
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             if ($intent->status === 'requires_action' && $intent->next_action->type === 'use_stripe_sdk') {
                 // Tell the client to handle the action
                 return [
@@ -421,6 +430,7 @@ class PaymentsController extends Controller
 
 
 
+                // TODO
 //                // At this point all the payment stuff has gone OK, so clear the
 //                // payment method on the Stripe Customer if its the last cart
 //                if ($lastCart) {
@@ -428,10 +438,28 @@ class PaymentsController extends Controller
 //                    $platformPaymentMethod = PaymentMethod::retrieve($paymentMethodId);
 //                    $platformPaymentMethod->detach();
 //                }
+
+
+
+                // Make a transaction
+                $transaction = $commerce->getTransactions()->createTransaction($order, null, TransactionRecord::TYPE_PURCHASE);
+
+                // Payment service _updateTransaction, _saveTransaction
+
+                // Then
+//                $order->updateOrderPaidInformation();
+//            } catch (Exception $e) {
+//                $transaction->status = TransactionRecord::STATUS_FAILED;
+//                $transaction->message = $e->getMessage();
 //
-//                // Make a transaction
-//                $transaction = craft()->commerce_transactions->createTransaction($order);
-//                $transaction->type = Commerce_TransactionRecord::TYPE_PURCHASE;
+//                // If this transactions is already saved, don't even try.
+//                if (!$transaction->id) {
+//                    $this->_saveTransaction($transaction);
+//                }
+//
+//                Craft::error($e->getMessage());
+//                throw new PaymentException($e->getMessage(), $e->getCode(), $e);
+//            }
 //
 //                // If we set it to success then all sorts of errors pop up in the cp due to
 //                // not having a payment method, so we leave it at pending
