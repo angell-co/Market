@@ -16,6 +16,9 @@ use angellco\market\models\StripeSettings;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\errors\CurrencyException;
+use craft\commerce\errors\PaymentException;
+use craft\commerce\errors\TransactionException;
+use craft\commerce\models\Transaction;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\records\Transaction as TransactionRecord;
 use craft\errors\ElementNotFoundException;
@@ -23,20 +26,14 @@ use craft\errors\InvalidFieldException;
 use craft\errors\MissingComponentException;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\ArrayHelper;
-use craft\helpers\StringHelper;
 use craft\web\Controller;
-use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
-use Stripe\PaymentMethod;
-use Stripe\SetupIntent;
-use Stripe\Stripe;
 use Stripe\StripeClient;
-use Stripe\Token;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
-use function Arrayy\array_first;
 
 /**
  * @author    Angell & Co
@@ -161,24 +158,18 @@ class PaymentsController extends Controller
         $this->requireAcceptsJson();
         $this->requirePostRequest();
 
-        $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
-        $stripe = new StripeClient($this->_settings->secretKey);
-
-        // First up, get the payment method - its already saved onto the platform customer account
-        // because the SetupIntent triggered that
+        $paymentIntentId = $this->request->getParam('paymentIntentId');
         $stripeCustomerId = $this->request->getRequiredParam('customerId');
         $paymentMethodId = $this->request->getRequiredParam('paymentMethodId');
-
-        try {
-            $paymentMethod = $stripe->paymentMethods->retrieve($paymentMethodId);
-        } catch (ApiErrorException $e) {
-            return $this->asErrorJson($e->getMessage());
-        }
 
         // If that worked we can start processing payments and completing carts
         foreach (Market::$plugin->getCarts()->getCarts() as $cart) {
             try {
-                $result = $this->_payCart($cart, $stripeCustomerId, $paymentMethodId);
+                $result = $this->_payCart($cart, $stripeCustomerId, $paymentMethodId, $paymentIntentId);
+
+                // We can’t re-use the $paymentIntentId, so after the first attempt to pay
+                // a cart we trash it
+                $paymentIntentId = null;
 
                 // Return to the client if we have an error
                 if ($result['status'] === 'error') {
@@ -192,9 +183,6 @@ class PaymentsController extends Controller
                         'payload' => $result['payload']
                     ]);
                 }
-
-                // No error, so crack on
-
             } catch (Exception $e) {
                 return $this->asErrorJson($e->getMessage());
             } catch (\Throwable $e) {
@@ -203,6 +191,17 @@ class PaymentsController extends Controller
         }
 
         // We got this far, so all the carts have been paid and completed
+
+        // Now we should clear the payment method on the platform customer
+        $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
+        $stripe = new StripeClient($this->_settings->secretKey);
+        try {
+            $platformPaymentMethod = $stripe->paymentMethods->retrieve($paymentMethodId);
+            $platformPaymentMethod->detach();
+        } catch (ApiErrorException $e) {
+            // Shhh ...
+        }
+
         return $this->asJson([
             'status' => 'success',
         ]);
@@ -215,14 +214,21 @@ class PaymentsController extends Controller
      * It returns an array, which will have a status key with either error, requires_action or success as the value.
      *
      * @param Order $order
-     * @param $stripeCustomerId
-     * @param $paymentMethodId
-     * @noinspection NullPointerExceptionInspection
+     * @param int $stripeCustomerId
+     * @param int $paymentMethodId
+     * @param null|int $paymentIntentId
      * @return array
+     * @throws CurrencyException
+     * @throws ElementNotFoundException
      * @throws Exception
+     * @throws InvalidConfigException
+     * @throws PaymentException
+     * @throws SiteNotFoundException
+     * @throws TransactionException
      * @throws \Throwable
+     * @noinspection NullPointerExceptionInspection
      */
-    private function _payCart(Order $order, $stripeCustomerId, $paymentMethodId): array
+    private function _payCart(Order $order, $stripeCustomerId, $paymentMethodId, $paymentIntentId = null): array
     {
         $commerce = Commerce::getInstance();
 
@@ -313,8 +319,6 @@ class PaymentsController extends Controller
             }
         }
 
-        $transaction = null;
-
         // Make sure during this payment request the order does not recalculate.
         // We don't want to save the order in this mode in case the payment fails. The customer should still be able to edit and recalculate the cart.
         // When the order is marked as complete from a payment later, the order will be set to 'recalculate none' mode permanently.
@@ -352,17 +356,36 @@ class PaymentsController extends Controller
         // Final check for errors
         if (!$order->hasErrors()) {
 
+            // We have to set a gateway otherwise the transactions will fail, so use the dummy one if needed
+            $gateways = $commerce->getGateways()->getAllGateways();
+            if (!$gateways) {
+                throw new InvalidConfigException('No gateway set, at least one is required.');
+            }
+
+            $gateway = ArrayHelper::firstValue($gateways);
+            $order->setGatewayId($gateway->id);
+
+            // Make a transaction
+            $transaction = $commerce->getTransactions()->createTransaction($order, null, TransactionRecord::TYPE_PURCHASE);
+
             // If we have a payment intent, confirm that
-            $paymentIntentId = $this->request->getParam('paymentIntentId');
             if ($paymentIntentId) {
                 try {
                     // Set Stripe to use the connected account
-                    Stripe::setApiKey($vendor->stripeAccessToken);
+                    $stripe = new StripeClient($vendor->stripeAccessToken);
 
                     // Get the payment intent from connected account and confirm it
-                    $intent = PaymentIntent::retrieve($paymentIntentId);
+                    $intent = $stripe->paymentIntents->retrieve($paymentIntentId);
                     $intent->confirm();
                 } catch (ApiErrorException $e) {
+                    $transaction->status = TransactionRecord::STATUS_FAILED;
+                    $transaction->message = $e->getMessage();
+
+                    // If this transaction is already saved, don't even try.
+                    if (!$transaction->id) {
+                        $this->_saveTransaction($transaction);
+                    }
+
                     return [
                         'status' => 'error',
                         'message' => $e->getMessage()
@@ -373,6 +396,7 @@ class PaymentsController extends Controller
             // automatic confirmation
             } else {
                 try {
+                    $this->_settings = Market::$plugin->getStripeSettings()->getSettings();
                     $stripe = new StripeClient($this->_settings->secretKey);
 
                     // Share the payment method with the connected account
@@ -397,6 +421,14 @@ class PaymentsController extends Controller
                         'stripe_account' => $vendor->stripeUserId
                     ]);
                 } catch (ApiErrorException $e) {
+                    $transaction->status = TransactionRecord::STATUS_FAILED;
+                    $transaction->message = $e->getMessage();
+
+                    // If this transaction is already saved, don't even try.
+                    if (!$transaction->id) {
+                        $this->_saveTransaction($transaction);
+                    }
+
                     return [
                         'status' => 'error',
                         'message' => $e->getMessage()
@@ -404,17 +436,11 @@ class PaymentsController extends Controller
                 }
             }
 
-            // If for some reason we don’t have any payment intents, throw an error
-            if (!isset($intent)) {
-                return [
-                    'status' => 'error',
-                    'message' => Craft::t('market', 'No Payment Intent exists.')
-                ];
-            }
-
             // Handle the payment response
             /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             if ($intent->status === 'requires_action' && $intent->next_action->type === 'use_stripe_sdk') {
+                $this->_updateTransaction($transaction, $intent);
+
                 // Tell the client to handle the action
                 return [
                     'status' => 'requires_action',
@@ -427,72 +453,18 @@ class PaymentsController extends Controller
 
             // The payment didn’t need any additional actions and completed!
             if ($intent->status === 'succeeded') {
+                $this->_updateTransaction($transaction, $intent);
 
+                if ($transaction->status !== TransactionRecord::STATUS_SUCCESS) {
+                    throw new PaymentException($transaction->message);
+                }
 
-
-                // TODO
-//                // At this point all the payment stuff has gone OK, so clear the
-//                // payment method on the Stripe Customer if its the last cart
-//                if ($lastCart) {
-//                    Stripe::setApiKey($this->_secretKey);
-//                    $platformPaymentMethod = PaymentMethod::retrieve($paymentMethodId);
-//                    $platformPaymentMethod->detach();
-//                }
-
-
-
-                // Make a transaction
-                $transaction = $commerce->getTransactions()->createTransaction($order, null, TransactionRecord::TYPE_PURCHASE);
-
-                // Payment service _updateTransaction, _saveTransaction
-
-                // Then
-//                $order->updateOrderPaidInformation();
-//            } catch (Exception $e) {
-//                $transaction->status = TransactionRecord::STATUS_FAILED;
-//                $transaction->message = $e->getMessage();
-//
-//                // If this transactions is already saved, don't even try.
-//                if (!$transaction->id) {
-//                    $this->_saveTransaction($transaction);
-//                }
-//
-//                Craft::error($e->getMessage());
-//                throw new PaymentException($e->getMessage(), $e->getCode(), $e);
-//            }
-//
-//                // If we set it to success then all sorts of errors pop up in the cp due to
-//                // not having a payment method, so we leave it at pending
-//                // $transaction->status = Commerce_TransactionRecord::STATUS_SUCCESS;
-//                $transaction->response = JsonHelper::encode($intent->charges->data);
-//
-//                if (!craft()->commerce_transactions->saveTransaction($transaction)) {
-//                    throw new Exception('Error saving transaction: ' . implode(', ', $transaction->getAllErrors()));
-//                }
-//
-//                // Pay off and complete the order
-//                $order->totalPaid = $order->totalPrice;
-//                $order->datePaid = DateTimeHelper::currentTimeForDb();
-//                $success = craft()->commerce_orders->completeOrder($order);
+                // Success!
+                $order->updateOrderPaidInformation();
 
                 return [
-                    'status' => 'success',
-                    'payload' => [
-                        'order' => $order->number,
-                    ]
+                    'status' => 'success'
                 ];
-
-
-//                // Successfully completed the order
-//                if ($success) {
-//                    $this->returnJson([
-//                        'success' => true,
-//                        'orderNumber' => $order->number
-//                    ]);
-//                } else {
-//                    $this->returnErrorJson(Craft::t('Sorry there was an internal error, please get in touch quoting #{number} to verify your order.', ['number' => $order->shortNumber]));
-//                    return;
-//                }
             }
 
             return [
@@ -505,43 +477,55 @@ class PaymentsController extends Controller
             'status' => 'error',
             'message' => Craft::t('commerce', 'Invalid payment or order. Please review.')
         ];
-
-
-//        if (!$success) {
-//            if ($this->request->getAcceptsJson()) {
-//                return $this->asJson([
-//                    'error' => $error,
-//                    'paymentFormErrors' => $paymentForm->getErrors(),
-//                    $this->_cartVariableName => $this->cartArray($order)
-//                ]);
-//            }
-//
-//            $this->setFailFlash($error);
-//
-//            Craft::$app->getUrlManager()->setRouteParams(['paymentForm' => $paymentForm, $this->_cartVariableName => $order]);
-//
-//            return null;
-//        }
-//
-//        if ($this->request->getAcceptsJson()) {
-//            $response = [
-//                'success' => true,
-//                $this->_cartVariableName => $this->cartArray($order)
-//            ];
-//
-//            if ($redirect) {
-//                $response['redirect'] = $redirect;
-//            }
-//
-//            if ($transaction) {
-//                /** @var Transaction $transaction */
-//                $response['transactionId'] = $transaction->reference;
-//                $response['transactionHash'] = $transaction->hash;
-//            }
-//
-//            return $this->asJson($response);
-//        }
     }
 
+
+    /**
+     * Save a transaction.
+     *
+     * @param Transaction $transaction
+     * @throws TransactionException
+     */
+    private function _saveTransaction($transaction): void
+    {
+        if (!Commerce::getInstance()->getTransactions()->saveTransaction($transaction)) {
+            throw new TransactionException('Error saving transaction: ' . implode(', ', $transaction->errors));
+        }
+    }
+
+    /**
+     * Updates a transaction.
+     *
+     * @param Transaction $transaction
+     * @param PaymentIntent $intent
+     * @throws TransactionException
+     * @noinspection NullPointerExceptionInspection
+     */
+    private function _updateTransaction(Transaction $transaction, PaymentIntent $intent): void
+    {
+        if ($intent->status === 'succeeded') {
+            $transaction->status = TransactionRecord::STATUS_SUCCESS;
+        } elseif ($intent->status === 'processing') {
+            $transaction->status = TransactionRecord::STATUS_PROCESSING;
+        } elseif ($intent->status === 'requires_action') {
+            $transaction->status = TransactionRecord::STATUS_REDIRECT;
+        } else {
+            $transaction->status = TransactionRecord::STATUS_FAILED;
+        }
+
+        // Get the response and remove the client secret
+        $response = $intent->getLastResponse();
+        $response->body = null;
+        if ($response->json['client_secret']) {
+            unset($response->json['client_secret']);
+        }
+
+        $transaction->response = $response;
+        $transaction->code = $intent->getLastResponse()->code;
+        $transaction->reference = $intent->id;
+        $transaction->message = $intent->last_payment_error->message ?? '';
+
+        $this->_saveTransaction($transaction);
+    }
 
 }
