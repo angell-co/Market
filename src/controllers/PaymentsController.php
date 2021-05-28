@@ -163,6 +163,8 @@ class PaymentsController extends Controller
 
         // If that worked we can start processing payments and completing carts
         foreach (Market::$plugin->getCarts()->getCarts() as $cart) {
+            // TODO: this should use try catch, if _payCart can’t complete the payment then it should throw something so
+            //       we can catch it and return here - or, it could always return an array - either success, needs action or error
             $this->_payCart($cart, $stripeCustomerId, $paymentMethodId);
         }
 
@@ -349,19 +351,19 @@ class PaymentsController extends Controller
                 return $this->asErrorJson($error);
             }
 
+            // Handle the payment response
+            if ($intent->status === 'requires_action' && $intent->next_action->type === 'use_stripe_sdk') {
+                // Tell the client to handle the action
+                $this->returnJson([
+                    'success' => false,
+                    'requiresAction' => true,
+                    'paymentIntentClientSecret' => $intent->client_secret,
+                    'connectedAccountId' => $vendor->stripeUserId
+                ]);
 
-//            // Handle the payment response
-//            if ($intent->status === 'requires_action' && $intent->next_action->type === 'use_stripe_sdk') {
-//                // Tell the client to handle the action
-//                $this->returnJson([
-//                    'success' => false,
-//                    'requiresAction' => true,
-//                    'paymentIntentClientSecret' => $intent->client_secret,
-//                    'connectedAccountId' => $vendor->stripeUserId
-//                ]);
-//                // The payment didn’t need any additional actions and completed!
-//            } else if ($intent->status === 'succeeded') {
-//
+            // The payment didn’t need any additional actions and completed!
+            } else if ($intent->status === 'succeeded') {
+
 //                // At this point all the payment stuff has gone OK, so clear the
 //                // payment method on the Stripe Customer if its the last cart
 //                if ($lastCart) {
@@ -398,11 +400,10 @@ class PaymentsController extends Controller
 //                    $this->returnErrorJson(Craft::t('Sorry there was an internal error, please get in touch quoting #{number} to verify your order.', ['number' => $order->shortNumber]));
 //                    return;
 //                }
-//            } else {
-//                // Invalid status
-//                $this->returnErrorJson('Invalid PaymentIntent status');
-//                return;
-//            }
+            } else {
+                $error = Craft::t('market', 'Invalid PaymentIntent status');
+                return $this->asErrorJson($error);
+            }
 
 
         } else {
