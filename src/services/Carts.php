@@ -13,6 +13,7 @@ namespace angellco\market\services;
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
+use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\commerce\helpers\Currency;
 use craft\commerce\Plugin as Commerce;
@@ -192,6 +193,7 @@ class Carts extends Component
 
             /** @var Variant $variant */
             $variant = $lineItem->getPurchasable();
+            /** @var Product $product */
             $product = $variant->getProduct();
             $img = $product->getFieldValue('primaryImage')[0] ?? null;
             $imgUrl = null;
@@ -205,6 +207,9 @@ class Carts extends Component
                 ]);
             }
 
+            $personalised = (bool) $product->getFieldValue('personalised');
+            $allowNotes = $personalised ?: (bool) $product->getFieldValue('allowNotes');
+
             $array['lineItems'][] = array_merge($lineItem->toArray(), [
                 'purchasable' => [
                     'title' => $variant->title,
@@ -212,6 +217,7 @@ class Carts extends Component
                     'minQty' => $variant->minQty,
                     'maxQty' => $variant->maxQty,
                     'hasUnlimitedStock' => $variant->hasUnlimitedStock,
+                    'hasStock' => $variant->hasStock(),
                     'stock' => $variant->stock,
                 ],
                 'product' => [
@@ -219,7 +225,7 @@ class Carts extends Component
                     'url' => $product->getUrl(),
                     'image' => $imgUrl,
                     'hasVariants' => (bool) $product->getType()->hasVariants,
-                    'allowNotes' => (bool) $product->getFieldValue('allowNotes')
+                    'allowNotes' => $allowNotes
                 ]
             ]);
         }
