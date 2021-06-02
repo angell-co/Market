@@ -163,6 +163,7 @@ class PaymentsController extends Controller
         $paymentMethodId = $this->request->getRequiredParam('paymentMethodId');
 
         // If that worked we can start processing payments and completing carts
+        $completedOrders = [];
         foreach (Market::$plugin->getCarts()->getCarts() as $cart) {
             try {
                 $result = $this->_payCart($cart, $stripeCustomerId, $paymentMethodId, $paymentIntentId);
@@ -173,20 +174,38 @@ class PaymentsController extends Controller
 
                 // Return to the client if we have an error
                 if ($result['status'] === 'error') {
-                    return $this->asErrorJson($result['message']);
+                    return $this->asJson([
+                        'error' => $result['message'],
+                        'completedOrders' => $completedOrders
+                    ]);
                 }
 
                 // If the response requires action, we have to tell the client and come back to this order later
                 if ($result['status'] === 'requires_action') {
                     return $this->asJson([
                         'status' => 'requires_action',
-                        'payload' => $result['payload']
+                        'payload' => $result['payload'],
+                        'completedOrders' => $completedOrders
                     ]);
                 }
+
+                // Add to the completed orders stack
+                $completedOrders[] = [
+                    'number' => $cart->number,
+                    'reference' => $cart->reference,
+                    'total' => $cart->totalPaidAsCurrency,
+                    'vendor' => $cart->getAttachedVendor()->title
+                ];
             } catch (Exception $e) {
-                return $this->asErrorJson($e->getMessage());
+                return $this->asJson([
+                    'error' => $e->getMessage(),
+                    'completedOrders' => $completedOrders
+                ]);
             } catch (\Throwable $e) {
-                return $this->asErrorJson($e->getMessage());
+                return $this->asJson([
+                    'error' => $e->getMessage(),
+                    'completedOrders' => $completedOrders
+                ]);
             }
         }
 
@@ -204,6 +223,7 @@ class PaymentsController extends Controller
 
         return $this->asJson([
             'status' => 'success',
+            'completedOrders' => $completedOrders
         ]);
     }
 
@@ -337,7 +357,6 @@ class PaymentsController extends Controller
 
         // Check we have stripe details
         if (!$vendor->stripeUserId) {
-            // TODO: MarketplacePlugin::log(Craft::t('Vendor {code} with id {id} isn’t connected to Stripe.', ['title'=>$vendor->code,'id'=>$vendor->id]), LogLevel::Info);
             return [
                 'status' => 'error',
                 'message' => Craft::t('market', 'Sorry this Vendor is unable to accept payments right now.')
