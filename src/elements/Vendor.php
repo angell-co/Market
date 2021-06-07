@@ -640,17 +640,22 @@ class Vendor extends Element
     /**
      * Returns this vendor’s shipping profiles.
      *
+     * @param bool $suppressExceptions
      * @return ShippingProfile[]|null
      * @throws VendorShippingProfilesNotFoundException
      */
-    public function getShippingProfiles(): ?array
+    public function getShippingProfiles($suppressExceptions = false): ?array
     {
         if ($this->_shippingProfiles) {
             return $this->_shippingProfiles;
         }
 
         if (!$this->_shippingProfiles = Market::$plugin->getShippingProfiles()->getShippingProfilesByVendorId($this->id)) {
-            throw new VendorShippingProfilesNotFoundException('No shipping profiles for Vendor ID: '.$this->id);
+            if ($suppressExceptions) {
+                return [];
+            }
+
+            throw new VendorShippingProfilesNotFoundException('No shipping profiles for Vendor ID: ' . $this->id);
         }
 
         return $this->_shippingProfiles;

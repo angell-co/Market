@@ -37,7 +37,7 @@
 
 {% block main %}
 
-    {% set profiles = currentVendor.getShippingProfiles() %}
+    {% set profiles = currentVendor.getShippingProfiles(true) %}
 
     {% if profiles %}
         <div class="flex flex-col">

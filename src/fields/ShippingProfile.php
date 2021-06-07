@@ -175,7 +175,11 @@ class ShippingProfile extends BaseOptionsField
             try {
                 $shippingProfiles = $vendor->getShippingProfiles();
             } catch (VendorShippingProfilesNotFoundException $e) {
-                $error = Craft::t('market', 'This Vendor doesn’t yet have any shipping profiles, please create some first.');
+                if (Craft::$app->request->isSiteRequest) {
+                    $error = Craft::t('market', 'You don’t have any shipping profiles configured yet, please create one first.');
+                } else {
+                    $error = Craft::t('market', 'This Vendor doesn’t yet have any shipping profiles, please create some first.');
+                }
             }
         }
 
