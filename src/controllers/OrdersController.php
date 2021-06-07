@@ -18,12 +18,14 @@ use craft\commerce\errors\TransactionException;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\records\Transaction as TransactionRecord;
 use craft\errors\ElementNotFoundException;
+use craft\errors\SiteNotFoundException;
 use craft\web\Controller;
 use League\Csv\Writer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\StripeClient;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 /**
  * @author    Angell & Co
@@ -93,7 +95,20 @@ class OrdersController extends Controller
         return $this->response->sendAndClose();
     }
 
-    public function actionRefund()
+    /**
+     * Refunds an order in full - always returns true.
+     *
+     * Ideal for Sprig.
+     *
+     * @return bool
+     * @throws BadRequestHttpException
+     * @throws ElementNotFoundException
+     * @throws Exception
+     * @throws SiteNotFoundException
+     * @throws TransactionException
+     * @throws \Throwable
+     */
+    public function actionRefund(): bool
     {
         $this->requirePostRequest();
         $chargeId = $this->request->getRequiredParam('chargeId');
@@ -123,29 +138,57 @@ class OrdersController extends Controller
                 'stripe_account' => $vendor->stripeUserId
             ]);
 
-            // Create the transaction
-            $parentTransaction = $order->getLastTransaction();
-            $transaction = Commerce::getInstance()->getTransactions()->createTransaction($order, $parentTransaction, TransactionRecord::TYPE_REFUND);
-            $transaction->status = TransactionRecord::STATUS_SUCCESS;
-            $transaction->response = $refund;
-            $transaction->reference = $refund->id;
-            Commerce::getInstance()->getTransactions()->saveTransaction($transaction);
-
-            // TODO Update the balance of the order?
-
-            // Change the status of the order
-            $order->orderStatusId = $orderStatusId;
-            Craft::$app->getElements()->saveElement($order);
+            $this->_createRefundOnOrder($order, $orderStatusId, $refund);
 
         } catch (ApiErrorException $e) {
-            // TODO
-        } catch (TransactionException $e) {
-        } catch (ElementNotFoundException $e) {
-        } catch (Exception $e) {
-        } catch (\Throwable $e) {
+            if ($e->getStripeCode() === 'charge_already_refunded') {
+                $this->_createRefundOnOrder($order, $orderStatusId);
+            }
         }
 
         return true;
+    }
+
+    /**
+     * Adds the transaction and updates the order status on a refunded order.
+     *
+     * @param $order
+     * @param $orderStatusId
+     * @param null $refund
+     * @return |null
+     * @throws ElementNotFoundException
+     * @throws Exception
+     * @throws TransactionException
+     * @throws \Throwable
+     */
+    private function _createRefundOnOrder($order, $orderStatusId, $refund = null): void
+    {
+        // Create the transaction
+        $parentTransaction = $order->getLastTransaction();
+        if (!$parentTransaction) {
+            return;
+        }
+
+        $transaction = Commerce::getInstance()->getTransactions()->createTransaction($order, $parentTransaction, TransactionRecord::TYPE_REFUND);
+        $transaction->status = TransactionRecord::STATUS_SUCCESS;
+
+        // Only refund in full for now
+        $transaction->paymentAmount = $parentTransaction->getRefundableAmount();
+
+        // Calculate amount in the primary currency
+        $transaction->amount = $transaction->paymentAmount / $parentTransaction->paymentRate;
+
+        // Add the refund data if we have it
+        if ($refund) {
+            $transaction->response = $refund;
+            $transaction->reference = $refund->id;
+        }
+
+        Commerce::getInstance()->getTransactions()->saveTransaction($transaction);
+
+        // Change the status of the order
+        $order->orderStatusId = $orderStatusId;
+        Craft::$app->getElements()->saveElement($order);
     }
 
 }

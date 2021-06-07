@@ -74,14 +74,19 @@
                 {# Stripe payment #}
                 {% set transaction = order.getLastTransaction() %}
                 {% set stripePaymentId = null %}
+                {% set refundChargeId = null %}
                 {% set response = transaction.response|json_decode %}
 
                 {% if response.object is defined and response.object == 'refund' %}
                     {% set stripePaymentId = response.payment_intent %}
+                    {# TODO XXX #}
+                    {% set refundChargeId = response.charge %}
                 {% elseif response.json is defined %}
                     {% set stripePaymentId = response.json.charges.data[0].payment_intent %}
+                    {% set refundChargeId = response.json.charges.data[0].id %}
                 {% elseif response[0] is defined %}
                     {% set stripePaymentId = response[0].id %}
+                    {% set refundChargeId = response[0].id %}
                 {% endif %}
 
                 {% if stripePaymentId %}
@@ -111,7 +116,7 @@
 
             {{ sprig('_market/_components/order-edit-actions', {
                 _orderId: order.id,
-                _chargeId: stripePaymentId ? stripePaymentId : null
+                _chargeId: refundChargeId ? refundChargeId : null
             }) }}
         </div>
     </div>

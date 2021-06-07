@@ -1,4 +1,4 @@
-{% if successfulNotice is defined %}
+{% if success is defined and successfulNotice is defined %}
     {% do craft.app.session.setNotice(successfulNotice) %}
     {% do sprig.redirect('/market/orders/'~_orderId) %}
 {% endif %}
