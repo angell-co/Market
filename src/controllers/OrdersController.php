@@ -10,12 +10,18 @@
 
 namespace angellco\market\controllers;
 
+use angellco\market\elements\Vendor;
 use angellco\market\Market;
 use Craft;
 use craft\commerce\elements\Order;
+use craft\commerce\errors\TransactionException;
+use craft\commerce\Plugin as Commerce;
+use craft\commerce\records\Transaction as TransactionRecord;
 use craft\errors\ElementNotFoundException;
 use craft\web\Controller;
 use League\Csv\Writer;
+use Stripe\Exception\ApiErrorException;
+use Stripe\StripeClient;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
 
@@ -85,6 +91,58 @@ class OrdersController extends Controller
         $csv->output($filename.'.csv');
 
         return $this->response->sendAndClose();
+    }
+
+    public function actionRefund()
+    {
+        $this->requirePostRequest();
+        $chargeId = $this->request->getRequiredParam('chargeId');
+        $orderId = $this->request->getRequiredParam('orderId');
+        $orderStatusId = $this->request->getRequiredParam('orderStatusId');
+
+        // Get the order
+        $query = Order::find()
+            ->anyStatus()
+            ->id($orderId);
+
+        $order = $query->one();
+
+        // Get the vendor
+        /** @var Vendor $vendor */
+        $vendor = Market::$plugin->getVendors()->getCurrentVendor();
+
+        $settings = Market::$plugin->getStripeSettings()->getSettings();
+        $stripe = new StripeClient($settings->secretKey);
+
+        try {
+            // Process the refund
+            $refund = $stripe->refunds->create([
+                'charge' => $chargeId,
+                'refund_application_fee' => true,
+            ], [
+                'stripe_account' => $vendor->stripeUserId
+            ]);
+
+            // Create the transaction
+            $parentTransaction = $order->getLastTransaction();
+            $transaction = Commerce::getInstance()->getTransactions()->createTransaction($order, $parentTransaction, TransactionRecord::TYPE_REFUND);
+            $transaction->response = $refund;
+            $transaction->reference = $refund->id;
+            Commerce::getInstance()->getTransactions()->saveTransaction($transaction);
+
+            // Change the status of the order
+            $order->orderStatusId = $orderStatusId;
+            Craft::$app->getElements()->saveElement($order);
+
+        } catch (ApiErrorException $e) {
+            // TODO
+        } catch (TransactionException $e) {
+        } catch (ElementNotFoundException $e) {
+        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        return true;
     }
 
 }
