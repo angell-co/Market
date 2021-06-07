@@ -284,11 +284,13 @@
                                     _fieldLimit: _fieldLimit,
                                     _fieldHandle: _fieldHandle,
                                     _originalIds: selectedIds[_fieldHandle]|join(','),
-                                    _folderId: _folderId
+                                    _folderId: _folderId,
+                                    selectedIds: selectedIds[_fieldHandle]|join(',')
                                 }, {
+                                    's-trigger': 'load, refresh, uploadfinished',
                                     'id' : 'field-'~_fieldId~'-assets-index',
                                     'class' : 'flex flex-col h-full field-assets-index',
-                                    'x-on:htmx:after-swap' : 'applyScroll'
+                                    'x-on:htmx:after-swap' : 'applyScroll',
                                 }) }}
                             </div>
                         </div>

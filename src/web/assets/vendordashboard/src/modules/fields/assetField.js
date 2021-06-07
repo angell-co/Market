@@ -39,7 +39,7 @@ const assetField = function() {
             evt.stopPropagation();
 
             // Then manually trigger a refresh of only the asset index
-            htmx.trigger('#field-'+this.fieldId+'-assets-index', 'refresh');
+            htmx.trigger('#field-'+this.fieldId+'-assets-index', 'uploadfinished');
 
             this.uploading = false;
             return false;
