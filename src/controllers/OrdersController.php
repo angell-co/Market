@@ -126,9 +126,12 @@ class OrdersController extends Controller
             // Create the transaction
             $parentTransaction = $order->getLastTransaction();
             $transaction = Commerce::getInstance()->getTransactions()->createTransaction($order, $parentTransaction, TransactionRecord::TYPE_REFUND);
+            $transaction->status = TransactionRecord::STATUS_SUCCESS;
             $transaction->response = $refund;
             $transaction->reference = $refund->id;
             Commerce::getInstance()->getTransactions()->saveTransaction($transaction);
+
+            // TODO Update the balance of the order?
 
             // Change the status of the order
             $order->orderStatusId = $orderStatusId;
