@@ -28,7 +28,7 @@
 {# Process the removed ID if there is one #}
 {% if removedId is defined %}
     {% set removedCat = craft.categories.id(removedId).one() %}
-    {% set childIds = removedCat.children.ids() %}
+    {% set childIds = removedCat.descendants.ids() %}
     {% set filterIds = childIds|push(removedCat.id) %}
     {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
 {% endif %}
@@ -99,7 +99,7 @@
                         <button sprig
                                 x-on:htmx:before-request="trackScroll"
                                 {% if category.id in selectedIds %}
-                                    {% set childIds = category.children.ids() %}
+                                    {% set childIds = category.descendants.ids() %}
                                     {% set filterIds = childIds|push(category.id) %}
                                     s-val:selected-ids="{{ selectedIds|filter(v => v not in filterIds)|join(',') }}"
                                 {% else %}
@@ -123,7 +123,7 @@
                         </button>
 
                         {% ifchildren %}
-                            <ul class="mt-1 mb-4 ml-{{ category.level * 5 }}">
+                            <ul class="mt-1 mb-4 ml-5">
                                 {% children %}
                             </ul>
                         {% endifchildren %}

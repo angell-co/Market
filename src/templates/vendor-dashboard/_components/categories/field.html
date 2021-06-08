@@ -45,7 +45,7 @@
 {# Process the removed ID if there is one #}
 {% if removedId is defined %}
     {% set removedCat = craft.categories.id(removedId).one() %}
-    {% set childIds = removedCat.children.ids() %}
+    {% set childIds = removedCat.descendants.ids() %}
     {% set filterIds = childIds|push(removedCat.id) %}
 
     {% set selectedIds = selectedIds|merge({
@@ -117,7 +117,7 @@
                     >
 
                     {% ifchildren %}
-                        <ul class="mt-1 mb-4 ml-{{ category.level * 5 }}">
+                        <ul class="mt-1 mb-4 ml-5">
                             {% children %}
                         </ul>
                     {% endifchildren %}

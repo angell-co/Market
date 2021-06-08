@@ -65,10 +65,13 @@ const cgColours = {
 };
 
 module.exports = {
-  purge: [
-    '../../../templates/vendor-dashboard/**/*.html',
-    './src/**/*.js',
-  ],
+  purge: {
+    content: [
+      '../../../templates/vendor-dashboard/**/*.html',
+      './src/**/*.js',
+    ],
+  },
+
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
@@ -76,7 +79,6 @@ module.exports = {
         brand: cgColours.teal,
         brandsecondary: cgColours.paleBlue,
         action: cgColours.yellow,
-
         red: colors.rose,
         green: colors.emerald,
         blue: colors.lightBlue,
