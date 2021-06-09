@@ -11,6 +11,7 @@
 namespace angellco\market\web\twig;
 
 use angellco\market\db\Table;
+use angellco\market\elements\Vendor;
 use angellco\market\helpers\ShippingProfileHelper;
 use angellco\market\Market;
 use angellco\market\models\StripeSettings;
@@ -141,5 +142,10 @@ class MarketVariable extends ServiceLocator
         }
 
         return $countGroupedByStatusId;
+    }
+
+    public function vendorQuery()
+    {
+        return Vendor::find();
     }
 }
