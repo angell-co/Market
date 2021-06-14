@@ -1,0 +1,452 @@
+{% set currentVendor = market.vendors.getCurrentVendor() %}
+{% set page = page ?? 1 %}
+{% set sort = sort ?? 'dateOrdered' %}
+{% set sortDir = sortDir ?? 'desc' %}
+{% set limit = limit ?? 10 %}
+{% if limit > 100 %}{% set limit = 100 %}{% endif %}
+{% set query = query ?? '' %}
+{% set status = status ?? '' %}
+{% do sprig.pushUrl('?page='~page~'&limit='~limit~'&sort='~sort~'&sortDir='~sortDir~'&status='~status~'&query='~query) %}
+
+{% set ordersQuery = craft.orders
+    .withCustomer(true)
+    .withAddresses(true)
+    .isCompleted(true)
+    .limit(limit)
+    .search(query)
+    .orderStatus(status)
+    .orderBy(sort~' '~sortDir)
+    .relatedTo({
+        'targetElement': currentVendor,
+        'field': 'vendor'
+    })
+%}
+
+{% set pageInfo = sprig.paginate(ordersQuery, page) %}
+{% set orders = pageInfo.pageResults %}
+
+{% set statusOptionMap = {
+    green: {
+        button: 'text-green-700 hover:bg-green-100 hover:text-green-900 focus:bg-green-100 focus:text-green-900 focus:ring-green-500',
+        circle: 'ring-green-300 bg-green-100'
+    },
+    blue: {
+        button: 'text-blue-700 hover:bg-blue-100 hover:text-blue-900 focus:bg-blue-100 focus:text-blue-900 focus:ring-blue-500',
+        circle: 'ring-blue-300 bg-blue-100'
+    },
+    pink: {
+        button: 'text-pink-700 hover:bg-pink-100 hover:text-pink-900 focus:bg-pink-100 focus:text-pink-900 focus:ring-pink-500',
+        circle: 'ring-pink-300 bg-pink-100'
+    },
+    default: {
+        button: 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:ring-action-500',
+        circle: 'ring-gray-300 bg-gray-100'
+    }
+} %}
+
+{% set statusMap = {
+    green: 'bg-green-100 text-green-800',
+    blue: 'bg-blue-100 text-blue-800',
+    pink: 'bg-pink-100 text-pink-800',
+    default: 'bg-gray-100 text-gray-800',
+} %}
+
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+{% if selectedIds is defined and selectedIds is not iterable %}
+    {% set selectedIds = selectedIds|split(',') %}
+{% endif %}
+
+{% set selectedIds = selectedIds|filter|unique %}
+
+{% if successfulNotice is defined %}
+    {% do craft.app.session.setNotice(successfulNotice) %}
+    {% do sprig.redirect('/market/orders') %}
+{% endif %}
+
+{# Header #}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <div class="lg:flex lg:items-center lg:justify-between mb-4">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                {{ 'Orders'|t('market') }}
+            </h1>
+        </div>
+
+        {# Actions #}
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+            {# Action menu for selected rows #}
+            {% if selectedIds %}
+                <div class="relative inline-block text-left z-10"
+                     x-data="{ open: false }"
+                     x-on:keydown.window.escape="open = false"
+                     x-on:click.away="open = false"
+                >
+                    <div>
+                        <button x-on:click="open = !open"
+                                class="inline-flex items-center bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                                id="product-actions-menu"
+                                aria-haspopup="true"
+                                x-bind:aria-expanded="open"
+                        >
+                            {# Heroicon name: cog #}
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                            </svg>
+                            {{ 'Options'|t('market') }}
+                        </button>
+                    </div>
+
+                    <div x-show="open"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="origin-top-right absolute right-0 mt-2 py-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+                         role="menu" aria-orientation="vertical" aria-labelledby="product-actions-menu"
+                    >
+                        <div class="px-4 py-3" role="none">
+                            <p class="text-sm font-medium text-gray-900" role="none">
+                                Applies to {{ selectedIds|length }} order{{ selectedIds|length > 1 ? 's' }}
+                            </p>
+                        </div>
+                        {# Order status change #}
+                        <div class="py-1" role="none">
+                            {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
+                                {% if orderStatus.handle not in ['new','refunded'] %}
+                                    <button sprig
+                                            s-action="market/orders/set-status"
+                                            s-method="post"
+                                            s-val:status-id="{{ orderStatus.id }}"
+                                            s-val:order-ids="{{ selectedIds|join(',') }}"
+                                            s-val:selected-ids=""
+                                            {% if selectedIds|length == 1 %}
+                                                s-val:successful-notice="Order status updated."
+                                            {% else %}
+                                                s-val:successful-notice="{{ selectedIds|length }} orders updated."
+                                            {% endif %}
+                                            type="button"
+                                            class="w-full group flex items-center px-4 py-2 text-sm focus:rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 {{ statusOptionMap[orderStatus.color].button }}"
+                                            role="menuitem"
+                                    >
+                                        <span class="block ml-1 mr-4 h-3 w-3 rounded-full ring-2 {{ statusOptionMap[orderStatus.color].circle }}"></span>
+                                        Mark as {{ orderStatus.name }}
+                                    </button>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {# Exports #}
+                        <div class="py-1" role="none">
+
+                            <form method="POST">
+                                {{ csrfInput() }}
+                                {{ actionInput('market/orders/export') }}
+                                {{ hiddenInput('orderIds', selectedIds|join(',')) }}
+                                {{ hiddenInput('format', 'standard') }}
+                                <button x-on:click.debounce="open = false"
+                                        type="submit"
+                                        class="w-full group flex items-center px-4 py-2 text-sm focus:rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 {{ statusOptionMap.default.button }}"
+                                        role="menuitem"
+                                >
+                                    <svg class="-ml-0.25 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                                    </svg>
+                                    Standard export
+                                </button>
+                            </form>
+
+                            <form method="POST">
+                                {{ csrfInput() }}
+                                {{ actionInput('market/orders/export') }}
+                                {{ hiddenInput('orderIds', selectedIds|join(',')) }}
+                                {{ hiddenInput('format', 'expanded') }}
+                                <button x-on:click.debounce="open = false"
+                                        type="submit"
+                                        class="w-full group flex items-center px-4 py-2 text-sm focus:rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 {{ statusOptionMap.default.button }}"
+                                        role="menuitem"
+                                >
+                                    <svg class="-ml-0.25 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                                    </svg>
+                                    Expanded export
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div x-data="{}"
+     {% if sprig.isInclude %}x-init="$refs.searchInput.focus()"{% endif %}
+     class="max-w-7xl mx-auto px-4 py-4 sm:px-6 md:px-8"
+>
+    {# Search and filters #}
+    <div class="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-4">
+        {# Search #}
+        <div class="col-span-2 sm:col-span-3 md:col-span-6 lg:col-span-4">
+            <label for="query" class="block text-sm font-medium text-gray-700">Search</label>
+            <div class="mt-1 relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    {# Heroicon name: search #}
+                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <input sprig
+                       s-trigger="keyup changed delay:250ms"
+                       s-replace="#results"
+                       s-val:sort="{{ sort }}"
+                       s-val:sort-dir="{{ sortDir }}"
+                       x-ref="searchInput"
+                       type="text" name="query" id="query"
+                       class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                       placeholder="Search orders by email, customer name, order number or address"
+                       value="{{ query }}"
+                >
+            </div>
+        </div>
+
+        {# Status #}
+        <div class="sm:col-span-2 md:col-span-3 lg:col-span-1">
+            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select sprig
+                    id="status"
+                    name="status"
+                    s-val:sort="{{ sort }}"
+                    s-val:sort-dir="{{ sortDir }}"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md"
+            >
+                <option value="" {{ status == '' ? 'selected' }}>View all</option>
+                {% set counts = market.getOrderCountByStatus() %}
+                {% for orderStatus in craft.commerce.orderStatuses.allOrderStatuses %}
+                    <option value="{{ orderStatus.handle }}" {{ status == orderStatus.handle ? 'selected' }}>
+                        ({{ counts[orderStatus.id].orderCount }})
+                        {{ orderStatus.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {# Limit #}
+        <div class="md:col-span-3 lg:col-span-1">
+            <label for="limit" class="block text-sm font-medium text-gray-700">Limit</label>
+            <select sprig
+                    id="limit"
+                    name="limit"
+                    s-val:sort="{{ sort }}"
+                    s-val:sort-dir="{{ sortDir }}"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500 sm:text-sm rounded-md"
+            >
+                <option value="5" {{ limit == 5 ? 'selected' }}>5</option>
+                <option value="10" {{ limit == 10 ? 'selected' }}>10</option>
+                <option value="20" {{ limit == 20 ? 'selected' }}>20</option>
+                <option value="50" {{ limit == 50 ? 'selected' }}>50</option>
+                <option value="100" {{ limit == 100 ? 'selected' }}>100</option>
+            </select>
+        </div>
+    </div>
+
+    {# Results container #}
+    <div id="results">
+        {% if orders %}
+            {# Results table #}
+            <div class="flex flex-col">
+                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-200" x-data="{ allchecked: false }">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="relative pl-3 py-0 text-left text-xs">
+                                            <span class="sr-only">Select all orders</span>
+                                            <input sprig
+                                                   id="orders-checkbox-all"
+                                                   type="checkbox"
+                                                   {% if orders|length == selectedIds|length %}
+                                                       checked
+                                                       s-val:selected-ids=""
+                                                   {% else %}
+                                                       s-val:selected-ids="{{ orders|map(o => o.id)|join(',') }}"
+                                                   {% endif %}
+                                                   s-val:sort="{{ sort }}"
+                                                   s-val:sort-dir="{{ sortDir }}"
+                                                   class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
+                                            >
+                                            {% if selectedIds|length >= 1 and orders|length != selectedIds|length %}
+                                                <script type="text/javascript">
+                                                    document.getElementById('orders-checkbox-all').indeterminate = true;
+                                                </script>
+                                            {% endif %}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Reference'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Customer'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ 'Status'|t('market') }}
+                                        </th>
+                                        <th scope="col" class="p-0">
+                                            <button sprig
+                                                    s-val:sort="totalPrice"
+                                                    s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
+                                                    type="button"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-action-500 ring-inset"
+                                            >
+                                                {{ 'Amount'|t('market') }}
+                                                {% if sort == 'totalPrice' and sortDir == 'desc' %}
+                                                    {# Heroicon name: chevron-down #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% elseif sort == 'totalPrice' and sortDir == 'asc' %}
+                                                    {# Heroicon name: chevron-up #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% endif %}
+                                            </button>
+                                        </th>
+                                        <th scope="col" class="p-0">
+                                            <button sprig
+                                                    s-val:sort="dateOrdered"
+                                                    s-val:sort-dir="{{ sortDir == 'desc' ? 'asc' : 'desc' }}"
+                                                    type="button"
+                                                    class="inline-flex w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-action-500 ring-inset"
+                                            >
+                                                {{ 'Date'|t('market') }}
+                                                {% if sort == 'dateOrdered' and sortDir == 'desc' %}
+                                                    {# Heroicon name: chevron-down #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% elseif sort == 'dateOrdered' and sortDir == 'asc' %}
+                                                    {# Heroicon name: chevron-up #}
+                                                    <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                {% endif %}
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                {% for order in orders %}
+                                    {% set billingAddress = order.billingAddress %}
+                                    <tr>
+                                        <td class="pl-3 py-0 text-xs">
+                                            <input sprig
+                                                   id="order-checkbox-{{ order.id }}"
+                                                   name="selectedIds[]"
+                                                   type="checkbox"
+                                                   value="{{ order.id }}"
+                                                   {% if order.id in selectedIds %}checked{% endif %}
+                                                   s-val:sort="{{ sort }}"
+                                                   s-val:sort-dir="{{ sortDir }}"
+                                                   class="focus:ring-action-500 h-4 w-4 text-action-600 border-gray-300 rounded"
+                                            >
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="{{ url('market/orders/'~order.id) }}" class="text-action-600 hover:text-action-900">{{ order.reference }}</a>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {% if billingAddress %}
+                                                    {{ billingAddress.firstName }} {{ billingAddress.lastName }}
+                                                {% endif %}
+                                            </div>
+                                            <span class="text-sm text-gray-500">{{ order.email }}</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ statusMap[order.orderStatus.color] is defined ? statusMap[order.orderStatus.color] : statusMap.default }}">
+                                                {{ order.orderStatus }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.storedTotalPrice|currency(order.currency, [], [], true) }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.dateOrdered|datetime('short') }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Pagination #}
+            {% include '_market/_includes/pagination' with {
+                itemType: 'orders',
+                vals: {
+                    'sort': sort,
+                    'sort-dir': sortDir
+                },
+            } %}
+
+        {% elseif query or status %}
+            {# No results #}
+            <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {# Heroicon name: emoji-sad #}
+                        <svg class="h-5 w-5 text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Oh no!
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 space-y-2">
+                            {% if query %}
+                                <p>We couldn’t find anything for <strong>“{{ query }}”</strong>, try being less specific or using different keywords.</p>
+                                <p>You can search for most things including order numbers, customer names, email addresses and billing or shipping addresses.</p>
+                            {% elseif status %}
+                                <p>We couldn’t find any <strong>{{ status }}</strong> orders.</p>
+                            {% endif %}
+                        </div>
+                        <div class="mt-4">
+                            <div class="-mx-2 -my-1.5 flex">
+                                <a href="{{ url('market/orders') }}" class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600">
+                                    Reset search
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            {# No orders at all yet #}
+            <div class="rounded-md shadow-md bg-orange-100 border border-orange-300 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {# Heroicon name: light-bulb #}
+                        <svg class="h-5 w-5 text-orange-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-orange-800">
+                            Nothing here …
+                        </h3>
+                        <div class="mt-2 text-sm text-orange-700 space-y-2">
+                            <p>You don’t have any orders yet, check back soon!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>

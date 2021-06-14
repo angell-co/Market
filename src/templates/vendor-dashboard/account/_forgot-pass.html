@@ -1,0 +1,102 @@
+{% extends "_market/_layouts/auth" %}
+
+{% if currentUser %}
+    {% if market.vendors.getCurrentVendor() %}
+        {% redirect url('market') %}
+    {% else %}
+        {% redirect url('/') %}
+    {% endif %}
+{% endif %}
+
+{% set title = 'Forgot Password'|t('market') %}
+
+{% block main %}
+    <main class="min-h-screen flex relative">
+        <div class="relative z-10 bg-white bg-opacity-90 flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+            <div class="mx-auto w-full max-w-sm lg:w-96">
+                <div>
+                    {% include '_market/_layouts/_logo.html' with {
+                        class: 'w-full text-brand-500'
+                    } %}
+
+                    <h2 class="mt-8 text-3xl font-extrabold text-gray-900">
+                        Forgot your password?
+                    </h2>
+
+                    <p class="mt-2 text-sm text-gray-600 max-w">
+                        Enter your email address here and we’ll send you a link to reset it.
+                    </p>
+                </div>
+
+                <form method="POST" class="mt-8 space-y-6">
+                    {{ csrfInput() }}
+                    {{ actionInput('users/send-password-reset-email') }}
+                    {{ redirectInput('market/forgot-password') }}
+
+                    <div>
+                        <label for="loginName" class="block text-sm font-medium text-gray-700">
+                            Email address
+                        </label>
+                        <div class="mt-1">
+                            <input id="loginName" name="loginName" type="email" autocomplete="email" required
+                                   class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    {% if errors ?? false %}
+                        <div class="relative mt-2 p-2 pl-9 rounded-md border border-red-500">
+                            <div class="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                                {# Heroicon name: solid/exclamation-circle #}
+                                <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+
+                            <p class="text-sm text-red-600">{{ errors[0] }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <button type="submit"
+                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-500 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-400">
+                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                {# Heroicon name: solid/lock-closed #}
+                                <svg class="h-5 w-5 text-brand-300 group-hover:text-brand-400"
+                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                     aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </span>
+                            Submit
+                        </button>
+                    </div>
+
+                    {% set flashes = craft.app.session.getAllFlashes() %}
+                    {% if flashes and flashes['notice'] is defined  %}
+                        <div class="relative mt-2 p-2 pl-9 rounded-md border border-brand-500">
+                            <div class="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                                {# Heroicon name: solid/check-circle #}
+                                <svg class="h-5 w-5 text-brand-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+
+                            <p class="text-sm text-brand-600">{{ flashes['notice'] }}</p>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        <div class="hidden lg:block absolute top-0 left-0 right-0 bottom-0">
+            <img class="absolute inset-0 h-full w-full object-cover"
+                 src="https://cheerfully-given.imgix.net/files/CG-Group.jpg?auto=format%2Ccompress&w=1080&dpr=3&s=97882ceb8c751a89d9a96e3a807cdb59"
+                 alt="The seller community standing in front of a wall">
+        </div>
+    </main>
+{% endblock %}
+

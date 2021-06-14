@@ -1,0 +1,313 @@
+{% extends "_market/_layouts/main" %}
+
+{% set currentVendor = market.vendors.getCurrentVendor() %}
+{% if productTypeHandle is not defined %}{% exit 403 %}{% endif %}
+{% set productType = craft.commerce.productTypes.getProductTypeByHandle(productTypeHandle) %}
+{% if not productType %}{% exit 404 %}{% endif %}
+{% set site = craft.app.getSites().currentSite %}
+
+{% set title = 'Create new {productType} product'|t('market', {productType: productType.name}) %}
+
+{% set sidebarFields = market.plugin.getSettings().productSidebarFieldHandles %}
+
+{# Sort out the product model #}
+{% if productId is defined and productId != null %}
+    {% if product is not defined %}
+        {% set product = craft.commerce.products.getProductById(productId) %}
+    {% endif %}
+    {% if not product %}{% exit 404 %}{% endif %}
+    {% set title = product.title %}
+{% elseif product is not defined %}
+    {% set product = create({
+        class: 'craft\\commerce\\elements\\Product',
+        typeId: productType.id,
+        taxCategoryId: productType.getTaxCategories()|keys|first,
+        shippingCategoryId: productType.getShippingCategories()|keys|first,
+        enabled: true,
+        siteId: site.id,
+        promotable: true,
+        availableForPurchase: true,
+        freeShipping: false
+    }) %}
+
+    {% do product.setFieldValue('vendor', [currentVendor.id]) %}
+{% endif %}
+
+{# TODO: permissions check #}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/products'),
+        label: 'Products'|t('market')
+    },
+    {
+        url: craft.app.request.getUrl,
+        label: title
+    }
+] %}
+
+{% block content %}
+    <form x-data="{
+              saveAndReload: '{{ ('market/products/'~productType.handle~'/{id}-{slug}')|hash }}',
+          }"
+          x-on:keydown.window.cmd.s.prevent="$refs.redirectInput.value = saveAndReload; $el.submit();"
+          method="POST"
+          class="py-6"
+    >
+        {{ csrfInput() }}
+        {{ actionInput('commerce/products/save-product') }}
+
+        <input type="hidden"
+               name="redirect"
+               value="{{ 'market/products'|hash }}"
+               x-ref="redirectInput"
+        >
+        {{ hiddenInput('typeId', productType.id) }}
+        {% if product is defined and product.id %}{{ hiddenInput('productId', product.id) }}{% endif %}
+
+        {# Header #}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div class="lg:flex lg:items-center lg:justify-between mb-4">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                        {{ title }}
+                    </h1>
+                </div>
+
+                {# Actions #}
+                <div class="mt-5 flex lg:mt-0 lg:ml-4">
+                    {# Save #}
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500">
+                        {# Heroicon name: save #}
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+                        </svg>
+                        {{ 'Save'|t('market') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# Main #}
+        {% set fl = productType.getFieldLayout() %}
+        {% set tabs = fl.getTabs() %}
+        {% set tabErrors = [] %}
+        {% set excludedFldElements = [
+            'craft\\fieldlayoutelements\\Heading',
+            'craft\\fieldlayoutelements\\HorizontalRule',
+            'craft\\fieldlayoutelements\\Template',
+            'craft\\fieldlayoutelements\\Tip',
+        ] %}
+
+        {% set tabContent %}
+            {% for tab in tabs %}
+                <div x-show="tab === '{{ tab.name|kebab }}'"
+                     x-cloak
+                     id="tab-{{ tab.name|kebab }}"
+                     class="shadow rounded-md overflow-hidden"
+                >
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {% for element in tab.elements %}
+                            {% if className(element) not in excludedFldElements %}
+                                {% if product is defined and product.getErrors(element.attribute) %}
+                                    {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                {% endif %}
+
+                                {% if element.attribute == 'variants' %}
+                                    {% for v in product.variants %}
+                                        {% if v.getErrors() %}
+                                            {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% include '_market/_includes/fld-element' with {
+                                    uielement: element,
+                                    element: product is defined ? product : null,
+                                    excludedFieldHandles: sidebarFields,
+                                    assetsFolderId: currentVendor.filesFolderId
+                                } only %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endset %}
+
+        <div x-data="Market.tabs()"
+             x-init="initTabs('{{ (tabs|first).name|kebab }}')"
+             class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-4 grid grid-cols-1 gap-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
+        >
+            {# Tab nav #}
+            <div class="col-span-full">
+                {# Mobile #}
+                <div class="sm:hidden">
+                    <label for="tabs" class="sr-only">Select a tab</label>
+                    <select x-on:change.prevent="changeTab($event.target.value)"
+                            class="block w-full focus:ring-brand-500 focus:border-brand-500 border-gray-300 rounded-md"
+                    >
+                        {% for tab in tabs  %}
+                            <option value="{{ tab.name|kebab }}"
+                                    :selected="tab === '{{ tab.name|kebab }}'"
+                            >
+                                {{ tab.name }}
+                                {% if tab.id in tabErrors %}⚠{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Larger #}
+                <div class="hidden sm:block">
+                    <nav class="flex space-x-4" aria-label="Tabs">
+                        {% for tab in tabs %}
+                            <a href="#{{ tab.name|kebab }}"
+                               x-on:click.prevent="changeTab('{{ tab.name|kebab }}')"
+                               class="px-3 py-2 font-medium text-sm rounded-md relative"
+                               :class="{
+                                   'bg-gray-100 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-600': tab !== '{{ tab.name|kebab }}',
+                                   'bg-brand-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-600': tab === '{{ tab.name|kebab }}'
+                               }"
+                            >
+                                {{ tab.name }}
+                                {% if tab.id in tabErrors %}
+                                    <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </nav>
+
+                </div>
+            </div>
+
+            <div class="lg:col-start-1 lg:col-span-2">
+                {# Tab content #}
+                {{ tabContent }}
+            </div>
+
+            <div class="lg:col-start-3 lg:col-span-1">
+                <div class="shadow rounded-md overflow-hidden divide-y">
+
+                    {# Core attributes #}
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {% include '_market/_includes/fields/slug.html' with {
+                            element: product is defined ? product : null
+                        } %}
+
+                        {% include '_market/_includes/fields/datetime.html' with {
+                            label: 'Post Date'|t('app'),
+                            attribute: 'postDate',
+                            element: product is defined ? product : null
+                        } %}
+
+                        {% include '_market/_includes/fields/datetime.html' with {
+                            label: 'Expiry Date'|t('app'),
+                            attribute: 'expiryDate',
+                            element: product is defined ? product : null
+                        } %}
+
+                        {# Available for purchase #}
+                        {% include '_market/_includes/fields/lightswitch.html' with {
+                            label: 'Available for purchase'|t('commerce'),
+                            attribute: 'availableForPurchase',
+                            element: product is defined ? product : null
+                        } %}
+
+                        {# Enabled switch #}
+                        {% include '_market/_includes/fields/lightswitch.html' with {
+                            label: 'Enabled'|t('app'),
+                            attribute: 'enabled',
+                            element: product is defined ? product : null
+                        } %}
+
+                        {# NOTE: no free shipping or promotable here yet #}
+                    </div>
+
+                    {# Single variant product, so we have the required fields in the sidebar #}
+                    {% if not productType.hasVariants %}
+                        {% set variant = product.id ? product.variants[0] : false %}
+                        {% set variantKey = variant and variant.id ? variant.id : 'new1' %}
+
+                        <div class="px-4 py-5 bg-gray-50 space-y-6 sm:p-6">
+                            {{ hiddenInput('variants['~variantKey~'][isDefault]', 1) }}
+                            {% include '_market/_includes/variant-fields.html' with {
+                                singleVariant: true,
+                                vendorCode: currentVendor.code
+                            } %}
+                        </div>
+                    {% endif %}
+
+
+                    {% if sidebarFields %}
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                            {% for handle in sidebarFields %}
+                                {% set field = craft.app.getFields().getFieldByHandle(handle) %}
+                                {% if field %}
+                                    {% include '_market/_includes/field' with {
+                                        element: product is defined ? product : null
+                                    } %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="px-4 sm:px-0 bg-gray-50">
+
+                        <dl class="sm:divide-y sm:divide-gray-200">
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    {{ 'Date Created'|t('app') }}
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 ">
+                                    {{ product.dateCreated|datetime('short')|replace(',','') }}
+                                </dd>
+                            </div>
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    {{ 'Date Updated'|t('app') }}
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                    {{ product.dateUpdated|datetime('short')|replace(',','') }}
+                                </dd>
+                            </div>
+                            {# NOTE: This is not very performant ... #}
+                            {% set variantIds = product.variants|map(v => v.id) %}
+
+                            {% set orders = craft.orders()
+                                .isCompleted()
+                                .hasPurchasables(variantIds)
+                                .all() %}
+
+                            {% set numberSold = 0 %}
+
+                            {% for order in orders %}
+                                {% for lineItem in order.lineItems %}
+                                    {% if lineItem.snapshot.purchasableId in variantIds %}
+                                        {% set numberSold = numberSold + lineItem.qty %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    {{ 'Quantity Sold'|t('market') }}
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                    {{ numberSold }}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                {# Delete action #}
+                {% if product.id %}
+                    <div class="mt-6 text-right">
+                        {{ sprig('_market/_components/delete-product', {
+                            _productId: product.id
+                        }) }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+{% endblock %}

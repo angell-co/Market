@@ -1,0 +1,51 @@
+{% set value = '' %}
+{% if element %}{% set value = element.slug %}{% endif %}
+<div x-data="Market.slugField()"
+     x-init="initSlug('{{ value }}')"
+>
+    <div class="flex justify-between">
+        <label for="slug" class="flex-grow block text-sm font-medium text-gray-700">
+            {{ 'Slug'|t('app') }}
+        </label>
+        {% if element is defined and element.enabled and element.id %}
+            <input x-ref="urlInput" class="sr-only" value="{{ element.getUrl() }}">
+            <button type="button"
+                    class="mr-2 -mt-1 mb-1 inline-flex items-center px-1.5 py-0.5 border border-transparent text-xs font-medium rounded focus:outline-none"
+                    :class="{
+                        'text-action-700 bg-action-100 hover:bg-action-200' : !showCopySuccess,
+                        'text-green-700 bg-green-100' : showCopySuccess,
+                    }"
+                    x-on:click.prevent="copyUrl"
+            >
+                Copy URL
+                <svg x-show="!showCopySuccess" class="ml-1 -mr-0.5 h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                </svg>
+
+                <svg x-show="showCopySuccess" class="ml-1 -mr-0.5 h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            </button>
+
+            <a href="{{ element.getUrl() }}" target="_blank" class="-mt-1 mb-1 inline-flex items-center px-1.5 py-0.5 border border-transparent text-xs font-medium rounded text-action-700 bg-action-100 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500">
+                View
+                <svg class="ml-1 -mr-0.5 h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                </svg>
+            </a>
+        {% endif %}
+    </div>
+
+    <input type="text"
+           name="slug"
+           id="slug"
+           x-model="slug"
+           x-on:blur="formatValue(slug)"
+           x-on:update-from-title="formatValue($event.target.value)"
+           value="{{ value }}"
+           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+    >
+</div>

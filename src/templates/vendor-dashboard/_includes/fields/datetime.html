@@ -1,0 +1,21 @@
+{% set value = null %}
+{% if element %}{% set value = element[attribute] %}{% endif %}
+<div>
+    <label for="{{ attribute }}" class="block text-sm font-medium text-gray-700">
+        {{ label }}
+    </label>
+    <div id="{{ attribute }}" class="relative grid gap-2 grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
+        <div>
+            {% include '_market/_includes/datepicker' with {
+                attribute: attribute~'[date]',
+                value: value ? value.date|date('Y-m-d') : null
+            } only %}
+        </div>
+        <div>
+            {% include '_market/_includes/timepicker' with {
+                attribute: attribute~'[time]',
+                value: value ? value.date|date('g:i A') : ''
+            } only %}
+        </div>
+    </div>
+</div>

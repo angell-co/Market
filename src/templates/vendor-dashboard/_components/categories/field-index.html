@@ -1,0 +1,266 @@
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+
+{# Handle original ids param which is from the initial page load #}
+{% if not sprig.isRequest %}
+    {% set selectedIds = _originalIds %}
+{% endif %}
+
+
+{# Grab the ids from parent context #}
+{% if selectedIds[_fieldHandle] is defined and selectedIds[_fieldHandle] is not empty %}
+    {% set selectedIds = selectedIds[_fieldHandle] %}
+{% endif %}
+
+
+{# Convert to array #}
+{% if selectedIds is not iterable %}
+    {% set selectedIds = selectedIds|split(',') %}
+{% endif %}
+
+
+{# Filter out duplicates and empties #}
+{% set selectedIds = selectedIds|filter|unique %}
+
+
+{# Process the removed ID if there is one #}
+{% if removedId is defined %}
+    {% set removedCat = craft.categories.id(removedId).one() %}
+    {% set childIds = removedCat.descendants.ids() %}
+    {% set filterIds = childIds|push(removedCat.id) %}
+    {% set selectedIds = selectedIds|filter((v, k) => v not in filterIds) %}
+{% endif %}
+
+
+{# Enforce branch limit etc #}
+{# TODO: multi-site #}
+{% set selectedCats = craft.categories.id(selectedIds).anyStatus().all() %}
+{% set selectedCats = market.prepStructuredElementsForField(selectedCats, _branchLimit) %}
+{% set preppedSelectedIds = selectedCats|map(c => c.id) %}
+{% set limitError = false %}
+{% if selectedIds|length > preppedSelectedIds|length %}
+    {% set limitError = true %}
+{% endif %}
+{% set selectedIds = preppedSelectedIds %}
+
+
+{# Run the queries for the actual display of the index #}
+{% set group = craft.app.getCategories().getGroupByUid(_groupUid) %}
+
+{% set query = query ?? '' %}
+
+{# TODO: multi-site #}
+{% set categoriesQuery = craft.categories
+    .groupId(group.id)
+    .limit(null)
+    .search(query)
+%}
+
+{% set categories = categoriesQuery.all() %}
+
+{# Panel middle #}
+<div id="field-{{ _fieldId }}-categories-index-container" class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
+
+    {# Search #}
+    <div class="mb-4">
+        <label for="query" class="block text-sm font-medium text-gray-700">Search</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                {# Heroicon name: search #}
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <input sprig
+                   s-trigger="keyup changed delay:250ms"
+                   s-replace="#field-{{ _fieldId }}-categories-index-results"
+                   s-val:selected-ids="{{ selectedIds|join(',') }}"
+                   x-ref="searchInput"
+                   type="text" name="query" id="query"
+                   class="block w-full pl-10 sm:text-sm border border-gray-300 focus:border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                   placeholder="Search categories"
+                   value="{{ query }}"
+            >
+        </div>
+    </div>
+
+    {# Results #}
+    <div id="field-{{ _fieldId }}-categories-index-results" class="relative">
+
+        {# And display #}
+        {% if categories %}
+
+            {# Results list #}
+            <ul class="mt-1">
+                {% nav category in categories %}
+                    <li class="mb-1">
+                        <button sprig
+                                x-on:htmx:before-request="trackScroll"
+                                {% if category.id in selectedIds %}
+                                    {% set childIds = category.descendants.ids() %}
+                                    {% set filterIds = childIds|push(category.id) %}
+                                    s-val:selected-ids="{{ selectedIds|filter(v => v not in filterIds)|join(',') }}"
+                                {% else %}
+                                    {% set ancestorIds = category.ancestors.ids() %}
+                                    {% set addIds = ancestorIds|push(category.id)|join(',') %}
+                                    s-val:selected-ids="{{ selectedIds|push(addIds)|join(',') }}"
+                                {% endif %}
+                                type="button"
+                                class="category-toggle group inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                        >
+                            {{ category.title }}
+
+                            {% if category.id in selectedIds %}
+                                <svg class="group-hover:hidden group-focus:hidden flex-shrink-0 ml-0.5 h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <svg class="hidden group-hover:block group-focus:block flex-shrink-0 ml-0.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            {% endif %}
+                        </button>
+
+                        {% ifchildren %}
+                            <ul class="mt-1 mb-4 ml-5">
+                                {% children %}
+                            </ul>
+                        {% endifchildren %}
+                    </li>
+                {% endnav %}
+            </ul>
+
+        {% elseif query %}
+
+            {# No results #}
+            <div class="rounded-md shadow-md bg-red-100 border border-red-300 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {# Heroicon name: emoji-sad #}
+                        <svg class="h-5 w-5 text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Oh no!
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 space-y-2">
+                            <p>We couldn’t find anything for <strong>“{{ query }}”</strong>, try being less specific or using different keywords.</p>
+                        </div>
+                        <div class="mt-4">
+                            <div class="-mx-2 -my-1.5 flex">
+                                <button sprig
+                                        s-val:query=""
+                                        s-val:selected-ids="{{ selectedIds|join(',') }}"
+                                        type="button"
+                                        class="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-100 focus:ring-red-600"
+                                >
+                                    Reset search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if limitError %}
+            <div class="fixed z-30 top-16 right-0 w-96 flex flex-col space-y-4 sm:space-y-6 items-end justify-center p-4 sm:p-6 pointer-events-none">
+                <div x-data="{ show: true, pointerActive: false }"
+                     x-init="() => { setTimeout(() => show = false, 5000) }"
+                     x-show="show || pointerActive"
+                     x-cloak
+                     x-on:mouseenter="pointerActive = true"
+                     x-transition:enter="transform ease-out duration-300 transition"
+                     x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                     x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+                >
+                    <div class="p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                {# Heroicon name: outline/x-circle #}
+                                <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-3 w-0 flex-1 pt-0.5">
+                                <p class="text-sm font-medium text-gray-900">
+                                    Limit reached
+                                </p>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Please deselect some categories before adding more
+                                </p>
+                                <div class="mt-2">
+                                    <button sprig
+                                            s-replace="#field-{{ _fieldId }}-categories-index-results"
+                                            s-val:selected-ids=""
+                                            type="button"
+                                            class="bg-white rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        Clear selection
+                                    </button>
+                                    <button type="button"
+                                            x-on:click.prevent="show = false; pointerActive = false"
+                                            class="ml-6 bg-white rounded-md text-sm font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        Dismiss
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 flex">
+                                <button type="button"
+                                        x-on:click.prevent="show = false; pointerActive = false"
+                                        class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                                >
+                                    <span class="sr-only">Close</span>
+                                    {# Heroicon name: solid/x #}
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{# Panel footer #}
+<div class="flex-none h-40 border-t">
+    <div class="flex justify-end items-center py-6 px-4 sm:px-6">
+        {# Right half #}
+        <div>
+            <button x-on:click.prevent="open = false"
+                    type="button"
+                    class="ml-4 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+            >
+                Cancel
+            </button>
+            <button sprig
+                    s-val:selected-ids="{{ selectedIds|join(',') }}"
+                    s-swap="none"
+                    x-on:htmx:after-request="onSave('{{ selectedIds|join(',') }}')"
+                    id="field-{{ _fieldId }}-categories-index-save"
+                    type="button"
+                    class="inline-flex items-center ml-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+            >
+                <span class="htmx-indicator h-3">
+                    <svg class="animate-spin -ml-1 -mt-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                        <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                    </svg>
+                </span>
+                Save
+            </button>
+        </div>
+    </div>
+</div>

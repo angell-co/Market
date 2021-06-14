@@ -1,0 +1,106 @@
+{% set currentVendor = market.vendors.getCurrentVendor() %}
+{% set generalVariantErrors = element.getErrors('variants') %}
+<div{% if generalVariantErrors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
+    <div class="flex">
+        <div class="flex-grow">
+            <label for="variants" class="block text-sm font-medium text-gray-700">
+                {{ 'Variants'|t('commerce') }}
+                <span class="text-red-600">*</span>
+            </label>
+        </div>
+
+        {% if generalVariantErrors %}
+            <div class="ml-3 leading-1 space-y-1.5">
+                {% for error in generalVariantErrors %}
+                    <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="flex-shrink-0 ml-3">
+                {# Heroicon name: solid/exclamation-circle #}
+                <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        {% endif %}
+    </div>
+
+    <input type="hidden" name="variants" value="">
+
+    <div id="variants-list" class="mt-2 space-y-6">
+        {% set count = 0 %}
+        {% for variant in element.variants %}
+            {% if variant.id %}
+                {% set variantKey = variant.id %}
+            {% else %}
+                {% set count = count + 1 %}
+                {% set variantKey = 'new'~count %}
+            {% endif %}
+
+            {% set variantErrors = variant.getErrors() %}
+
+            <div x-data="Market.variantBlock()"
+                 x-init="initBlock({{ variant.isDefault ? 'true' : 'false' }}, {{ variant.enabled ? 'true' : 'false' }}, false, '{{ variant.title }}')"
+                 class="variant-block bg-white shadow rounded-md relative{% if variantErrors %} border border-red-500{% endif %}"
+                 x-show="visible"
+                 x-on:update-from-title="updateTitle"
+                 x-on:make-default="isDefault = true"
+                 x-transition:enter="ease-in-out duration-500"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in-out duration-500"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+            >
+
+                {% if variantErrors %}
+                    <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                {% endif %}
+
+                {% include '_market/_includes/variant-block-header.html' with {
+                    enabled: variant.enabled,
+                    isDefault: variant.isDefault
+                }%}
+
+                <div x-show="isExpanded"
+                     class="bg-gray-50 px-2 py-2.5 sm:p-3 rounded-b-md grid gap-3 grid-cols-2"
+                >
+                    {# Title #}
+                    {% include '_market/_includes/fields/title.html' with {
+                        value: variant ? variant.title : '',
+                        errors: variant ? variant.getErrors('title') : [],
+                        name: 'variants['~variantKey~'][title]',
+                        id: 'variants-'~variantKey~'-title',
+                        updateVariantTitle: true
+                    } only %}
+
+                    {% include '_market/_includes/variant-fields' with {
+                        vendorCode: currentVendor.code
+                    } %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {{ sprig('_market/_components/add-variant', {
+        startingCount: element.variants|length
+    }, {
+        'id': 'add-variants',
+        'class': 'mt-6'
+    }) }}
+</div>
+
+<script type="text/javascript">
+    // Sortable - wait for main js bundles to be executed
+    window.onload = (event) => {
+        var el = document.querySelector("#variants-list");
+        if (el) {
+            new Market.Sortable(el, {
+                ghostClass: 'opacity-10',
+                handle: '.variant-drag-handle',
+                draggable: '.variant-block',
+                group: 'variants'
+            });
+        }
+    };
+</script>

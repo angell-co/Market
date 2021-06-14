@@ -1,0 +1,19 @@
+{% requireAdmin %}
+
+{% extends "market/_layouts/cp" %}
+
+{% set title = "Market Settings"|t('market') %}
+
+{% set selectedSubnavItem = 'settings' %}
+
+{% set navItems = {
+    general: { label: "General"|t('market'), url: url('market/settings/general') },
+    vendors: { label: "Vendors"|t('market'), url: url('market/settings/vendors') },
+    stripe: { label: "Stripe"|t('market'), url: url('market/settings/stripe') },
+} %}
+
+{% set docTitle = navItems[selectedNavItem].label~' - '~title %}
+
+{% block sidebar %}
+    {% include "_includes/nav" with { items: navItems, selectedItem: selectedNavItem } only %}
+{% endblock %}

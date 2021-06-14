@@ -1,0 +1,29 @@
+<div>
+    <label for="variants-{{ variantKey }}-minQty" class="block text-sm font-medium text-gray-700">
+        {{ 'Min Qty'|t('commerce') }}
+    </label>
+
+    <input type="number"
+           step="1"
+           min="0"
+           id="variants-{{ variantKey }}-minQty"
+           name="variants[{{ variantKey }}][minQty]"
+           value="{{ minValue }}"
+           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+    >
+</div>
+
+<div>
+    <label for="variants-{{ variantKey }}-minQty" class="block text-sm font-medium text-gray-700">
+        {{ 'Max Qty'|t('commerce') }}
+    </label>
+
+    <input type="number"
+           step="1"
+           min="0"
+           id="variants-{{ variantKey }}-maxQty"
+           name="variants[{{ variantKey }}][maxQty]"
+           value="{{ maxValue }}"
+           class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+    >
+</div>

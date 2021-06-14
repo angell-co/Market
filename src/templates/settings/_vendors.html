@@ -1,0 +1,71 @@
+{% extends 'market/_layouts/settings' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set fullPageForm = true %}
+
+{% set selectedNavItem = 'vendors' %}
+
+{# TODO: multi-site #}
+
+{% block content %}
+
+    {{ actionInput('market/settings/save-vendors') }}
+    {{ redirectInput('market/settings/vendors') }}
+
+    {% if settings.id %}
+        {{ hiddenInput('settingsId', settings.id) }}
+    {% endif %}
+
+    {{ forms.textField({
+        first: true,
+        label: 'URL Format'|t('app'),
+        instructions: 'What the vendor URLs should look like. You can include tags that output vendor properties, such as {ex1} or {ex2}.'|t('market', params = { ex1: '<code>{slug}</code>', ex2: '<code>{user.username}</code>' }),
+        id: 'urlFormat',
+        class: 'code',
+        name: 'urlFormat',
+        value: settings.urlFormat ? settings.urlFormat : 'shop/{slug}',
+        errors: settings.getErrors('urlFormat'),
+        required: true
+    }) }}
+
+    {{ forms.textField({
+        label: 'Template'|t('app'),
+        instructions: 'The template to use when a vendor’s URL is requested.'|t('market'),
+        id: 'template',
+        name: 'template',
+        value: settings.template ? settings.template : 'marketplace/vendors/_entry',
+        errors: settings.getErrors('template')
+    }) }}
+
+    {{ forms.selectField({
+        id: 'volumeId',
+        name: 'volumeId',
+        label: 'Asset Volume'|t('app'),
+        instructions: 'The asset volume that should used to store this vendor’s files.'|t('market'),
+        options: volumeOptions,
+        value: settings.volumeId,
+        errors: settings.getErrors('volumeId'),
+        required: true,
+    }) }}
+
+    {{ forms.selectField({
+        id: 'shippingOriginId',
+        name: 'shippingOriginId',
+        label: 'Default Shipping Origin'|t('market'),
+        instructions: 'Where Vendors will ship from by default, they won’t be able to change this in their shipping profiles but admins can in the cp.'|t('market'),
+        options: countryOptions,
+        value: settings.shippingOriginId,
+        errors: settings.getErrors('shippingOriginId'),
+        required: true,
+    }) }}
+
+    <hr>
+
+    {{ forms.fieldLayoutDesignerField({
+        fieldLayout: craft.app.fields.getLayoutByType(
+            'angellco\\market\\elements\\Vendor'
+        ),
+    }) }}
+
+{% endblock %}

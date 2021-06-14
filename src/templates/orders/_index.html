@@ -1,0 +1,53 @@
+{% extends 'market/_layouts/cp' %}
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+{% do view.registerTranslations('market', [
+    'No orders available.',
+    'Orders',
+    'Date Ordered',
+    'Search orders by customer name, email, or order number…',
+]) %}
+
+{% set title = 'Orders'|t('market') %}
+{% set selectedSubnavItem = 'orders' %}
+
+{% block content %}
+    <div id="orders-vue-admin-table"></div>
+{% endblock %}
+
+{% js %}
+var columns = [
+    { name: '__slot:title', title: Craft.t('app', 'Name'), sortField: 'billingName' },
+    { name: 'email', title: Craft.t('app', 'Email'), sortField: 'email' },
+    { name: 'orders', title: Craft.t('market', 'Orders'), callback: function(value) {
+        if (!value) {
+            return '';
+        }
+
+        var output = '';
+
+        if (value && value.length) {
+            for (var i = 0; i < value.length; i++) {
+                output += '<a href="'+value[i].cpEditUrl+'">'+value[i].reference+'</a>';
+                if (i < (value.length - 1)) {
+                    output += ', ';
+                }
+            }
+        }
+
+        return output;
+    } },
+    { name: 'total', title: Craft.t('market', 'total') },
+    { name: 'dateOrdered', title: Craft.t('market', 'Date Ordered'), sortField: 'dateOrdered' },
+];
+
+new Craft.VueAdminTable({
+    columns: columns,
+    container: '#orders-vue-admin-table',
+    emptyMessage: Craft.t('market', 'No orders available.'),
+    padded: true,
+    search: true,
+    searchPlaceholder: Craft.t('market', 'Search orders by customer name, email, or order number…'),
+    tableDataEndpoint: Craft.getActionUrl('market/order-groups/orders-table'),
+});
+{% endjs %}
+

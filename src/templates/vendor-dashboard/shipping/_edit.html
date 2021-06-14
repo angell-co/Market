@@ -1,0 +1,212 @@
+{% extends "_market/_layouts/main" %}
+
+{% set currentVendor = market.vendors.getCurrentVendor() %}
+{% set vendorSettings = market.plugin.getVendorSettings().getSettings() %}
+{% set shippingZones = craft.commerce.getShippingZones().getAllShippingZones() %}
+{% set currentCurrency = craft.commerce.getPaymentCurrencies().primaryPaymentCurrency %}
+{% set site = craft.app.getSites().currentSite %}
+{% set title = 'Create new shipping profile'|t('market') %}
+
+{% if profileId is defined and profileId != null %}
+    {% if shippingProfile is not defined %}
+        {% set shippingProfile = market.plugin.shippingProfiles.getShippingProfileById(profileId) %}
+    {% endif %}
+    {% if not shippingProfile %}{% exit 404 %}{% endif %}
+    {% set title = shippingProfile.name %}
+{% elseif shippingProfile is not defined %}
+    {% set shippingProfile = create({
+        class: 'angellco\\market\\models\\ShippingProfile',
+        vendorId: currentVendor.id
+    }) %}
+{% endif %}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/shipping'),
+        label: 'Shipping'|t('market')
+    },
+    {
+        url: craft.app.request.getUrl,
+        label: title
+    }
+] %}
+
+{% block content %}
+    <form x-data="{
+              saveAndReload: '{{ ('market/shipping/{id}')|hash }}',
+          }"
+          x-on:keydown.window.cmd.s.prevent="$refs.redirectInput.value = saveAndReload; $el.submit();"
+          method="POST"
+          class="py-6"
+    >
+        {{ csrfInput() }}
+        {{ actionInput('market/shipping/save-shipping-profile') }}
+
+        <input type="hidden"
+               name="redirect"
+               value="{{ 'market/shipping'|hash }}"
+               x-ref="redirectInput"
+        >
+        {% if shippingProfile is defined and shippingProfile.id %}{{ hiddenInput('profileId', shippingProfile.id) }}{% endif %}
+        {{ hiddenInput('vendorId', currentVendor.id) }}
+        {{ hiddenInput('originCountryId', vendorSettings.shippingOriginId) }}
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+
+            {# Header #}
+            <div class="lg:flex lg:items-center lg:justify-between mb-4">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                        {{ title }}
+                    </h1>
+                </div>
+
+                {# Actions #}
+                <div class="mt-5 flex lg:mt-0 lg:ml-4">
+                    {# Save #}
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500">
+                        {# Heroicon name: save #}
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+                        </svg>
+                        {{ 'Save'|t('market') }}
+                    </button>
+                </div>
+            </div>
+
+            {# Main #}
+            <div class="shadow rounded-md overflow-hidden">
+                <div class="px-4 py-5 bg-white sm:p-6">
+
+                    <div class="lg:grid lg:grid-cols-3 lg:gap-6">
+
+                        {# Left col #}
+                        <div class="space-y-6">
+                            {# Name #}
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700">
+                                    {{ 'Name'|t('app') }}
+                                    <span class="text-red-600">*</span>
+                                </label>
+
+                                <p class="text-xs text-gray-500">{{ 'What this shipping profile will be called, this will be seen by customers during checkout.'|t('market') }}</p>
+
+                                <input type="text"
+                                       name="name"
+                                       id="name"
+                                       value="{{ shippingProfile ? shippingProfile.name : '' }}"
+                                       class="mt-1 focus:ring-action-500 focus:border-action-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                >
+                            </div>
+
+                            {# Processing Time #}
+                            <div>
+                                <label for="processingTime" class="block text-sm font-medium text-gray-700">
+                                    {{ 'Processing Time'|t('market') }}
+                                    <span class="text-red-600">*</span>
+                                </label>
+
+                                <p class="text-xs text-gray-500">{{ 'How long it takes you to ship this item.'|t('market') }}</p>
+
+                                <select id="processingTime"
+                                        name="processingTime"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-action-500 focus:border-action-500 sm:text-sm rounded-md"
+                                >
+                                    {% for option in market.shippingProfileHelper.processingTimeOptions() %}
+                                        <option {{ shippingProfile and option.value == shippingProfile.processingTime ? 'selected' }} value="{{ option.value }}">{{ option.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        {# Right col #}
+                        <div class="mt-6 lg:mt-0 lg:col-span-2">
+
+                            {% set generalDestinationErrors = shippingProfile.getErrors('shippingDestinations') %}
+                            <div{% if generalDestinationErrors %} class="ring-1 ring-red-500 ring-offset-8 rounded-sm mb-8 sm:ring-offset-12 sm:mb-10"{% endif %}>
+                                <div class="flex">
+                                    <div class="flex-grow">
+                                        <label for="variants" class="block text-sm font-medium text-gray-700">
+                                            {{ 'Shipping Costs'|t('market') }}
+                                            <span class="text-red-600">*</span>
+                                        </label>
+                                    </div>
+
+                                    {% if generalDestinationErrors %}
+                                        <div class="ml-3 leading-1 space-y-1.5">
+                                            {% for error in generalDestinationErrors %}
+                                                <p class="text-sm text-red-600">{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="flex-shrink-0 ml-3">
+                                            {# Heroicon name: solid/exclamation-circle #}
+                                            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <p class="text-xs text-gray-500">{{ 'Add a shipping cost for each destination you ship to.'|t('market') }}</p>
+
+                                <input type="hidden" name="destinations" value="">
+
+                                <div id="destinations-list" class="mt-2 space-y-6">
+                                    {% set count = 0 %}
+                                    {% for destination in shippingProfile.getShippingDestinations() %}
+                                        {% if destination.id %}
+                                            {% set destinationKey = destination.id %}
+                                        {% else %}
+                                            {% set count = count + 1 %}
+                                            {% set destinationKey = 'new'~count %}
+                                        {% endif %}
+
+                                        {% set destinationErrors = destination.getErrors() %}
+
+                                        <div x-data="Market.shippingDestinationBlock()"
+                                             x-init="initBlock(false, {{ shippingZones|length }})"
+                                             class="destination-block bg-white shadow rounded-md relative{% if destinationErrors %} border border-red-500{% endif %}"
+                                             x-show="visible"
+                                             x-transition:enter="ease-in-out duration-500"
+                                             x-transition:enter-start="opacity-0"
+                                             x-transition:enter-end="opacity-100"
+                                             x-transition:leave="ease-in-out duration-500"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                        >
+
+                                            {% if destinationErrors %}
+                                                <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                            {% endif %}
+
+                                            {% include '_market/_includes/shipping-destination-block.html' %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                {{ sprig('_market/_components/add-destination', {
+                                    startingCount: shippingProfile.getShippingDestinations()|length,
+                                    _limit: shippingZones|length
+                                }, {
+                                    'id': 'add-destinations',
+                                    'class': 'mt-6'
+                                }) }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {# Delete action #}
+            {% if shippingProfile.id %}
+                <div class="mt-6 text-right">
+                    {{ sprig('_market/_components/delete-shipping-profile', {
+                        _profileId: shippingProfile.id
+                    }) }}
+                </div>
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

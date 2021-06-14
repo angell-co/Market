@@ -1,0 +1,29 @@
+{% set value = '' %}
+{% if element %}{% set value = element.getFieldValue(field.handle).all() %}{% endif %}
+
+<div>
+    <label for="field-{{ field.id }}" class="block text-sm font-medium text-gray-700">
+        {{ field.name }}
+        {% if field.required %}<span class="text-red-600">*</span>{% endif %}
+    </label>
+
+    {% if field.instructions %}
+        <p class="text-xs text-gray-500">{{ field.instructions|md(inlineOnly = true) }}</p>
+    {% endif %}
+
+    {{ hiddenInput('fields['~field.handle~']', '') }}
+
+    {% set value = element.getFieldValue(field.handle) %}
+    {% set selectedIds = value ? value.ids()|join(',') : '' %}
+
+    {{ sprig('_market/_components/categories/field', {
+        _fieldId: field.id,
+        _fieldHandle: field.handle,
+        _branchLimit: field.branchLimit ?? null,
+        _groupUid: field.source|split('group:')[1],
+        _originalIds: selectedIds
+    }, {
+        id: 'field-'~field.id,
+        class: 'field-categories'
+    }) }}
+</div>

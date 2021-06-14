@@ -1,0 +1,17 @@
+{% extends "_market/_layouts/main" %}
+
+{% set title = 'Products'|t('market') %}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/products'),
+        label: title
+    }
+] %}
+
+{% block content %}
+    <div class="py-6">
+        {{ sprig('_market/_components/products-index') }}
+    </div>
+{% endblock %}
+

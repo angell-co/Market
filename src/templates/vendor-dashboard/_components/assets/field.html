@@ -1,0 +1,314 @@
+{##
+ # Selected IDs will be always present, initially it will be whatever is stored in the field
+ # It may be a comma separated string, so we need to split that into an array
+ #}
+
+{% if selectedIds is not defined %}
+    {% set selectedIds = [] %}
+{% endif %}
+
+{% if not sprig.isRequest %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): _originalIds
+    }) %}
+{% endif %}
+
+{% if selectedIds[_fieldHandle] is not iterable %}
+    {% if selectedIds[_fieldHandle] is not empty %}
+        {% set selectedIds = selectedIds|merge({
+            (_fieldHandle): selectedIds[_fieldHandle]|split(',')
+        }) %}
+    {% else %}
+        {% set selectedIds = selectedIds|merge({
+            (_fieldHandle): []
+        }) %}
+    {% endif %}
+{% endif %}
+
+
+{# If the field values are submitted, then we need to use them to sort the selectedIds by #}
+{% if fields is defined and fields[_fieldHandle] is defined %}
+    {% set sortedIds = [] %}
+
+    {% for id in fields[_fieldHandle] %}
+        {% if id in selectedIds[_fieldHandle] %}
+            {% set sortedIds = sortedIds|push(id) %}
+        {% endif %}
+    {% endfor %}
+
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): sortedIds|merge(selectedIds[_fieldHandle])|filter|unique
+    }) %}
+{% endif %}
+
+
+{# Process the removed ID if there is one #}
+{% if removedId is defined %}
+    {% set selectedIds = selectedIds|merge({
+        (_fieldHandle): selectedIds[_fieldHandle]|filter((v, k) => v != removedId)
+    }) %}
+{% endif %}
+
+
+{# Now we can fetch the assets #}
+{% set assets = [] %}
+{% if selectedIds[_fieldHandle] %}
+    {% set assets = craft.assets.id(selectedIds[_fieldHandle]).fixedOrder().all() %}
+{% endif %}
+
+
+{##
+ # At this point we need to store them in a field as a string so we can update
+ # this from the asset index child component and trigger a refresh
+ #}
+{{ hiddenInput('selectedIds['~_fieldHandle~']', selectedIds[_fieldHandle]|join(','), {
+    id: 'field-'~_fieldId~'-selectedIds'
+}) }}
+
+<div class="mt-2">
+    {##
+     # Output the selected assets
+     # Sortable is wired up here, we have swap the DOM so we submit the new order
+     #}
+    <ul id="field-{{ _fieldId }}-list"
+        class="{{ _useGrid ? 'grid gap-4 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5' : 'max-w-36' }}"
+        sprig
+        s-trigger="end"
+    >
+        {% for asset in assets %}
+            <li x-data="{ visible: true, showOptions: false }" class="col-span-1 flex flex-col">
+                <div x-show="visible"
+                     x-transition:enter="ease-in-out duration-100"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="ease-in-out duration-100"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="relative cursor-pointer bg-white rounded-md overflow-hidden shadow hover:bg-gray-50"
+                >
+
+                    {# Options menu #}
+                    <div x-on:keydown.window.escape="showOptions = false"
+                         x-on:click.away="showOptions = false"
+                         class="absolute top-2 right-2 z-10"
+                    >
+                        <button x-on:click.prevent="showOptions = !showOptions"
+                                type="button"
+                                class="group relative w-8 h-8 bg-white opacity-50 hover:opacity-100 focus:opacity-100 rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                                id="asset-options-menu-{{ asset.id }}"
+                                aria-haspopup="true"
+                                x-bind:aria-expanded="showOptions"
+                        >
+                            <span class="sr-only">Open options menu</span>
+                            <span class="flex items-center justify-center h-full w-full rounded-full">
+                                {# Heroicon name: dots-vertical #}
+                                <svg class="w-5 h-5 text-action-400 group-hover:text-action-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                </svg>
+                            </span>
+                        </button>
+
+                        <div x-show="showOptions"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="origin-top-right absolute z-10 top-10 right-0 w-30 xl:w-24 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+                             role="menu" aria-orientation="vertical" aria-labelledby="asset-options-menu-{{ asset.id }}"
+                        >
+                            <div class="py-1">
+                                <a href="{{ url('market/files/'~asset.id) }}"
+                                   target="_blank"
+                                   class="group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:rounded-md focus:bg-gray-100 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                                   role="menuitem"
+                                >
+                                    {# Heroicon name: eye #}
+                                    <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    View
+                                </a>
+                            </div>
+                            <div class="py-1">
+                                <button sprig
+                                        s-val:removed-id="{{ asset.id }}"
+                                        s-swap="innerHTML settle:1s"
+                                        s-target="#field-{{ _fieldId }}"
+                                        x-on:click="visible = false"
+                                        type="button"
+                                        class="w-full group flex items-center px-4 py-2 text-sm xl:px-2 xl:py-1 xl:text-xs text-red-700 hover:bg-red-100 hover:text-red-900 focus:rounded-md focus:bg-red-100 focus:text-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        role="menuitem"
+                                >
+                                    {# Heroicon name: minus-circle #}
+                                    <svg class="mr-3 h-5 w-5 xl:mr-1 xl:h-3 xl:w-3 text-red-400 group-hover:text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Image #}
+                    <div class="flex-1 flex flex-col">
+                        <div class="aspect-w-1 aspect-h-1 relative">
+                            {% if asset.kind == 'image' %}
+                                <img class="object-cover" src="{{ asset.url({ width: 500, height: 500 }) }}" alt="{{ asset.title }}" />
+                            {% else %}
+                                <div class="object-cover">
+                                    <svg class="text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    <div class="absolute top-1/2 right-1/2 h-7 w-12 -mt-3.5 -mr-6 text-gray-400 text-lg font-bold text-center">{{ asset.extension|upper }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Title #}
+                    <div class="flex-1 flex flex-col p-2 border-t">
+                        <div class="text-sm truncate">
+                            <span class="font-medium text-gray-700">{{ asset.title }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden"
+                       name="{{ _inputName }}[]"
+                       value="{{ asset.id }}"
+                >
+            </li>
+        {% endfor %}
+    </ul>
+
+    {# Asset browser #}
+    <div x-data="Market.assetField()"
+         x-init="initField('{{ _fieldId }}')"
+    >
+
+        {# Button and spinner#}
+        <div class="flex items-center mt-4">
+
+            {# Button to trigger it if applicable #}
+            {% if _fieldLimit > assets|length %}
+                <button type="button"
+                        x-on:click.prevent="open = true; setTimeout(() => {$refs.searchInput.focus()}, 550)"
+                        class="mr-4 relative inline-flex items-center space-x-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-action-700 bg-action-100 hover:bg-action-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-action-500"
+                >
+                    {# Heroicon name: plus-circle #}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-action-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                    </svg>
+                    Add a file
+                </button>
+            {% endif %}
+
+            <span class="htmx-indicator text-gray-500">
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path class="opacity-25" stroke="currentColor" stroke-width="3" d="M10,1.5 C12.3472102,1.5 14.4722102,2.45139491 16.0104076,3.98959236 C17.5486051,5.52778981 18.5,7.65278981 18.5,10 C18.5,12.3472102 17.5486051,14.4722102 16.0104076,16.0104076 C14.4722102,17.5486051 12.3472102,18.5 10,18.5 C7.65278981,18.5 5.52778981,17.5486051 3.98959236,16.0104076 C2.45139491,14.4722102 1.5,12.3472102 1.5,10 C1.5,7.65278981 2.45139491,5.52778981 3.98959236,3.98959236 C5.52778981,2.45139491 7.65278981,1.5 10,1.5 Z"></path>
+                    <path class="opacity-75" fill="currentColor" d="M5.04093691,14.9404144 C3.77966158,13.6744079 3,11.9282538 3,10 C3,6.13400675 6.13400675,3 10,3 L10,-6.03961325e-14 C4.4771525,-6.03961325e-14 0,4.4771525 0,10 C0,12.721285 1.08698573,15.1886909 2.85045872,16.9917192 L5.04093691,14.9404144 L5.04093691,14.9404144 Z"></path>
+                </svg>
+            </span>
+
+        </div>
+
+        {# The actual asset browser / index #}
+        <div x-show="open"
+             x-cloak
+        >
+            <div class="fixed inset-0 overflow-hidden z-60">
+                <div class="absolute inset-0 overflow-hidden">
+
+                    {# Overlay #}
+                    <div x-transition:enter="ease-in-out duration-500"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in-out duration-500"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                         aria-hidden="true"
+                         x-show="open"
+                    ></div>
+
+                    {# Panel #}
+                    <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex sm:pl-16" aria-labelledby="field-{{ _fieldId }}-slide-over-heading">
+                        <div class="w-screen max-w-2xl"
+                             x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+                             x-transition:enter-start="translate-x-full"
+                             x-transition:enter-end="translate-x-0"
+                             x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
+                             x-transition:leave-start="translate-x-0"
+                             x-transition:leave-end="translate-x-full"
+                             x-on:keydown.window.escape="open = false"
+                             x-on:click.away="open = false"
+                             x-show="open"
+                        >
+                            <div class="flex flex-col h-full bg-white shadow-xl overflow-hidden">
+
+                                {# Panel header #}
+                                <div class="flex-shrink-0 justify-start shadow-xl">
+                                    <div class="py-6 px-4 bg-brand-700 sm:px-6 w-full">
+                                        <div class="flex items-center justify-between">
+                                            <h2 id="field-{{ _fieldId }}-slide-over-heading" class="text-lg font-medium text-white">
+                                                Add a file
+                                            </h2>
+                                            <div class="ml-3 h-7 flex items-center">
+                                                <button type="button"
+                                                        class="bg-brand-700 rounded-md text-brand-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                                        x-on:click.prevent="open = false"
+                                                >
+                                                    <span class="sr-only">Close panel</span>
+                                                    {# Heroicon name: outline/x #}
+                                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mt-1">
+                                            <p class="text-sm text-brand-300">
+                                                Choose a file from your library or upload a new one.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Middle and footer #}
+                                {{ sprig('_market/_components/assets/field-index', {
+                                    _fieldId: _fieldId,
+                                    _fieldLimit: _fieldLimit,
+                                    _fieldHandle: _fieldHandle,
+                                    _originalIds: selectedIds[_fieldHandle]|join(','),
+                                    _folderId: _folderId,
+                                    selectedIds: selectedIds[_fieldHandle]|join(',')
+                                }, {
+                                    's-trigger': 'load, refresh, uploadfinished',
+                                    'id' : 'field-'~_fieldId~'-assets-index',
+                                    'class' : 'flex flex-col h-full field-assets-index',
+                                    'x-on:htmx:after-swap' : 'applyScroll',
+                                }) }}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sortable - wait for htmx
+    htmx.onLoad(function(content) {
+        var el = content.querySelector("#field-{{ _fieldId }}-list");
+        if (el) {
+            new Market.Sortable(el, {
+                ghostClass: 'opacity-10'
+            });
+        }
+    });
+</script>

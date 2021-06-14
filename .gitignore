@@ -7,10 +7,7 @@
 /vendor
 
 # BUILD FILES
-/bower_components/*
-/node_modules/*
-/build/*
-/yarn-error.log
+node_modules
 
 # MISC FILES
 .cache

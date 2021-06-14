@@ -1,0 +1,182 @@
+{% extends "_market/_layouts/main" %}
+
+{% set title = 'Shop Front'|t('market') %}
+
+{% set breadcrumbs = [
+    {
+        url: craft.app.request.getUrl,
+        label: title
+    }
+] %}
+
+{% block content %}
+    <form x-data="{
+              saveAndReload: '{{ ('market/shop-front')|hash }}',
+          }"
+          x-on:keydown.window.cmd.s.prevent="$refs.redirectInput.value = saveAndReload; $el.submit();"
+          method="POST"
+          class="py-6"
+    >
+        {{ csrfInput() }}
+        {{ actionInput('market/vendors/save-vendor') }}
+
+        <input type="hidden"
+               name="redirect"
+               value="{{ 'market/shop-front'|hash }}"
+               x-ref="redirectInput"
+        >
+        {% if craft.app.getIsMultiSite() %}{{ hiddenInput('siteId', currentVendor.siteId) }}{% endif %}
+
+        {{ hiddenInput('vendorId', currentVendor.id) }}
+        {{ hiddenInput('code', currentVendor.code) }}
+        {{ hiddenInput('userId', currentVendor.userId) }}
+
+        {{ hiddenInput('successMessage', 'Shop front saved.'|hash) }}
+        {{ hiddenInput('failMessage', 'Couldn’t save shop front.'|hash) }}
+
+        {# Header #}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div class="lg:flex lg:items-center lg:justify-between mb-4">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                        {{ title }}
+                    </h1>
+                </div>
+
+                {# Actions #}
+                <div class="mt-5 flex lg:mt-0 lg:ml-4">
+                    {# Save #}
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-action-600 hover:bg-action-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-action-500">
+                        {# Heroicon name: save #}
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
+                        </svg>
+                        {{ 'Save'|t('market') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        {# Main #}
+        {% set fl = currentVendor.getFieldLayout() %}
+        {% set tabs = fl.getTabs() %}
+        {% set tabErrors = [] %}
+        {% set excludedFldElements = [
+            'craft\\fieldlayoutelements\\Heading',
+            'craft\\fieldlayoutelements\\HorizontalRule',
+            'craft\\fieldlayoutelements\\Template',
+            'craft\\fieldlayoutelements\\Tip',
+        ] %}
+
+        {% set tabContent %}
+            {% for tab in tabs %}
+                <div {% if tabs|length > 1 %}x-show="tab === '{{ tab.name|kebab }}'" x-cloak{% endif %}
+                     id="tab-{{ tab.name|kebab }}"
+                     class="shadow rounded-md overflow-hidden"
+                >
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {% for element in tab.elements %}
+                            {% if className(element) not in excludedFldElements %}
+                                {% if currentVendor.getErrors(element.attribute) %}
+                                    {% set tabErrors = tabErrors|merge([tab.id]) %}
+                                {% endif %}
+
+                                {% include '_market/_includes/fld-element' with {
+                                    uielement: element,
+                                    element: currentVendor,
+                                    excludedFieldHandles: ['holidayMode', 'holidayModeMessage'],
+                                    assetsFolderId: currentVendor.accountFolderId
+                                } only %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endset %}
+
+        <div {% if tabs|length > 1 %}x-data="Market.tabs()" x-init="initTabs('{{ (tabs|first).name|kebab }}')"{% endif %}
+             class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-4 grid grid-cols-1 gap-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3"
+        >
+            {% if tabs|length > 1 %}
+                {# Tab nav #}
+                <div class="col-span-full">
+                    {# Mobile #}
+                    <div class="sm:hidden">
+                        <label for="tabs" class="sr-only">Select a tab</label>
+                        <select x-on:change.prevent="changeTab($event.target.value)"
+                                class="block w-full focus:ring-brand-500 focus:border-brand-500 border-gray-300 rounded-md"
+                        >
+                            {% for tab in tabs  %}
+                                <option value="{{ tab.name|kebab }}"
+                                        :selected="tab === '{{ tab.name|kebab }}'"
+                                >
+                                    {{ tab.name }}
+                                    {% if tab.id in tabErrors %}⚠{% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {# Larger #}
+                    <div class="hidden sm:block">
+                        <nav class="flex space-x-4" aria-label="Tabs">
+                            {% for tab in tabs %}
+                                <a href="#{{ tab.name|kebab }}"
+                                   x-on:click.prevent="changeTab('{{ tab.name|kebab }}')"
+                                   class="px-3 py-2 font-medium text-sm rounded-md relative"
+                                   :class="{
+                                       'bg-gray-100 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-600': tab !== '{{ tab.name|kebab }}',
+                                       'bg-brand-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand-600': tab === '{{ tab.name|kebab }}'
+                                   }"
+                                >
+                                    {{ tab.name }}
+                                    {% if tab.id in tabErrors %}
+                                        <span class="absolute top-0 right-0 block h-2.5 w-2.5 transform -translate-y-1/2 translate-x-1/2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </nav>
+
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="lg:col-start-1 lg:col-span-2">
+                {# Tab content #}
+                {{ tabContent }}
+            </div>
+
+            <div class="lg:col-start-3 lg:col-span-1">
+                <div class="shadow rounded-md overflow-hidden divide-y">
+
+                    {# Core attributes #}
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        {# Slug #}
+                        {% include '_market/_includes/fields/slug.html' with {
+                            element: currentVendor
+                        } %}
+
+                        {# Profile picture #}
+                        {% include '_market/_includes/fields/assets.html' with {
+                            element: currentVendor,
+                            field: {
+                                id: 'profilePictureId',
+                                handle: 'profilePictureId',
+                                name: 'Profile Picture',
+                                required: false,
+                                instructions: null,
+                                limit: 1
+                            },
+                            value: [currentVendor.profilePictureId],
+                            selectedIds: [currentVendor.profilePictureId]|join(','),
+                            assetsFolderId: currentVendor.accountFolderId,
+                            useFieldsNamespace: false,
+                            useGrid: false
+                        } %}
+
+                    </div>
+                </div>
+            </div>
+    </form>
+{% endblock %}

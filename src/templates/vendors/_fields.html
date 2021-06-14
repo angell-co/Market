@@ -1,0 +1,54 @@
+{% macro generalMetaFields(vendor) %}
+    {%- import "_includes/forms" as forms -%}
+
+    {{ forms.textField({
+        label: "Code"|t('market'),
+        siteId: vendor.siteId,
+        id: 'code',
+        name: 'code',
+        value: vendor.code,
+        autocorrect: false,
+        autocapitalize: true,
+        placeholder: 'e.g. APC'|t,
+        required: true,
+        disabled: vendor.id is not empty,
+        errors: vendor.getErrors('code')
+    }) }}
+
+    {{ forms.textField({
+        label: "Slug"|t('app'),
+        siteId: vendor.siteId,
+        id: 'slug',
+        name: 'slug',
+        autocorrect: false,
+        autocapitalize: false,
+        value: vendor.slug,
+        placeholder: "Enter slug"|t('app'),
+        required: true,
+        errors: (vendor.getErrors('slug')|merge(vendor.getErrors('uri')))
+    }) }}
+
+{% endmacro %}
+
+{% macro stripeMeta(vendor) %}
+    {%- import "_includes/forms" as forms -%}
+
+    {% if vendor.id %}
+
+        {% set stripeInput %}
+            <div class="element small hasstatus">
+                {% if vendor.stripeUserId %}
+                    <span class="status green"></span>Connected
+                {% else %}
+                    <span class="status red"></span>Not connected
+                {% endif %}
+            </div>
+        {% endset %}
+
+        {{ forms.field({
+            id: 'stripeUserId',
+            label: 'Stripe status'|t
+        }, stripeInput) }}
+
+    {% endif %}
+{% endmacro %}

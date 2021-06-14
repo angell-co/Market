@@ -1,0 +1,18 @@
+{% extends "_market/_layouts/main" %}
+
+{% set title = 'Files'|t('market') %}
+
+{% set breadcrumbs = [
+    {
+        url: url('market/files'),
+        label: title
+    }
+] %}
+
+{% block content %}
+    <div class="py-6">
+        {{ sprig('_market/_components/assets/index', {}, {
+            id: 'files-index'
+        }) }}
+    </div>
+{% endblock %}
