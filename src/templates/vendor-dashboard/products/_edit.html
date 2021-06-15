@@ -9,6 +9,7 @@
 {% set title = 'Create new {productType} product'|t('market', {productType: productType.name}) %}
 
 {% set sidebarFields = market.plugin.getSettings().productSidebarFieldHandles %}
+{% set productTabsToExclude = market.plugin.getSettings().productTabsToExclude %}
 
 {# Sort out the product model #}
 {% if productId is defined and productId != null %}
@@ -100,7 +101,7 @@
         ] %}
 
         {% set tabContent %}
-            {% for tab in tabs %}
+            {% for tab in tabs if tab.name not in productTabsToExclude %}
                 <div x-show="tab === '{{ tab.name|kebab }}'"
                      x-cloak
                      id="tab-{{ tab.name|kebab }}"
@@ -146,7 +147,7 @@
                     <select x-on:change.prevent="changeTab($event.target.value)"
                             class="block w-full focus:ring-brand-500 focus:border-brand-500 border-gray-300 rounded-md"
                     >
-                        {% for tab in tabs  %}
+                        {% for tab in tabs if tab.name not in productTabsToExclude %}
                             <option value="{{ tab.name|kebab }}"
                                     :selected="tab === '{{ tab.name|kebab }}'"
                             >
@@ -160,7 +161,7 @@
                 {# Larger #}
                 <div class="hidden sm:block">
                     <nav class="flex space-x-4" aria-label="Tabs">
-                        {% for tab in tabs %}
+                        {% for tab in tabs if tab.name not in productTabsToExclude %}
                             <a href="#{{ tab.name|kebab }}"
                                x-on:click.prevent="changeTab('{{ tab.name|kebab }}')"
                                class="px-3 py-2 font-medium text-sm rounded-md relative"
