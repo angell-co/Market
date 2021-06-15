@@ -51,4 +51,9 @@ class Settings extends Model
      */
     public $productSidebarFieldHandles = [];
 
+    /**
+     * @var array
+     */
+    public $productTabsToExclude = [];
+
 }
