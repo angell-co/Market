@@ -370,7 +370,7 @@ class PaymentsController extends Controller
         $totalPricePence = $order->totalPrice * (10 ** $currency->minorUnit);
 
         // Figure out the commission fee of 20% of the item subtotal (excludes adjustments)
-        $fee = floor($itemSubtotalPence * 20) / 100;
+        $fee = round(($itemSubtotalPence * 20) / 100);
 
         // Final check for errors
         if (!$order->hasErrors()) {
