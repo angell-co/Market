@@ -26,6 +26,9 @@ use craft\db\Table as CraftTable;
 use yii\di\ServiceLocator;
 
 /**
+ * @property-read array $orderCountByStatus
+ * @property-read string $stripeClientId
+ *
  * @author    Angell & Co
  * @package   Market
  * @since     2.0.0
