@@ -42,9 +42,9 @@ class OrdersController extends Controller
      *
      * @return bool
      * @throws BadRequestHttpException
-     * @throws \Throwable
      * @throws ElementNotFoundException
      * @throws Exception
+     * @throws \Throwable
      */
     public function actionSetStatus(): bool
     {
@@ -60,9 +60,10 @@ class OrdersController extends Controller
             ->limit(null)
             ->id($orderIds);
 
+
         foreach ($query->all() as $order) {
             $order->orderStatusId = $statusId;
-            $elementsService->saveElement($order);
+            $elementsService->saveElement($order, false);
         }
 
         return true;
