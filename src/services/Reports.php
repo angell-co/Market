@@ -10,12 +10,14 @@
 
 namespace angellco\market\services;
 
+use angellco\market\elements\Vendor;
 use angellco\market\Market;
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\models\Address;
 use craft\commerce\models\LineItem;
+use League\Csv\CannotInsertRecord;
 use League\Csv\Writer;
 use yii\web\HttpException;
 
@@ -64,17 +66,19 @@ class Reports extends Component
     /**
      * @param array $orderIds
      * @param string $format
+     * @param Vendor|null $vendor
      * @return bool|Writer
+     * @throws CannotInsertRecord
      * @throws HttpException
-     * @throws \League\Csv\CannotInsertRecord
      */
-    public function createOrdersCsv(array $orderIds = [], string $format = 'standard')
+    public function createOrdersCsv(array $orderIds = [], string $format = 'standard', Vendor $vendor = null)
     {
         if (!$orderIds) {
             return false;
         }
 
-        if (!$vendor = Market::$plugin->getVendors()->getCurrentVendor()) {
+        // Check we’ve been given a vendor or are logged in as one
+        if (!$vendor && !$vendor = Market::$plugin->getVendors()->getCurrentVendor()) {
             throw new HttpException(403, Craft::t('market', 'Sorry you must be a Vendor to perform this action.'));
         }
 

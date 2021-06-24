@@ -51,6 +51,7 @@ use yii\web\User;
  * @property StripeSettings $stripeSettings the stripe settings service
  * @property ShippingProfiles $shippingProfiles the shipping profiles service
  * @property ShippingDestinations $shippingDestinations the shipping destinations service
+ * @property Reports $reports the reports service
  *
  * @author    Angell & Co
  * @package   Market
@@ -117,6 +118,16 @@ trait PluginTrait
     public function getCarts(): Carts
     {
         return $this->get('carts');
+    }
+
+    /**
+     * Returns the reports service
+     *
+     * @return Reports The reports service
+     */
+    public function getReports(): Reports
+    {
+        return $this->get('reports');
     }
 
     /**
