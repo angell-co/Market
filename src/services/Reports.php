@@ -73,10 +73,6 @@ class Reports extends Component
      */
     public function createOrdersCsv(array $orderIds = [], string $format = 'standard', Vendor $vendor = null)
     {
-        if (!$orderIds) {
-            return false;
-        }
-
         // Check we’ve been given a vendor or are logged in as one
         if (!$vendor && !$vendor = Market::$plugin->getVendors()->getCurrentVendor()) {
             throw new HttpException(403, Craft::t('market', 'Sorry you must be a Vendor to perform this action.'));
@@ -86,12 +82,15 @@ class Reports extends Component
             ->anyStatus()
             ->isCompleted(true)
             ->limit(null)
-            ->id($orderIds)
             ->orderBy('dateOrdered desc')
             ->relatedTo([
                 'targetElement' => $vendor->id,
                 'field' => 'vendor'
             ]);
+
+        if ($orderIds) {
+            $query->id($orderIds);
+        }
 
         // Make the row data
         $rows = [];
