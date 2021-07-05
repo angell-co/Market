@@ -97,6 +97,30 @@ class OrdersController extends Controller
     }
 
     /**
+     * Creates a CSV of all orders and downloads them.
+     *
+     * @throws BadRequestHttpException
+     * @throws \Throwable
+     */
+    public function actionExportAll()
+    {
+        $filename = 'cheerfully-given-orders';
+
+        $format = $this->request->getRequiredParam('format');
+
+        /** @var Writer $csv */
+        $csv = Market::$plugin->reports->createOrdersCsv([], $format);
+
+        if ($format === 'expanded') {
+            $filename .= '_expanded';
+        }
+
+        $csv->output($filename.'.csv');
+
+        return $this->response->sendAndClose();
+    }
+
+    /**
      * Refunds an order in full - always returns true.
      *
      * Ideal for Sprig.
