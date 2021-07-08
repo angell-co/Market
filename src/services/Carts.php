@@ -210,7 +210,7 @@ class Carts extends Component
             $personalised = (bool) $product->getFieldValue('personalised');
             $allowNotes = $personalised ?: (bool) $product->getFieldValue('allowNotes');
 
-            $array['lineItems'][] = array_merge($lineItem->toArray(), [
+            $array['lineItems'][] = array_merge($lineItem->toArray(['*'], ['snapshot']), [
                 'purchasable' => [
                     'title' => $variant->title,
                     'sku' => $variant->sku,
