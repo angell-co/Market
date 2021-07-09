@@ -125,7 +125,7 @@ class Carts extends Component
         }
 
         if ($asArray) {
-            return array_map([$this, '_cartToArray'], $this->_carts);
+            return array_map([$this, 'cartToArray'], $this->_carts);
         }
 
         return $this->_carts;
@@ -181,7 +181,7 @@ class Carts extends Component
      * @throws InvalidFieldException
      * @throws InvalidConfigException
      */
-    private function _cartToArray(Order $cart): array
+    public function cartToArray(Order $cart): array
     {
         $cart->typeCastAttributes();
 
