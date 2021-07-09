@@ -190,12 +190,7 @@ class PaymentsController extends Controller
                 }
 
                 // Add to the completed orders stack
-                $completedOrders[] = [
-                    'number' => $cart->number,
-                    'reference' => $cart->reference,
-                    'total' => $cart->totalPaidAsCurrency,
-                    'vendor' => $cart->getAttachedVendor()->title
-                ];
+                $completedOrders[] = Market::$plugin->getCarts()->cartToArray($cart);
             } catch (Exception $e) {
                 return $this->asJson([
                     'error' => $e->getMessage(),
