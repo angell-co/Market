@@ -155,6 +155,14 @@ class Vendor extends Element
     /**
      * @inheritdoc
      */
+    public static function refHandle()
+    {
+        return 'vendor';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function hasContent(): bool
     {
         return true;

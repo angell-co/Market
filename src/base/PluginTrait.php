@@ -17,6 +17,7 @@ use angellco\market\fields\ShippingProfile as ShippingProfileField;
 use angellco\market\fields\Vendors as VendorsField;
 use angellco\market\Market;
 use angellco\market\models\VendorsLinkItType;
+use angellco\market\seoelements\SeoVendor;
 use angellco\market\services\Carts;
 use angellco\market\services\Reports;
 use angellco\market\services\ShippingDestinations;
@@ -42,6 +43,7 @@ use craft\web\UrlManager;
 use craft\web\View;
 use fruitstudios\linkit\events\RegisterLinkTypesEvent;
 use fruitstudios\linkit\services\LinkitService;
+use nystudio107\seomatic\services\SeoElements;
 use yii\base\Event;
 use yii\web\User;
 
@@ -257,6 +259,14 @@ trait PluginTrait
             Event::on(User::class, User::EVENT_AFTER_LOGIN, [$this->getCarts(), 'loginHandler']);
             Event::on(User::class, User::EVENT_AFTER_LOGOUT, [$this->getCarts(), 'logoutHandler']);
         }
+
+        // Register SEOmatic element type
+        Event::on(SeoElements::class,
+            SeoElements::EVENT_REGISTER_SEO_ELEMENT_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = SeoVendor::class;
+            }
+        );
     }
 
     private function _installSiteEventListeners(): void
