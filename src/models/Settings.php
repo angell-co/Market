@@ -56,4 +56,9 @@ class Settings extends Model
      */
     public $productTabsToExclude = [];
 
+    /**
+     * @var array
+     */
+    public $vendorTabsToExclude = [];
+
 }
