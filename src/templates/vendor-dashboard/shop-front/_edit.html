@@ -69,8 +69,12 @@
             'craft\\fieldlayoutelements\\Tip',
         ] %}
 
+        {% set excludedTabs = [
+            'SEO'
+        ] %}
+
         {% set tabContent %}
-            {% for tab in tabs %}
+            {% for tab in tabs if tab.name not in excludedTabs %}
                 <div {% if tabs|length > 1 %}x-show="tab === '{{ tab.name|kebab }}'" x-cloak{% endif %}
                      id="tab-{{ tab.name|kebab }}"
                      class="shadow rounded-md overflow-hidden"
@@ -107,7 +111,7 @@
                         <select x-on:change.prevent="changeTab($event.target.value)"
                                 class="block w-full focus:ring-brand-500 focus:border-brand-500 border-gray-300 rounded-md"
                         >
-                            {% for tab in tabs  %}
+                            {% for tab in tabs if tab.name not in excludedTabs %}
                                 <option value="{{ tab.name|kebab }}"
                                         :selected="tab === '{{ tab.name|kebab }}'"
                                 >
@@ -121,7 +125,7 @@
                     {# Larger #}
                     <div class="hidden sm:block">
                         <nav class="flex space-x-4" aria-label="Tabs">
-                            {% for tab in tabs %}
+                            {% for tab in tabs if tab.name not in excludedTabs %}
                                 <a href="#{{ tab.name|kebab }}"
                                    x-on:click.prevent="changeTab('{{ tab.name|kebab }}')"
                                    class="px-3 py-2 font-medium text-sm rounded-md relative"
