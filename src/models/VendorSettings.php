@@ -11,6 +11,7 @@
 namespace angellco\market\models;
 
 use angellco\market\elements\Vendor;
+use angellco\market\Market;
 use Craft;
 use craft\base\Model;
 use craft\base\Volume;
@@ -76,6 +77,21 @@ class VendorSettings extends Model
     public $urlFormat;
 
     /**
+     * @var bool Has URLs
+     */
+    public $hasUrls = true;
+
+    /**
+     * @var string|null Name
+     */
+    public $name;
+
+    /**
+     * @var string|null Handle
+     */
+    public $handle;
+
+    /**
      * @var string UID
      */
     public $uid;
@@ -102,10 +118,10 @@ class VendorSettings extends Model
     public function __toString()
     {
         if ($this->getSite()) {
-            return Craft::t('market', 'Vendor Settings ({siteName})', ['siteName' => $this->getSite()->name]);
+            return Craft::t('market', 'Vendors ({siteName})', ['siteName' => $this->getSite()->name]);
         }
 
-        return (string) $this->id;
+        return (string) Craft::t('market', 'Vendors');
     }
 
     /**
@@ -119,6 +135,28 @@ class VendorSettings extends Model
         $rules[] = [['siteId', 'volumeId', 'shippingOriginId', 'urlFormat'], 'required'];
 
         return $rules;
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function getName(): string
+    {
+        return $this->__toString();
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function getHandle(): string
+    {
+        if ($this->getSite()) {
+            return 'vendorsettings_'.$this->getSite()->handle;
+        }
+
+        return (string) 'vendorsettings';
     }
 
     /**
@@ -263,6 +301,12 @@ class VendorSettings extends Model
         }
 
         return $config;
+    }
+
+
+    public function getSiteSettings()
+    {
+        return Market::$plugin->getVendorSettings()->getAllSettings();
     }
 
 }

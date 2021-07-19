@@ -12,6 +12,7 @@ namespace angellco\market\services;
 
 use angellco\market\db\Table;
 use angellco\market\elements\Vendor;
+use angellco\market\events\VendorSettingsEvent;
 use angellco\market\models\VendorSettings as VendorSettingsModel;
 use angellco\market\records\VendorSettings as VendorSettingsRecord;
 use Craft;
@@ -34,6 +35,7 @@ use yii\web\ServerErrorHttpException;
  *
  * TODO: multi-site
  *
+ * @property-read VendorSettingsModel[] $allSettings
  * @property-read VendorSettingsModel $settings
  *
  * @author    Angell & Co
@@ -44,6 +46,16 @@ class VendorSettings extends Component
 {
 
     public const CONFIG_VENDOR_SETTINGS_KEY = 'market.settings.vendors';
+
+    /**
+     * @event VendorSettingsEvent The event that is triggered after the settings are saved.
+     */
+    public const EVENT_AFTER_SAVE_SETTINGS = 'afterSaveSettings';
+
+    /**
+     * @event VendorSettingsEvent The event that is triggered after the settings are deleted.
+     */
+    public const EVENT_AFTER_DELETE_SETTINGS = 'afterDeleteSettings';
 
     /**
      * Returns the settings for this Site.
@@ -83,6 +95,23 @@ class VendorSettings extends Component
         }
 
         return null;
+    }
+
+    /**
+     * Returns all the vendor settings for all active sites.
+     *
+     * @return VendorSettingsModel[]
+     * @throws SiteNotFoundException
+     */
+    public function getAllSettings(): array
+    {
+        $models = [];
+
+        foreach (Craft::$app->getSites()->getAllSites() as $site) {
+            $models[$site->id] = $this->getSettings($site->id);
+        }
+
+        return $models;
     }
 
     /**
@@ -169,6 +198,7 @@ class VendorSettings extends Component
         $site = Craft::$app->getSites()->getSiteByUid($data['site']);
         $volume = Craft::$app->getVolumes()->getVolumeByUid($data['volume']);
         $settingsRecord = $this->_getSettingsRecord($uid);
+        $isNewSettings = $settingsRecord->getIsNewRecord();
 
         if (!$shippingOrigin || !$site || !$volume || !$settingsRecord) {
             return;
@@ -207,6 +237,13 @@ class VendorSettings extends Component
             throw $e;
         }
 
+        if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_SETTINGS)) {
+            $this->trigger(self::EVENT_AFTER_SAVE_SETTINGS, new VendorSettingsEvent([
+                'vendorSettings' => $this->getSettingsById($settingsRecord->id),
+                'isNew' => $isNewSettings
+            ]));
+        }
+
         // Invalidate entry caches
         Craft::$app->getElements()->invalidateCachesForElementType(Vendor::class);
     }
@@ -228,10 +265,19 @@ class VendorSettings extends Component
             return;
         }
 
+        $vendorSettings = $this->getSettingsById($record->id);
+
         // Delete its row
         Craft::$app->db->createCommand()
             ->delete(Table::VENDORSETTINGS, ['id' => $record->id])
             ->execute();
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_SETTINGS)) {
+            $this->trigger(self::EVENT_AFTER_DELETE_SETTINGS, new VendorSettingsEvent([
+                'vendorSettings' => $vendorSettings,
+            ]));
+        }
+
     }
 
     /**
