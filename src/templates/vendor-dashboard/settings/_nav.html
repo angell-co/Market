@@ -9,6 +9,7 @@
             <option value="password"{{ craft.app.request.getSegment(3) == 'password' ? ' selected' }}>Password</option>
             <option value="payments"{{ craft.app.request.getSegment(3) == 'payments' ? ' selected' }}>Payments</option>
             <option value="holiday"{{ craft.app.request.getSegment(3) == 'holiday' ? ' selected' }}>Holiday Mode</option>
+            <option value="fsc"{{ craft.app.request.getSegment(3) == 'fsc' ? ' selected' }}>FSC Licence</option>
             <option value="product-catalogue"{{ craft.app.request.getSegment(3) == 'product-catalogue' ? ' selected' }}>Product Catalogue</option>
         </select>
     </div>
@@ -53,6 +54,15 @@
                 {% endif %}
 
                 <span>Holiday Mode</span>
+            </a>
+
+            <a href="{{ url('market/settings/fsc') }}" class="{{ craft.app.request.getSegment(3) == 'fsc' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-2 lg:py-4 px-1 border-b-2 font-medium text-sm">
+                {# Heroicon name: solid/clipboard-check #}
+                <svg class="hidden lg:block {{ craft.app.request.getSegment(3) == 'fsc' ? 'text-action-500' : 'text-gray-400 group-hover:text-gray-500' }} -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>FSC Licence</span>
             </a>
 
             <a href="{{ url('market/settings/product-catalogue') }}" class="{{ craft.app.request.getSegment(3) == 'product-catalogue' ? 'border-action-500 text-action-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} group inline-flex items-center py-2 lg:py-4 px-1 border-b-2 font-medium text-sm">
