@@ -634,7 +634,7 @@ class Vendor extends Element
      */
     public function getSettings(): VendorSettings
     {
-        if ($this->_vendorSettings[$this->siteId]) {
+        if (is_array($this->_vendorSettings) && $this->_vendorSettings[$this->siteId]) {
             return $this->_vendorSettings[$this->siteId];
         }
 
