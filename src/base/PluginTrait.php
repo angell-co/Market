@@ -309,6 +309,7 @@ trait PluginTrait
                 $event->rules['market/settings/payments'] = ['template' => '_market/settings/_payments'];
                 $event->rules['market/settings/holiday'] = ['template' => '_market/settings/_holiday'];
                 $event->rules['market/settings/product-catalogue'] = ['template' => '_market/settings/_product-catalogue'];
+                $event->rules['market/settings/fsc'] = ['template' => '_market/settings/_fsc'];
 
                 $event->rules['market/login'] = ['template' => '_market/account/_login'];
                 $event->rules['market/forgot-password'] = ['template' => '_market/account/_forgot-pass'];
